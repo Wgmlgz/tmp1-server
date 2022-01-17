@@ -1,15 +1,7 @@
 import { Request, Response } from 'express'
 import mongoose from 'mongoose'
 import User from '../models/user'
-
-export const enshureAdmin = (req: any) => {
-  if (!req.user.admin) throw new Error('You are not admin')
-}
-
-export const enshureSuperAdmin = (req: any) => {
-  if (!req.user.super_admin) throw new Error('You are not super admin')
-}
-
+import { enshureSuperAdmin } from './auth'
 
 export const superAdminUpdateUser = async (req: Request, res: Response) => {
   try {

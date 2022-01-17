@@ -19,12 +19,21 @@ export const authenticateToken = (
 ) => {
   const token = req.cookies['access-token']
 
-  if (!token) return res.sendStatus(401)
+  if (!token) return res.status(401)
   jwt.verify(token, ACCESS_TOKEN_SECRET as string, (err: any, user: any) => {
-    if (err) res.sendStatus(401)
+    if (err) res.status(401)
     else req.user = user
     next()
   })
+}
+
+export const enshureAdmin = (req: any) => {
+  if (!req.user.admin && !req.user.super_admin)
+    throw new Error('You are not admin')
+}
+
+export const enshureSuperAdmin = (req: any) => {
+  if (!req.user.super_admin) throw new Error('You are not super admin')
 }
 
 export const generateAccessToken = (user: IUser) => {
@@ -143,4 +152,3 @@ export const register = (req: Request, res: Response) => {
     res.status(400).send(err.message)
   }
 }
-
