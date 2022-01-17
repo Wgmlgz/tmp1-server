@@ -10,6 +10,7 @@ import {
   REFRESH_TOKEN_EXPIRES,
   REFRESH_TOKEN_SECRET,
 } from '../config/env'
+import mongoose from 'mongoose'
 
 export const authenticateToken = (
   req: any,
@@ -52,7 +53,12 @@ export const login = async (req: Request, res: Response) => {
       if (!isMatch) {
         res.status(400).send('password is invalid')
       } else {
-        const user = { email, password }
+        const user = {
+          email,
+          password,
+          admin: db_user.admin,
+          super_admin: db_user.super_admin,
+        }
 
         const access_token = generateAccessToken(user)
         const refresh_token = generateRefreshToken(user)
@@ -87,6 +93,8 @@ export const token = async (req: Request, res: Response) => {
       const access_token = generateAccessToken({
         email: String(user.email),
         password: String(user.password),
+        admin: Boolean(user.admin),
+        super_admin: Boolean(user.super_admin),
       })
       res.cookie('access-token', access_token, { httpOnly: true })
       res.json()
@@ -125,6 +133,8 @@ export const register = (req: Request, res: Response) => {
       const new_user = new User({
         email,
         password: hashed_password,
+        admin: false,
+        super_admin: false,
       })
       await new_user.save()
       res.send('User Created')
@@ -134,10 +144,3 @@ export const register = (req: Request, res: Response) => {
   }
 }
 
-export const getUser = (req: any, res: Response) => {
-  res.json(req.user.email)
-}
-
-export const getUsers = async (req: any, res: Response) => {
-  res.json((await User.find({})).map(user => user.email))
-}

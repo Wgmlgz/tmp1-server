@@ -2,6 +2,8 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import cors from 'cors'
 import auth_routes from './routes/auth'
+import user_routes from './routes/user'
+import super_admin_routes from './routes/super_admin'
 import mongoose from 'mongoose'
 import cookieParser from 'cookie-parser'
 import { CORS_ORIGIN, MONGO_CONNECTION_URL, PORT } from './config/env'
@@ -18,6 +20,8 @@ app.use(
 )
 
 app.use('/api/auth', auth_routes)
+app.use('/api/user', user_routes)
+app.use('/api/super_admin', super_admin_routes)
 
 mongoose
   .connect(MONGO_CONNECTION_URL)
