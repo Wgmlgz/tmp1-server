@@ -3,11 +3,11 @@ import bodyParser from 'body-parser'
 import cors from 'cors'
 import auth_routes from './routes/auth'
 import mongoose from 'mongoose'
-
+import cookieParser from 'cookie-parser'
 import { CORS_ORIGIN, MONGO_CONNECTION_URL, PORT } from './config/env'
 
 const app = express()
-
+app.use(cookieParser())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(

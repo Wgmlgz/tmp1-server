@@ -16,12 +16,12 @@ export const authenticateToken = (
   res: Response,
   next: NextFunction
 ) => {
-  const authHeader = req.headers['authorization']
-  const token = authHeader?.split(' ')[1]
+  const token = req.cookies['access-token']
+
   if (!token) return res.sendStatus(401)
   jwt.verify(token, ACCESS_TOKEN_SECRET as string, (err: any, user: any) => {
-    if (err) return res.sendStatus(401)
-    req.user = user
+    if (err) res.sendStatus(401)
+    else req.user = user
     next()
   })
 }
@@ -47,8 +47,6 @@ export const login = async (req: Request, res: Response) => {
     const db_user = await User.findOne({ email: email })
     if (!db_user) throw new Error('email not registered')
 
-    let match = false
-
     bcrypt.compare(password, db_user.password, async (err, isMatch) => {
       if (err) throw err
       if (!isMatch) {
@@ -62,7 +60,10 @@ export const login = async (req: Request, res: Response) => {
         const new_refresh_token = new RefreshToken({ token: refresh_token })
         await new_refresh_token.save()
 
-        res.json({ access_token, refresh_token })
+        res.cookie('access-token', access_token, { httpOnly: true })
+        res.cookie('refresh-token', refresh_token, { httpOnly: true })
+
+        res.json({})
       }
     })
   } catch (err: any) {
@@ -71,7 +72,8 @@ export const login = async (req: Request, res: Response) => {
 }
 
 export const token = async (req: Request, res: Response) => {
-  const refreshToken = req.body.token
+  const refreshToken = req.cookies['refresh-token']
+
   if (refreshToken == null) return res.sendStatus(403)
 
   if (!(await RefreshToken.exists({ token: refreshToken })))
@@ -82,17 +84,18 @@ export const token = async (req: Request, res: Response) => {
     REFRESH_TOKEN_SECRET as string,
     (err: any, user: any) => {
       if (err) return res.sendStatus(403)
-      const accessToken = generateAccessToken({
+      const access_token = generateAccessToken({
         email: String(user.email),
         password: String(user.password),
       })
-      res.json({ accessToken: accessToken })
+      res.cookie('access-token', access_token, { httpOnly: true })
+      res.json()
     }
   )
 }
 
 export const logout = (req: Request, res: Response) => {
-  RefreshToken.deleteOne({ token: req.body.token }).then(() =>
+  RefreshToken.deleteOne({ token: req.cookies['refresh-token'] }).then(() =>
     res.sendStatus(204)
   )
 }
@@ -136,7 +139,5 @@ export const getUser = (req: any, res: Response) => {
 }
 
 export const getUsers = async (req: any, res: Response) => {
-  res.json(
-    (await User.find({})).map(user => user.email)
-  )
+  res.json((await User.find({})).map(user => user.email))
 }
