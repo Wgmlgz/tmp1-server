@@ -114,21 +114,15 @@ export const getProducts = async (req: Request, res: Response) => {
   try {
     enshureAdmin(req)
     const products = await Product.find()
-    // const res_categories = categories.map(category => {
-    //   return {
-    //     _id: category._id,
-    //     name: category.name,
-    //     descriptrion: category.descriptrion,
-    //     img: category.img,
-    //     tags: category.tags,
-    //     parent: category.parent,
-    //   }
-
-    // })
     console.log(products);
     
     res.status(200).json(products)
   } catch (err: any) {
     res.status(400).send(err.message)
   }
+}
+
+export const getImg = async (req: Request, res: Response) => {
+  const { id } = req.params
+  res.sendFile(`./upload/products/${id}`, { root: process.cwd() })
 }
