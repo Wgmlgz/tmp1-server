@@ -7,7 +7,7 @@ import path from 'path'
 import sharp from 'sharp'
 import multer from 'multer'
 import { v4 as uuidv4 } from 'uuid'
-import { resizeImg } from '../util/imgs'
+import { resizeImg100 } from '../util/imgs'
 
 sharp.cache(false)
 
@@ -50,7 +50,7 @@ export const createCategory = (req: Request, res: Response) => {
       }
 
       if (req.file) {
-        resizeImg(req.file.path)
+        resizeImg100(req.file.path)
       }
       const new_category = new Category({
         name,
