@@ -28,11 +28,13 @@ export const authenticateToken = (
 }
 
 export const enshureAdmin = (req: any) => {
+  if (!req.user) throw new Error('You are not logged in')
   if (!req.user.admin && !req.user.super_admin)
     throw new Error('You are not admin')
 }
 
 export const enshureSuperAdmin = (req: any) => {
+  if (!req.user) throw new Error('You are not logged in')
   if (!req.user.super_admin) throw new Error('You are not super admin')
 }
 
@@ -63,6 +65,7 @@ export const login = async (req: Request, res: Response) => {
         res.status(400).send('password is invalid')
       } else {
         const user = {
+          id: db_user._id,
           email,
           password,
           admin: db_user.admin,

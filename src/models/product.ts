@@ -45,7 +45,6 @@ const ProductSchema = new mongoose.Schema<IProduct>({
   },
   description: {
     type: String,
-    required: true,
     maxLength: 2000,
   },
   tags: {

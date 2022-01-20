@@ -3,16 +3,13 @@ import {
   createCategory,
   removeCategory,
   getCategories,
-  getImg,
-  upload
 } from '../controllers/categories'
 import { authenticateToken } from '../controllers/auth'
+import { createProduct, upload } from '../controllers/products'
+
 
 const router = express.Router()
 
-router.get('/', authenticateToken, getCategories)
-router.post('/', [upload.single('file'), authenticateToken], createCategory)
-router.delete('/:id', authenticateToken, removeCategory)
-router.get('/img/:id', getImg)
+router.post('/', [upload.array('imgs', 12), authenticateToken], createProduct)
 
 export default router

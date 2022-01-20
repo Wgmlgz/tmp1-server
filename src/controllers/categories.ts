@@ -5,13 +5,37 @@ import { enshureAdmin } from './auth'
 import fs from 'fs'
 import path from 'path'
 import sharp from 'sharp'
+import multer from 'multer'
+import { v4 as uuidv4 } from 'uuid'
+import { resizeImg } from '../util/imgs'
 
 sharp.cache(false)
 
-async function resizeFile(path: string) {
-  let buffer = await sharp(path).resize(100, 100).toBuffer()
-  return sharp(buffer).toFile(path)
+const UPLOAD_FILES_DIR = './upload/categories'
+
+const storage = multer.diskStorage({
+  destination(req, file, cb) {
+    cb(null, UPLOAD_FILES_DIR)
+  },
+  filename(req, file, cb) {
+    cb(null, uuidv4() + '-' + Date.now() + path.extname(file.originalname))
+  },
+})
+
+const fileFilter = (
+  req: Request,
+  file: Express.Multer.File,
+  cb: multer.FileFilterCallback
+) => {
+  const allowedFileTypes = ['image/jpeg', 'image/jpg', 'image/png']
+  if (allowedFileTypes.includes(file.mimetype)) {
+    cb(null, true)
+  } else {
+    cb(null, false)
+  }
 }
+
+export const upload = multer({ storage, fileFilter })
 
 export const createCategory = (req: Request, res: Response) => {
   try {
@@ -26,7 +50,7 @@ export const createCategory = (req: Request, res: Response) => {
       }
 
       if (req.file) {
-        resizeFile(req.file.path)
+        resizeImg(req.file.path)
       }
       const new_category = new Category({
         name,
@@ -55,6 +79,7 @@ export const removeCategory = async (req: Request, res: Response) => {
     res.status(400).send(err.message)
   }
 }
+
 export const getCategories = async (req: Request, res: Response) => {
   try {
     enshureAdmin(req)
@@ -73,4 +98,9 @@ export const getCategories = async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(400).send(err.message)
   }
+}
+
+export const getImg = async (req: Request, res: Response) => {
+  const { id } = req.params
+  res.sendFile(`./upload/categories/${id}`, { root: process.cwd() })
 }

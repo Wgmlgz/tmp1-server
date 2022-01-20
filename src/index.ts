@@ -6,6 +6,7 @@ import auth_routes from './routes/auth'
 import user_routes from './routes/user'
 import super_admin_routes from './routes/super_admin'
 import categories_routes from './routes/category'
+import products_routes from './routes/products'
 
 import mongoose from 'mongoose'
 import cookieParser from 'cookie-parser'
@@ -26,6 +27,7 @@ app.use('/api/auth', auth_routes)
 app.use('/api/user', user_routes)
 app.use('/api/super_admin', super_admin_routes)
 app.use('/api/categories', categories_routes)
+app.use('/api/products', products_routes)
 
 mongoose
   .connect(MONGO_CONNECTION_URL)
