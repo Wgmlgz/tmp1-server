@@ -1,7 +1,6 @@
 import { Request, Response } from 'express'
 import Category, { ICategory } from '../models/category'
 import mongoose from 'mongoose'
-import { enshureAdmin } from './auth'
 import fs from 'fs'
 import path from 'path'
 import sharp from 'sharp'
@@ -39,7 +38,6 @@ export const upload = multer({ storage, fileFilter })
 
 export const createCategory = (req: Request, res: Response) => {
   try {
-    enshureAdmin(req)
     let { name, descriptrion, img, tags, parent } = req.body
     tags = JSON.parse(tags)
     if (!name) throw new Error('Expected name')
@@ -69,7 +67,6 @@ export const createCategory = (req: Request, res: Response) => {
 
 export const removeCategory = async (req: Request, res: Response) => {
   try {
-    enshureAdmin(req)
     const { id } = req.params
     if (!mongoose.Types.ObjectId.isValid(id))
       return res.status(404).send(`No category with id: ${id}`)
@@ -82,7 +79,6 @@ export const removeCategory = async (req: Request, res: Response) => {
 
 export const getCategories = async (req: Request, res: Response) => {
   try {
-    enshureAdmin(req)
     const categories = await Category.find()
     const res_categories = categories.map(category => {
       return {

@@ -12,7 +12,22 @@ import {
 } from '../config/env'
 import mongoose from 'mongoose'
 
-export const authenticateToken = (
+// export const authenticateToken = (
+//   req: any,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   const token = req.cookies['access-token']
+
+//   if (!token) return res.status(401)
+//   jwt.verify(token, ACCESS_TOKEN_SECRET as string, (err: any, user: any) => {
+//     if (err) res.status(401)
+//     else req.user = user
+//     next()
+//   })
+// }
+
+export const authenticateUser = (
   req: any,
   res: Response,
   next: NextFunction
@@ -27,16 +42,56 @@ export const authenticateToken = (
   })
 }
 
-export const enshureAdmin = (req: any) => {
-  if (!req.user) throw new Error('You are not logged in')
-  if (!req.user.admin && !req.user.super_admin)
-    throw new Error('You are not admin')
+export const authenticateAdmin = (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  const token = req.cookies['access-token']
+
+  if (!token) return res.status(401)
+  jwt.verify(token, ACCESS_TOKEN_SECRET as string, (err: any, user: any) => {
+    if (err) {
+      res.status(401)
+    } else if (!user.admin && !user.super_admin) {
+      res.status(400).send('You are not super admin')
+    } else {
+      req.user = user
+      next()
+    }
+  })
 }
 
-export const enshureSuperAdmin = (req: any) => {
-  if (!req.user) throw new Error('You are not logged in')
-  if (!req.user.super_admin) throw new Error('You are not super admin')
+export const authenticateSuperAdmin = (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  const token = req.cookies['access-token']
+
+  if (!token) return res.status(401)
+  jwt.verify(token, ACCESS_TOKEN_SECRET as string, (err: any, user: any) => {
+    if (err) {
+      res.status(401)
+    } else if (!user.super_admin) {
+      res.status(400).send('You are not super admin')
+    } else {
+      req.user = user
+      next()
+    }
+  })
 }
+
+// export const enshureAdmin = (req: any) => {
+//   if (!req.user) throw new Error('You are not logged in')
+//   if (!req.user.admin && !req.user.super_admin)
+//     throw new Error('You are not admin')
+// }
+
+// export const enshureSuperAdmin = (req: any) => {
+//   if (!req.user) throw new Error('You are not logged in')
+//   if (!req.user.super_admin) throw new Error('You are not super admin')
+// }
 
 export const generateAccessToken = (user: IUser) => {
   return jwt.sign(user, ACCESS_TOKEN_SECRET as string, {

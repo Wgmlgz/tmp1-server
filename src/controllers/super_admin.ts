@@ -1,11 +1,9 @@
 import { Request, Response } from 'express'
 import mongoose from 'mongoose'
 import User from '../models/user'
-import { enshureSuperAdmin } from './auth'
 
 export const superAdminUpdateUser = async (req: Request, res: Response) => {
   try {
-    enshureSuperAdmin(req)
     const { id, admin } = req.body
     if (!id || admin === undefined) throw new Error('Please fill in all fields')
 
@@ -23,7 +21,6 @@ export const superAdminUpdateUser = async (req: Request, res: Response) => {
 
 export const superAdminGetUsers = async (req: any, res: Response) => {
   try {
-    enshureSuperAdmin(req)
     res.json(
       (await User.find({})).map(user => ({
         _id: user._id,
@@ -33,6 +30,7 @@ export const superAdminGetUsers = async (req: any, res: Response) => {
       }))
     )
   } catch (err: any) {
+    console.log(err);
     res.status(400).send(err.message)
   }
 }

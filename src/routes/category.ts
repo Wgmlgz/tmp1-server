@@ -4,15 +4,15 @@ import {
   removeCategory,
   getCategories,
   getImg,
-  upload
+  upload,
 } from '../controllers/categories'
-import { authenticateToken } from '../controllers/auth'
+import { authenticateAdmin } from '../controllers/auth'
 
 const router = express.Router()
 
-router.get('/', authenticateToken, getCategories)
-router.post('/', [upload.single('file'), authenticateToken], createCategory)
-router.delete('/:id', authenticateToken, removeCategory)
+router.get('/', authenticateAdmin, getCategories)
+router.post('/', [authenticateAdmin, upload.single('file')], createCategory)
+router.delete('/:id', authenticateAdmin, removeCategory)
 router.get('/img/:id', getImg)
 
 export default router
