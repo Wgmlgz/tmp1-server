@@ -39,6 +39,8 @@ const parseReqToProduct = (req: Request) => {
     count,
     address,
     provider,
+    mark,
+    country
   } = req.body
 
   let imgs: string[] | undefined = [],
@@ -87,10 +89,20 @@ const parseReqToProduct = (req: Request) => {
     count,
     address,
     provider,
-    user_creator_id: user.id,
+    mark,
+    country,
     changed: new Date(),
     user_changed_id: user.id,
   }
+  product.videos.forEach((video: string) => {
+    if (
+      !video.match(
+        /http(?:s?):\/\/(?:www\.)?youtu(?:be\.com\/watch\?v=|\.be\/)([\w\-\_]*)(&(amp;)?‌​[\w\?‌​=]*)?/
+      )
+    ) {
+      throw new Error('Invalid youtube link')
+    }
+  })
   return product
 }
 
@@ -102,6 +114,9 @@ export const createProduct = async (req: Request, res: Response) => {
     const product = parseReqToProduct(req)
 
     const new_product = new Product(product)
+    new_product.created = new Date()
+    const user: IUser & { id: string } = (req as any).user
+    new_product.user_creator_id = user.id
     await new_product.save()
     res.send('Product created')
   } catch (err: any) {
@@ -116,7 +131,6 @@ export const updateProduct = async (req: Request, res: Response) => {
     if (!mongoose.Types.ObjectId.isValid(id))
       return res.status(404).send(`No product with id: ${id}`)
     const old_product = await Product.findById(id)
-    // old_product.
     if (!old_product) return res.status(400).send(`Product doens't Exists`)
 
     const updated_product = parseReqToProduct(req)

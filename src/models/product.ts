@@ -21,6 +21,9 @@ export interface IProduct {
   count?: number
   provider?: string
   address?: string
+  mark?: string
+  country?: string
+  created?: Date
   user_creator_id?: string
   changed?: Date
   user_changed_id?: string
@@ -101,6 +104,15 @@ const ProductSchema = new mongoose.Schema<IProduct>({
     type: String,
     maxLength: 50,
   },
+  mark: {
+    type: String,
+    maxLength: 100,
+  },
+  country: {
+    type: String,
+    maxLength: 50,
+  },
+  created: Date,
   user_creator_id: {
     type: String,
   },

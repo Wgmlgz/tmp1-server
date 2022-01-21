@@ -1,9 +1,4 @@
 import express from 'express'
-import {
-  createCategory,
-  removeCategory,
-  getCategories,
-} from '../controllers/categories'
 import { authenticateAdmin } from '../controllers/auth'
 import {
   createProduct,
