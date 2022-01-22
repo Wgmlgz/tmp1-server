@@ -10,7 +10,7 @@ import products_routes from './routes/products'
 
 import mongoose from 'mongoose'
 import cookieParser from 'cookie-parser'
-import { CORS_ORIGIN, MONGO_CONNECTION_URL, PORT } from './config/env'
+import { CORS_ORIGIN, MONGO_CONNECTION_URL, PORT, NODE_ENV } from './config/env'
 import path from 'path'
 
 const app = express()
@@ -30,15 +30,17 @@ app.use('/api/super_admin', super_admin_routes)
 app.use('/api/categories', categories_routes)
 app.use('/api/products', products_routes)
 
-app.use(express.static(path.join(__dirname, '../build')))
 
-app.get('/static/*', function (req, res) {
-  res.sendFile(path.join(__dirname, '../build', req.url))
-})
-app.get('/*', function (req, res) {
-  res.sendFile(path.join(__dirname, '../build', 'index.html'))
-})
+if (NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../build')))
 
+  app.get('/static/*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../build', req.url))
+  })
+  app.get('/*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../build', 'index.html'))
+  })
+}
 mongoose
   .connect(MONGO_CONNECTION_URL)
   .then(() =>
