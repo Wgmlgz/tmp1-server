@@ -11,6 +11,7 @@ import products_routes from './routes/products'
 import mongoose from 'mongoose'
 import cookieParser from 'cookie-parser'
 import { CORS_ORIGIN, MONGO_CONNECTION_URL, PORT } from './config/env'
+import path from 'path'
 
 const app = express()
 app.use(cookieParser())
@@ -28,6 +29,11 @@ app.use('/api/user', user_routes)
 app.use('/api/super_admin', super_admin_routes)
 app.use('/api/categories', categories_routes)
 app.use('/api/products', products_routes)
+
+app.use(express.static(path.join(__dirname, '..', 'build')))
+app.use((req, res, next) => {
+  res.sendFile(path.join(__dirname, '..', 'build', 'index.html'))
+})
 
 mongoose
   .connect(MONGO_CONNECTION_URL)
