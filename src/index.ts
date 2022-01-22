@@ -24,16 +24,17 @@ app.use(
   })
 )
 
+app.use(express.static(path.join(__dirname, '..', 'build')))
+app.use((req, res, next) => {
+  res.sendFile(path.join(__dirname, '..', 'build', 'index.html'))
+})
+
 app.use('/api/auth', auth_routes)
 app.use('/api/user', user_routes)
 app.use('/api/super_admin', super_admin_routes)
 app.use('/api/categories', categories_routes)
 app.use('/api/products', products_routes)
 
-app.use(express.static(path.join(__dirname, '..', 'build')))
-app.use((req, res, next) => {
-  res.sendFile(path.join(__dirname, '..', 'build', 'index.html'))
-})
 
 mongoose
   .connect(MONGO_CONNECTION_URL)
