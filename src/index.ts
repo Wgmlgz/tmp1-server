@@ -32,13 +32,13 @@ app.use('/api/products', products_routes)
 
 
 if (NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../build')))
+  app.use(express.static(path.join(__dirname, '../client/build')))
 
   app.get('/static/*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../build', req.url))
+    res.sendFile(path.join(__dirname, '../client/build', req.url))
   })
   app.get('/*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../build', 'index.html'))
+    res.sendFile(path.join(__dirname, '../client/build', 'index.html'))
   })
 }
 mongoose
