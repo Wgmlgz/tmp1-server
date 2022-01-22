@@ -2,7 +2,7 @@ import axios from 'axios'
 import { ICategory } from '../app_components/categories/Categories'
 import { IProduct } from '../app_components/products/ProductsForm'
 
-export const url = process.env.REACT_APP_SERVER_URL
+export const url = process.env.REACT_APP_SERVER_URL || 'https://tmp1-server.herokuapp.com'
 export const auth_url = `${url}/api/auth`
 export const user_url = `${url}/api/user`
 export const super_admin_url = `${url}/api/super_admin`
