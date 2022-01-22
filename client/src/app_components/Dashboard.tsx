@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import 'antd/dist/antd.css'
 import { Button, Layout, Menu } from 'antd'
 import {
@@ -8,14 +8,7 @@ import {
 } from '@ant-design/icons'
 import { getUser, logout } from '../api/api'
 import SuperAdminUsers from './super_admin/SuperAdminUsers'
-import {
-  BrowserRouter as Router,
-  Navigate,
-  Route,
-  Link,
-  useParams,
-  Routes,
-} from 'react-router-dom'
+import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom'
 import Categories from './categories/Categories'
 import Products from './products/Products'
 
@@ -84,24 +77,14 @@ export default function Dashboard() {
             <Menu.Item key='1' icon={<UserOutlined />}>
               <Link to='/dashboard/users'>Users</Link>
             </Menu.Item>
-            <Menu.Item key='2' icon={<UnorderedListOutlined />}>
-              <Link to='/dashboard/categories'>Categories</Link>
-            </Menu.Item>
-            <Menu.Item key='3' icon={<AppstoreOutlined />}>
-              <Link to='/dashboard/products'>Products</Link>
-            </Menu.Item>
-            {/* <SubMenu key='sub1' icon={<UserOutlined />} title='User'>
-              <Menu.Item key='3'>Tom</Menu.Item>
-              <Menu.Item key='4'>Bill</Menu.Item>
-              <Menu.Item key='5'>Alex</Menu.Item>
+            <SubMenu key='sub1' icon={<AppstoreOutlined />} title='Products'>
+              <Menu.Item key='2' icon={<AppstoreOutlined />}>
+                <Link to='/dashboard/products'>Products</Link>
+              </Menu.Item>
+              <Menu.Item key='3' icon={<UnorderedListOutlined />}>
+                <Link to='/dashboard/categories'>Categories</Link>
+              </Menu.Item>
             </SubMenu>
-            <SubMenu key='sub2' icon={<TeamOutlined />} title='Team'>
-              <Menu.Item key='6'>Team 1</Menu.Item>
-              <Menu.Item key='8'>Team 2</Menu.Item>
-            </SubMenu>
-            <Menu.Item key='9' icon={<FileOutlined />}>
-              Files
-            </Menu.Item> */}
           </Menu>
         </Sider>
         <Content style={{ margin: '20px' }}>

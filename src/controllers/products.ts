@@ -40,7 +40,7 @@ const parseReqToProduct = (req: Request) => {
     address,
     provider,
     mark,
-    country
+    country,
   } = req.body
 
   let imgs: string[] | undefined = [],
@@ -108,8 +108,11 @@ const parseReqToProduct = (req: Request) => {
 
 export const createProduct = async (req: Request, res: Response) => {
   try {
-    const doc = await Product.findOne({ name: req.body.name })
-    if (doc) return res.status(400).send('Product Already Exists')
+    const doc1 = await Product.findOne({ name: req.body.name })
+    if (doc1) return res.status(400).send('Product already Exists')
+
+    const doc2 = await Product.findOne({ article: req.body.article })
+    if (doc2) return res.status(400).send('Product already Exists')
 
     const product = parseReqToProduct(req)
 
@@ -140,7 +143,15 @@ export const updateProduct = async (req: Request, res: Response) => {
       // @ts-ignore
       updated_product[key] === undefined ? delete updated_product[key] : {}
     )
-    console.log(updated_product)
+
+    const doc1 = await Product.findOne({ article: updated_product.article })
+    if (doc1 && doc1._id !== id)
+      return res.status(400).send('Product with this article already exists')
+
+    const doc2 = await Product.findOne({ name: updated_product.name })
+    if (doc2 && doc2._id !== id)
+      return res.status(400).send('Product with this name already Exists')
+
     await Product.findByIdAndUpdate(id, updated_product, { new: true })
     res.send('Product updated')
   } catch (err: any) {

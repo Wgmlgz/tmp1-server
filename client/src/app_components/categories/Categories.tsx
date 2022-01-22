@@ -1,17 +1,5 @@
 import React, { FC, useEffect, useRef, useState } from 'react'
-import {
-  Form,
-  Input,
-  Button,
-  Alert,
-  Upload,
-  message,
-  Tag,
-  Typography,
-  Table,
-  Card,
-} from 'antd'
-import { UploadOutlined } from '@ant-design/icons'
+import { Form, Input, Button, message, Tag, Table, Card, Select } from 'antd'
 import {
   categories_url,
   createCategory,
@@ -20,6 +8,9 @@ import {
 } from '../../api/api'
 import axios from 'axios'
 import { ColumnsType } from 'antd/lib/table'
+
+const { Option } = Select
+
 export interface ICategory {
   name: string
   descriptrion?: string
@@ -34,7 +25,10 @@ export interface ICategoryFull extends ICategory {
 export default function Categories() {
   const [img, setImg] = useState<File>()
   const [tags, setTags] = useState<string[]>([])
+  const [categories, setCategories] = useState<ICategoryFull[]>([])
+
   const input_tags_ref = useRef<Input>(null)
+
   const onFinish = async ({ name, descriptrion, parent }: ICategory) => {
     const category: ICategory = { name, descriptrion, img, tags, parent }
     console.log(category)
@@ -56,7 +50,6 @@ export default function Categories() {
     if (img) setImg(img)
   }
 
-  const [categories, setCategories] = useState<ICategoryFull[]>([])
 
   const columns: ColumnsType<ICategoryFull> = [
     {
@@ -180,7 +173,11 @@ export default function Categories() {
               />
             </Form.Item>
             <Form.Item name='parent'>
-              <Input placeholder='parent' />
+              <Select>
+                {categories.map(s => (
+                  <Option value={s.name}>{s.name}</Option>
+                ))}
+              </Select>
             </Form.Item>
             <Form.Item>
               <Button

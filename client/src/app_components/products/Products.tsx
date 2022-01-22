@@ -153,28 +153,31 @@ const Products = () => {
             placeItems: 'center',
             backdropFilter: 'blur(4px)',
             backgroundColor: '#22222222',
+          }}
+          onClick={() => {
+            setEditedProductId('')
           }}>
-          <ProductsForm
-            header='Edit product'
-            button='Edit'
-            onCancel={() => {
-              setEditedProductId('')
-            }}
-            product={edited_product}
-            onSubmit={async product => {
-              try {
-                await updateProduct(product, edited_product_id)
-                await fetchProducts()
-                message.success('Product updated')
-              } catch (err) {
-                if (axios.isAxiosError(err)) {
-                  String(err.response?.data)
-                    .split(',')
-                    .forEach(msg => message.error(msg))
+          <div onClick={e => e.stopPropagation()}>
+            <ProductsForm
+              header='Edit product'
+              button='Edit'
+              onCancel={() => setEditedProductId('')}
+              product={edited_product}
+              onSubmit={async product => {
+                try {
+                  await updateProduct(product, edited_product_id)
+                  await fetchProducts()
+                  message.success('Product updated')
+                } catch (err) {
+                  if (axios.isAxiosError(err)) {
+                    String(err.response?.data)
+                      .split(',')
+                      .forEach(msg => message.error(msg))
+                  }
                 }
-              }
-            }}
-          />
+              }}
+            />
+          </div>
         </div>
       )}
     </>

@@ -4,6 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "cd client && yarn build",
+    "install-client": "cd client && yarn",
+    "heroku-postbuild": "yarn install-client && yarn build",
     "dev": "nodemon ./src/index.ts",
     "start": "ts-node ./src/index.ts"
   },

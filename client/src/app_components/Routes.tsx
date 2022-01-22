@@ -12,7 +12,7 @@ export default function AppRoutes() {
   return (
     <Router>
       <Routes>
-        <Route path='/' element={<Navigate to='/login' />} />
+        <Route path='/' element={<Navigate to='/dashboard' />} />
         <Route path='/login' element={<LoginForm />} />
         <Route path='/register' element={<RegisterForm />} />
         <Route path='/dashboard/*' element={<Dashboard />} />
@@ -20,3 +20,4 @@ export default function AppRoutes() {
     </Router>
   )
 }
+        
