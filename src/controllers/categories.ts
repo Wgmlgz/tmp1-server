@@ -7,6 +7,7 @@ import sharp from 'sharp'
 import multer from 'multer'
 import { v4 as uuidv4 } from 'uuid'
 import { resizeImg100 } from '../util/imgs'
+import Product from '../models/product'
 
 sharp.cache(false)
 
@@ -70,8 +71,25 @@ export const removeCategory = async (req: Request, res: Response) => {
     const { id } = req.params
     if (!mongoose.Types.ObjectId.isValid(id))
       return res.status(404).send(`No category with id: ${id}`)
+    const old = await Category.findById(id)
+    const old_name = old?.name
+    console.log(old_name)
+
+    await Product.updateMany({}, [
+      {
+        $set: {
+          category: {
+            $cond: {
+              if: { $eq: ['$category', old_name] },
+              then: '',
+              else: '$category',
+            },
+          },
+        },
+      },
+    ])
     await Category.findByIdAndRemove(id)
-      res.status(200).send('Deleted')
+    res.status(200).send('Deleted')
   } catch (err: any) {
     res.status(400).send(err.message)
   }
@@ -80,16 +98,14 @@ export const removeCategory = async (req: Request, res: Response) => {
 export const getCategories = async (req: Request, res: Response) => {
   try {
     const categories = await Category.find()
-    const res_categories = categories.map(category => {
-      return {
-        _id: category._id,
-        name: category.name,
-        descriptrion: category.descriptrion,
-        img: category.img,
-        tags: category.tags,
-        parent: category.parent,
-      }
-    })
+    const res_categories = categories.map(category => ({
+      _id: category._id,
+      name: category.name,
+      descriptrion: category.descriptrion,
+      img: category.img,
+      tags: category.tags,
+      parent: category.parent,
+    }))
     res.status(200).json(res_categories)
   } catch (err: any) {
     res.status(400).send(err.message)
