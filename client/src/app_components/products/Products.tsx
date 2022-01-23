@@ -1,21 +1,24 @@
-import { Button, Card, message, Select, Table } from 'antd'
+import { Button, Card, Input, message, Select, Table } from 'antd'
 import { useEffect, useState } from 'react'
 import {
   createProduct,
   getCategories,
   getProducts,
   products_url,
+  searchProducts,
   updateProduct,
 } from '../../api/api'
 import axios from 'axios'
 import { ColumnsType } from 'antd/lib/table'
 import { ICategory } from '../categories/Categories'
 import ProductsForm, { IProductFull } from './ProductsForm'
+import Search from 'antd/lib/input/Search'
 
 const { Option } = Select
 
 const Products = () => {
   const [products, setProducts] = useState<IProductFull[]>([])
+  const [product_creation, setProductCreation] = useState<boolean>(false)
   const [categories, setCategories] = useState<string[]>([])
 
   const [active_products, setActiveProducts] = useState<IProductFull[]>([])
@@ -105,41 +108,87 @@ const Products = () => {
 
   return (
     <>
-      <div style={{ display: 'flex', gap: '20px' }}>
-        <ProductsForm
-          header='Create new product'
-          button='Create'
-          onSubmit={async product => {
-            try {
-              await createProduct(product)
-              await fetchProducts()
-              message.success('Product created')
-            } catch (err) {
-              if (axios.isAxiosError(err)) {
-                String(err.response?.data)
-                  .split(',')
-                  .forEach(msg => message.error(msg))
-              }
-            }
-          }}
-        />
-        <div style={{ width: 'fit-content' }}>
-          <Card title='All products'>
-            <Select
-              placeholder='Filter by category'
-              style={{ width: '200px' }}
-              onChange={e => {
-                setActiveCategory(e)
-              }}>
-              <Option value=''>All</Option>
-              {categories.map(s => (
-                <Option value={s}>{s}</Option>
-              ))}
-            </Select>
-            <Table dataSource={active_products} columns={columns} />
-          </Card>
-        </div>
+      <div style={{ width: '100%' }}>
+        <Card
+          title='All products'
+          extra={
+            <div style={{ display: 'flex', gap: '20px' }}>
+              <Input.Search
+                placeholder='search by name'
+                onSearch={async e => {
+                  try {
+                    const res = await searchProducts(e)
+                    setProducts(res.data)
+                  } catch (e) {
+                    if (axios.isAxiosError(e)) {
+                      message.error(e.response?.data)
+                    }
+                  }
+                  console.log(e)
+                }}
+              />
+              <Button
+                style={{ backgroundColor: '#98f379' }}
+                onClick={() => {
+                  setProductCreation(true)
+                }}>
+                Create new product
+              </Button>
+              <Select
+                placeholder='Filter by category'
+                style={{ width: '200px' }}
+                onChange={e => {
+                  setActiveCategory(e)
+                }}>
+                <Option value=''>All</Option>
+                {categories.map(s => (
+                  <Option value={s}>{s}</Option>
+                ))}
+              </Select>
+            </div>
+          }>
+          <Table dataSource={active_products} columns={columns} />
+        </Card>
       </div>
+      {product_creation && (
+        <div
+          style={{
+            position: 'fixed',
+            left: 0,
+            top: 0,
+            width: '100%',
+            height: '100%',
+            zIndex: '100',
+            display: 'grid',
+            placeItems: 'center',
+            backdropFilter: 'blur(4px)',
+            backgroundColor: '#22222222',
+          }}
+          onClick={() => {
+            setProductCreation(false)
+          }}>
+          <div onClick={e => e.stopPropagation()}>
+            <ProductsForm
+              header='Create new product'
+              button='Create'
+              onSubmit={async product => {
+                try {
+                  await createProduct(product)
+                  await fetchProducts()
+                  setProductCreation(false)
+                  message.success('Product created')
+                } catch (err) {
+                  if (axios.isAxiosError(err)) {
+                    String(err.response?.data)
+                      .split(',')
+                      .forEach(msg => message.error(msg))
+                  }
+                }
+              }}
+            />
+          </div>
+        </div>
+      )}
       {edited_product_id && (
         <div
           style={{

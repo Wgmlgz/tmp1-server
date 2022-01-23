@@ -168,6 +168,18 @@ export const getProducts = async (req: Request, res: Response) => {
   }
 }
 
+export const searchProducts = async (req: Request, res: Response) => {
+  try {
+    const { str } = req.body
+
+    const products = await Product.find({ name: new RegExp(str, 'i') })
+
+    res.status(200).json(products)
+  } catch (err: any) {
+    res.status(400).send(err.message)
+  }
+}
+
 export const getImg = async (req: Request, res: Response) => {
   const { id } = req.params
   res.sendFile(`./upload/products/${id}`, { root: process.cwd() })

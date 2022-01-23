@@ -4,6 +4,7 @@ import {
   createProduct,
   getImg,
   getProducts,
+  searchProducts,
   updateProduct,
   upload,
 } from '../controllers/products'
@@ -11,6 +12,7 @@ import {
 const router = express.Router()
 
 router.post('/', [authenticateAdmin, upload.array('imgs', 12)], createProduct)
+router.post('/search', authenticateAdmin, searchProducts)
 router.patch(
   '/:id',
   [authenticateAdmin, upload.array('imgs', 12)],

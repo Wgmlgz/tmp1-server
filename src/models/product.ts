@@ -122,6 +122,7 @@ const ProductSchema = new mongoose.Schema<IProduct>({
   },
 })
 
-const ProductModel = mongoose.model('Product', ProductSchema)
+ProductSchema.index({ name: 'text' })
 
+const ProductModel = mongoose.model('Product', ProductSchema)
 export default ProductModel
