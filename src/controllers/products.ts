@@ -21,6 +21,8 @@ const storage = multer.diskStorage({
 export const upload = multer({ storage })
 
 const parseReqToProduct = (req: Request) => {
+  console.log(req.body);
+  
   let {
     type,
     category,
@@ -41,6 +43,7 @@ const parseReqToProduct = (req: Request) => {
     provider,
     mark,
     country,
+    barcode,
   } = req.body
 
   let imgs: string[] | undefined = [],
@@ -93,6 +96,7 @@ const parseReqToProduct = (req: Request) => {
     country,
     changed: new Date(),
     user_changed_id: user.id,
+    barcode,
   }
   product.videos.forEach((video: string) => {
     if (
@@ -145,11 +149,12 @@ export const updateProduct = async (req: Request, res: Response) => {
     )
 
     const doc1 = await Product.findOne({ article: updated_product.article })
-    if (doc1 && doc1._id !== id)
+    
+    if (doc1 && doc1.id !== id)
       return res.status(400).send('Product with this article already exists')
 
     const doc2 = await Product.findOne({ name: updated_product.name })
-    if (doc2 && doc2._id !== id)
+    if (doc2 && doc2.id !== id)
       return res.status(400).send('Product with this name already Exists')
 
     await Product.findByIdAndUpdate(id, updated_product, { new: true })

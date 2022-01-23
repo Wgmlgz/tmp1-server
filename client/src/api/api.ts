@@ -75,14 +75,12 @@ export const searchProducts = (str: string) =>
 export const removeProduct = (id: string) =>
   axios.delete(`${products_url}/${id}`)
 
-export const createProduct = (product: IProduct) => {
-  const config = { headers: { 'Content-Type': 'multipart/form-data' } }
+const productToFormData = (product: IProduct) => {
   let fd = new FormData()
 
   if (product.imgs) {
     Array.from(product.imgs).forEach(file => fd.append('imgs', file))
   }
-
   ;[
     'type',
     'category',
@@ -101,6 +99,7 @@ export const createProduct = (product: IProduct) => {
     'provider',
     'mark',
     'country',
+    'barcode',
   ].forEach(field => {
     // @ts-ignore
     if (product.hasOwnProperty(field) && product[field] !== undefined) {
@@ -111,51 +110,23 @@ export const createProduct = (product: IProduct) => {
 
   fd.append('tags', JSON.stringify(product.tags))
   fd.append('videos', JSON.stringify(product.videos))
-  return axios.post(`${products_url}`, fd, config)
+  return fd
 }
-
-export const updateProduct = (product: IProduct, id: string) => {
-  const config = { headers: { 'Content-Type': 'multipart/form-data' } }
-  let fd = new FormData()
-
-  if (product.imgs) {
-    Array.from(product.imgs).forEach(file => fd.append('imgs', file))
-  }
-
-  ;[
-    'type',
-    'category',
-    'article',
-    'name',
-    'description',
-    'buy_price',
-    'delivery_price',
-    'height',
-    'length',
-    'width',
-    'weight',
-    'brand',
-    'count',
-    'address',
-    'provider',
-    'mark',
-    'country',
-  ].forEach(field => {
-    // @ts-ignore
-    if (product.hasOwnProperty(field) && product[field] !== undefined) {
-      // @ts-ignore
-      fd.append(field, product[field])
-    }
+export const createProduct = (product: IProduct) =>
+  axios.post(`${products_url}`, productToFormData(product), {
+    headers: { 'Content-Type': 'multipart/form-data' },
   })
 
-  fd.append('tags', JSON.stringify(product.tags))
-  fd.append('videos', JSON.stringify(product.videos))
-  return axios.patch(`${products_url}/${id}`, fd, config)
-}
+export const updateProduct = (product: IProduct, id: string) =>
+  axios.patch(`${products_url}/${id}`, productToFormData(product), {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
 
 /** Warehouses */
 export const getWarehouses = () => axios.get(`${warehouses_url}`)
-export const createWarehouse = (warehouse: IWarehouse) => axios.post(`${warehouses_url}`, warehouse)
+export const createWarehouse = (warehouse: IWarehouse) =>
+  axios.post(`${warehouses_url}`, warehouse)
 export const updateWarehouse = (id: string, warehouse: IWarehouse) =>
   axios.patch(`${warehouses_url}/${id}`, warehouse)
-export const removeWarehouse = (id: string) => axios.delete(`${warehouses_url}/${id}`)
+export const removeWarehouse = (id: string) =>
+  axios.delete(`${warehouses_url}/${id}`)

@@ -27,6 +27,7 @@ export interface IProduct {
   user_creator_id?: string
   changed?: Date
   user_changed_id?: string
+  barcode?: string
 }
 
 const ProductSchema = new mongoose.Schema<IProduct>({
@@ -118,6 +119,9 @@ const ProductSchema = new mongoose.Schema<IProduct>({
   },
   changed: Date,
   user_changed_id: {
+    type: String,
+  },
+  barcode: {
     type: String,
   },
 })

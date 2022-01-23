@@ -40,10 +40,11 @@ export interface IProduct {
   address?: string
   mark?: string
   country?: string
-  created?: Date,
+  created?: Date
   user_creator_id?: string
   changed?: Date
   user_changed_id?: string
+  barcode?: string
 }
 
 export interface IProductFull extends IProduct {
@@ -100,6 +101,7 @@ const ProductsForm: FC<Props> = ({
     width,
     mark,
     country,
+    barcode,
     yt1,
     yt2,
     yt3,
@@ -127,8 +129,9 @@ const ProductsForm: FC<Props> = ({
         provider,
         mark,
         country,
+        barcode,
       }
-      console.log(imgs)
+      console.log(product)
 
       onSubmit(product)
     } catch (err) {
@@ -143,7 +146,20 @@ const ProductsForm: FC<Props> = ({
   return (
     <div style={{ width: '500px' }}>
       <Card title={header}>
-        <Form name='normal_login' className='login-form' onFinish={onFinish}>
+        <Form
+          name='normal_login'
+          className='login-form'
+          onFinish={onFinish}
+          initialValues={{
+            article: product?.article,
+            name: product?.name,
+            buy_price: product?.buy_price,
+            delivery_price: product?.delivery_price,
+            width: product?.width,
+            height: product?.height,
+            length: product?.length,
+            weight: product?.weight,
+          }}>
           <div style={{ overflowY: 'auto', maxHeight: '80vh' }}>
             <Collapse defaultActiveKey={['1']}>
               <Panel header='Data' key='1'>
@@ -161,6 +177,12 @@ const ProductsForm: FC<Props> = ({
                   <Input
                     defaultValue={product?.article}
                     placeholder='Article'
+                  />
+                </Form.Item>
+                <Form.Item label='Barcode' name='barcode'>
+                  <Input
+                    defaultValue={product?.barcode}
+                    placeholder='Barcode'
                   />
                 </Form.Item>
               </Panel>
