@@ -40,6 +40,7 @@ export interface IProduct {
   address?: string
   mark?: string
   country?: string
+  created?: Date,
   user_creator_id?: string
   changed?: Date
   user_changed_id?: string

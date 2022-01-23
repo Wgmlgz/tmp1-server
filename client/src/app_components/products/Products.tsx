@@ -13,6 +13,7 @@ import { ColumnsType } from 'antd/lib/table'
 import { ICategory } from '../categories/Categories'
 import ProductsForm, { IProductFull } from './ProductsForm'
 import Search from 'antd/lib/input/Search'
+import moment from 'moment'
 
 const { Option } = Select
 
@@ -79,6 +80,7 @@ const Products = () => {
       title: 'Name (click to edit)',
       dataIndex: 'name',
       key: 'name',
+      sorter: (a, b) => a.delivery_price.localeCompare(b.delivery_price),
       render: (text, record, index) => (
         <Button
           onClick={() => {
@@ -93,11 +95,20 @@ const Products = () => {
       title: 'Buy price',
       dataIndex: 'buy_price',
       key: 'buy_price',
+      sorter: (a, b) => a.buy_price.localeCompare(b.buy_price),
     },
     {
       title: 'Delivery price',
       dataIndex: 'delivery_price',
       key: 'delivery_price',
+      sorter: (a, b) => a.delivery_price.localeCompare(b.delivery_price),
+    },
+    {
+      title: 'Created',
+      dataIndex: 'created',
+      key: 'created',
+      render: (text, record, index) => moment(record.created).format('DD-MM-GGGG'),
+      sorter: (a, b) => moment(a.created).unix() - moment(b.created).unix(),
     },
     {
       title: 'Count',
