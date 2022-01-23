@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { ICategory } from '../app_components/categories/Categories'
 import { IProduct } from '../app_components/products/ProductsForm'
+import { IWarehouse } from '../app_components/warehouses/WarehouseForm'
 
 export const url =
   process.env.REACT_APP_SERVER_URL || 'https://tmp1-server.herokuapp.com'
@@ -9,6 +10,7 @@ export const user_url = `${url}/api/user`
 export const super_admin_url = `${url}/api/super_admin`
 export const categories_url = `${url}/api/categories`
 export const products_url = `${url}/api/products`
+export const warehouses_url = `${url}/api/warehouses`
 
 axios.interceptors.request.use(
   config => {
@@ -35,6 +37,7 @@ const createAxiosResponseInterceptor = () => {
 }
 createAxiosResponseInterceptor()
 
+/** Auth */
 export const getUser = () => axios.get(`${user_url}/user`)
 
 export const superAdminGetUsers = () => axios.get(`${super_admin_url}/users`)
@@ -48,6 +51,7 @@ export const register = (email: string, password: string) =>
   axios.post(`${auth_url}/register`, { email, password })
 export const refreshToken = () => axios.post(`${auth_url}/token`, {})
 
+/** Categories */
 export const getCategories = () => axios.get(`${categories_url}`)
 export const removeCategory = (id: string) =>
   axios.delete(`${categories_url}/${id}`)
@@ -62,6 +66,7 @@ export const createCategory = (category: ICategory) => {
   return axios.post(`${categories_url}`, fd, config)
 }
 
+/** Products */
 export const getProducts = () => axios.get(`${products_url}`)
 
 export const searchProducts = (str: string) =>
@@ -147,3 +152,10 @@ export const updateProduct = (product: IProduct, id: string) => {
   fd.append('videos', JSON.stringify(product.videos))
   return axios.patch(`${products_url}/${id}`, fd, config)
 }
+
+/** Warehouses */
+export const getWarehouses = () => axios.get(`${warehouses_url}`)
+export const createWarehouse = (warehouse: IWarehouse) => axios.post(`${warehouses_url}`, warehouse)
+export const updateWarehouse = (id: string, warehouse: IWarehouse) =>
+  axios.patch(`${warehouses_url}/${id}`, warehouse)
+export const removeWarehouse = (id: string) => axios.delete(`${warehouses_url}/${id}`)

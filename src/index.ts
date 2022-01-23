@@ -7,6 +7,7 @@ import user_routes from './routes/user'
 import super_admin_routes from './routes/super_admin'
 import categories_routes from './routes/category'
 import products_routes from './routes/products'
+import warehouses_routes from './routes/warehouse'
 
 import mongoose from 'mongoose'
 import cookieParser from 'cookie-parser'
@@ -29,7 +30,7 @@ app.use('/api/user', user_routes)
 app.use('/api/super_admin', super_admin_routes)
 app.use('/api/categories', categories_routes)
 app.use('/api/products', products_routes)
-
+app.use('/api/warehouses', warehouses_routes)
 
 if (NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/build')))
@@ -41,6 +42,7 @@ if (NODE_ENV === 'production') {
     res.sendFile(path.join(__dirname, '../client/build', 'index.html'))
   })
 }
+
 mongoose
   .connect(MONGO_CONNECTION_URL)
   .then(() =>

@@ -12,6 +12,9 @@ import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom'
 import Categories from './categories/Categories'
 import Products from './products/Products'
 
+import {PicCenterOutlined} from '@ant-design/icons'
+import Warehouses from './warehouses/Warehouses'
+
 const { Header, Content, Footer, Sider } = Layout
 const { SubMenu } = Menu
 
@@ -85,6 +88,14 @@ export default function Dashboard() {
                 <Link to='/dashboard/categories'>Categories</Link>
               </Menu.Item>
             </SubMenu>
+            <SubMenu key='sub2' icon={<PicCenterOutlined />} title='Warehouses'>
+              <Menu.Item key='4' icon={<PicCenterOutlined />}>
+                <Link to='/dashboard/warehouses'>Warehouses</Link>
+              </Menu.Item>
+              {/* <Menu.Item key='5' icon={<UnorderedListOutlined />}> */}
+              {/* <Link to='/dashboard/categories'></Link> */}
+              {/* </Menu.Item> */}
+            </SubMenu>
           </Menu>
         </Sider>
         <Content style={{ margin: '20px' }}>
@@ -94,6 +105,7 @@ export default function Dashboard() {
                 <Route path='/users' element={<SuperAdminUsers />} />
                 <Route path='/categories' element={<Categories />} />
                 <Route path='/products' element={<Products />} />
+                <Route path='/warehouses' element={<Warehouses />} />
               </Routes>
             </div>
           </div>
