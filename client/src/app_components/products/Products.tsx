@@ -1,5 +1,5 @@
 import { Button, Card, Input, message, Select, Table } from 'antd'
-import { useEffect, useState } from 'react'
+import { Key, useEffect, useState } from 'react'
 import {
   createProduct,
   getCategories,
@@ -14,12 +14,29 @@ import { ICategory } from '../categories/Categories'
 import ProductsForm, { IProductFull } from './ProductsForm'
 import Search from 'antd/lib/input/Search'
 import moment from 'moment'
+import Barcodes from './Barcodes'
+import React from 'react'
+import CSS from 'csstype'
 
 const { Option } = Select
+
+const full_screen_card_style: CSS.Properties = {
+  position: 'fixed',
+  left: 0,
+  top: 0,
+  width: '100%',
+  height: '100%',
+  zIndex: '100',
+  display: 'grid',
+  placeItems: 'center',
+  backdropFilter: 'blur(4px)',
+  backgroundColor: '#22222222',
+}
 
 const Products = () => {
   const [products, setProducts] = useState<IProductFull[]>([])
   const [product_creation, setProductCreation] = useState<boolean>(false)
+  const [barcodes_creation, setBarcodesCreation] = useState<boolean>(false)
   const [categories, setCategories] = useState<string[]>([])
 
   const [active_products, setActiveProducts] = useState<IProductFull[]>([])
@@ -27,7 +44,13 @@ const Products = () => {
 
   const [edited_product_id, setEditedProductId] = useState<string>('')
   const [edited_product, setEditedProduct] = useState<IProductFull>()
+  const [selected_row_keys, setSelectedRowKeys] = useState<Key[]>([])
+  const [selected_products, setSelectedProducts] = useState<IProductFull[]>([])
 
+  useEffect(() => {
+    const set = new Set(selected_row_keys)
+    setSelectedProducts(products.filter(product => set.has(product._id)))
+  }, [products, selected_row_keys])
   const refreshProducts = (products: IProductFull[], category: string) => {
     setActiveProducts(
       products.filter(product => !category || product.category === category)
@@ -107,7 +130,8 @@ const Products = () => {
       title: 'Created',
       dataIndex: 'created',
       key: 'created',
-      render: (text, record, index) => moment(record.created).format('DD-MM-GGGG'),
+      render: (text, record, index) =>
+        moment(record.created).format('DD-MM-GGGG'),
       sorter: (a, b) => moment(a.created).unix() - moment(b.created).unix(),
     },
     {
@@ -119,11 +143,34 @@ const Products = () => {
 
   return (
     <>
+      {barcodes_creation && (
+        <div
+          style={full_screen_card_style}
+          onClick={() => {
+            setBarcodesCreation(false)
+          }}>
+          <div onClick={e => e.stopPropagation()}>
+            <Barcodes
+              barcodes={selected_products.map(product => ({
+                barcode: product.barcode || '',
+                name: product.name || '',
+                article: product.article || '',
+              }))}
+            />
+          </div>
+        </div>
+      )}
       <div style={{ width: '100%' }}>
         <Card
           title='All products'
           extra={
             <div style={{ display: 'flex', gap: '20px' }}>
+              <Button
+                onClick={() => {
+                  setBarcodesCreation(true)
+                }}>
+                Print labels
+              </Button>
               <Input.Search
                 placeholder='search by name'
                 onSearch={async e => {
@@ -135,7 +182,6 @@ const Products = () => {
                       message.error(e.response?.data)
                     }
                   }
-                  console.log(e)
                 }}
               />
               <Button
@@ -158,23 +204,22 @@ const Products = () => {
               </Select>
             </div>
           }>
-          <Table dataSource={active_products} columns={columns} />
+          <Table
+            rowSelection={{
+              selectedRowKeys: selected_row_keys,
+              onChange: selectedRowKeys => {
+                console.log('selectedRowKeys changed: ', selectedRowKeys)
+                setSelectedRowKeys(selectedRowKeys)
+              },
+            }}
+            dataSource={active_products.map(t => ({ ...t, key: t._id }))}
+            columns={columns}
+          />
         </Card>
       </div>
       {product_creation && (
         <div
-          style={{
-            position: 'fixed',
-            left: 0,
-            top: 0,
-            width: '100%',
-            height: '100%',
-            zIndex: '100',
-            display: 'grid',
-            placeItems: 'center',
-            backdropFilter: 'blur(4px)',
-            backgroundColor: '#22222222',
-          }}
+          style={full_screen_card_style}
           onClick={() => {
             setProductCreation(false)
           }}>
@@ -202,18 +247,7 @@ const Products = () => {
       )}
       {edited_product_id && (
         <div
-          style={{
-            position: 'fixed',
-            left: 0,
-            top: 0,
-            width: '100%',
-            height: '100%',
-            zIndex: '100',
-            display: 'grid',
-            placeItems: 'center',
-            backdropFilter: 'blur(4px)',
-            backgroundColor: '#22222222',
-          }}
+          style={full_screen_card_style}
           onClick={() => {
             setEditedProductId('')
           }}>

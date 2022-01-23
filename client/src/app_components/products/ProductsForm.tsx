@@ -357,13 +357,13 @@ const ProductsForm: FC<Props> = ({
                 {button}
               </Button>
             </Form.Item>
-            <Form.Item>
-              {onCancel && (
+            {onCancel && (
+              <Form.Item>
                 <Button style={{ width: '100%' }} onClick={onCancel}>
                   Cancel
                 </Button>
-              )}
-            </Form.Item>
+              </Form.Item>
+            )}
           </div>
         </Form>
       </Card>
