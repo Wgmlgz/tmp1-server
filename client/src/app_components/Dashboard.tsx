@@ -14,6 +14,9 @@ import Products from './products/Products'
 
 import {PicCenterOutlined} from '@ant-design/icons'
 import Warehouses from './warehouses/Warehouses'
+import ProductsIn from './warehouses/ProductsIn'
+import ProductsOut from './warehouses/ProductsOut'
+import ProductsMove from './warehouses/ProductsMove'
 
 const { Header, Content, Footer, Sider } = Layout
 const { SubMenu } = Menu
@@ -88,13 +91,19 @@ export default function Dashboard() {
                 <Link to='/dashboard/categories'>Categories</Link>
               </Menu.Item>
             </SubMenu>
-            <SubMenu key='sub2' icon={<PicCenterOutlined />} title='Warehouses'>
+            <SubMenu key='sub2' icon={<PicCenterOutlined />} title='Склады'>
               <Menu.Item key='4' icon={<PicCenterOutlined />}>
-                <Link to='/dashboard/warehouses'>Warehouses</Link>
+                <Link to='/dashboard/warehouses'>Склады</Link>
               </Menu.Item>
-              {/* <Menu.Item key='5' icon={<UnorderedListOutlined />}> */}
-              {/* <Link to='/dashboard/categories'></Link> */}
-              {/* </Menu.Item> */}
+              <Menu.Item key='5' icon={<PicCenterOutlined />}>
+                <Link to='/dashboard/products_in'>Приходы</Link>
+              </Menu.Item>
+              <Menu.Item key='6' icon={<PicCenterOutlined />}>
+                <Link to='/dashboard/products_out'>Списания</Link>
+              </Menu.Item>
+              <Menu.Item key='7' icon={<PicCenterOutlined />}>
+                <Link to='/dashboard/products_move'>Перемещения</Link>
+              </Menu.Item>
             </SubMenu>
           </Menu>
         </Sider>
@@ -106,6 +115,9 @@ export default function Dashboard() {
                 <Route path='/categories' element={<Categories />} />
                 <Route path='/products' element={<Products />} />
                 <Route path='/warehouses' element={<Warehouses />} />
+                <Route path='/products_in' element={<ProductsIn />} />
+                <Route path='/products_out' element={<ProductsOut />} />
+                <Route path='/products_move' element={<ProductsMove />} />
               </Routes>
             </div>
           </div>
