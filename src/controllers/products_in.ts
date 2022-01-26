@@ -1,10 +1,14 @@
 import { Request, Response } from 'express'
 import ProductIn, { IProductIn } from '../models/products_in'
 import mongoose from 'mongoose'
+import { IUser } from '../models/user'
 
 export const createProductIn = async (req: Request, res: Response) => {
   try {
-    let { warehouse, date, user, comment, products } = req.body
+    const req_user: IUser & { id: string } = (req as any).user
+
+    let { warehouse, date, comment, products } = req.body
+    const user = req_user.id
 
     const new_product_in = new ProductIn({
       warehouse,
@@ -32,24 +36,29 @@ export const removeProductIn = async (req: Request, res: Response) => {
   }
 }
 
-// export const updateProductIn = async (req: Request, res: Response) => {
-//   try {
-//     const { id } = req.params
-//     const { name, description } = req.body
+export const updateProductIn = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+    const req_user: IUser & { id: string } = (req as any).user
 
-//     console.log(name, description)
+    let { warehouse, date, comment, products } = req.body
+    const user = req_user.id
 
-//     if (!mongoose.Types.ObjectId.isValid(id))
-//       return res.status(404).send(`No warehouse with id: ${id}`)
-//     const old_warehouse = await Warehouse.findById(id)
-//     if (!old_warehouse) return res.status(400).send(`Product doens't Exists`)
+    if (!mongoose.Types.ObjectId.isValid(id))
+      return res.status(404).send(`No product_in with id: ${id}`)
+    const old_product_in = await ProductIn.findById(id)
+    if (!old_product_in) return res.status(400).send(`ProductIn doens't Exists`)
 
-//     await Warehouse.findByIdAndUpdate(id, { name, description }, { new: true })
-//     res.send('Warehouse updated')
-//   } catch (err: any) {
-//     res.status(400).send(err.message)
-//   }
-// }
+    await ProductIn.findByIdAndUpdate(
+      id,
+      { warehouse, date, comment, products, user },
+      { new: true }
+    )
+    res.send('ProductIn updated')
+  } catch (err: any) {
+    res.status(400).send(err.message)
+  }
+}
 
 export const getProductsIn = async (req: Request, res: Response) => {
   try {

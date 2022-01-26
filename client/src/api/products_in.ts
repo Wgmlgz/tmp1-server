@@ -6,9 +6,9 @@ export const products_in_url = `${url}/api/products_in`
 
 /** Warehouses */
 export const getProductsIn = () => axios.get(`${products_in_url}`)
-export const createProductIn = (warehouse: IProductIn) =>
-  axios.post(`${products_in_url}`, warehouse)
-export const updateProductIn = (id: string, warehouse: IProductIn) =>
-  axios.patch(`${products_in_url}/${id}`, warehouse)
+export const createProductIn = (product_in: IProductIn) =>
+  axios.post(`${products_in_url}`, product_in)
+export const updateProductIn = (id: string, product_in: IProductIn) =>
+  axios.patch(`${products_in_url}/${id}`, product_in)
 export const removeProductIn = (id: string) =>
   axios.delete(`${products_in_url}/${id}`)

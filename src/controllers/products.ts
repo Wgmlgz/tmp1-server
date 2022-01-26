@@ -21,8 +21,6 @@ const storage = multer.diskStorage({
 export const upload = multer({ storage })
 
 const parseReqToProduct = (req: Request) => {
-  console.log(req.body);
-  
   let {
     type,
     category,
