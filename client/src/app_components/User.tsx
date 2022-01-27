@@ -1,5 +1,5 @@
 import axios from 'axios'
-import React, { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { getUser } from '../api/api'
 
 export default function User() {
@@ -21,7 +21,7 @@ export default function User() {
   useEffect(() => {
     setup()
   }, [setup])
-  
+
   return (
     <>
       <p>{user}</p>

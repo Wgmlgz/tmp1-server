@@ -1,7 +1,6 @@
 import { Request, Response } from 'express'
 import Category, { ICategory } from '../models/category'
 import mongoose from 'mongoose'
-import fs from 'fs'
 import path from 'path'
 import sharp from 'sharp'
 import multer from 'multer'

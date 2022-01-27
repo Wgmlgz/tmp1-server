@@ -1,4 +1,3 @@
-import React, { useCallback } from 'react'
 import { logout } from '../api/api'
 
 export default function Logout() {

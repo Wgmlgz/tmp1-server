@@ -8,17 +8,17 @@ import {
 } from '@ant-design/icons'
 import { getUser, logout } from '../api/api'
 import SuperAdminUsers from './super_admin/SuperAdminUsers'
-import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom'
+import { Route, Link, Routes } from 'react-router-dom'
 import Categories from './categories/Categories'
 import Products from './products/Products'
 
-import {PicCenterOutlined} from '@ant-design/icons'
+import { PicCenterOutlined } from '@ant-design/icons'
 import Warehouses from './warehouses/Warehouses'
 import ProductsIn from './warehouses/ProductsIn'
 import ProductsOut from './warehouses/ProductsOut'
 import ProductsMove from './warehouses/ProductsMove'
 
-const { Header, Content, Footer, Sider } = Layout
+const { Header, Content, Sider } = Layout
 const { SubMenu } = Menu
 
 export default function Dashboard() {

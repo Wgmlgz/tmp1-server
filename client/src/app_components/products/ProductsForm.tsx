@@ -8,9 +8,9 @@ import {
   Select,
   Tag,
 } from 'antd'
-import React, { FC, useEffect, useRef, useState } from 'react'
+import { FC, useEffect, useRef, useState } from 'react'
 import { Collapse } from 'antd'
-import { createProduct, getCategories } from '../../api/api'
+import { getCategories } from '../../api/api'
 import axios from 'axios'
 import { ICategory } from '../categories/Categories'
 

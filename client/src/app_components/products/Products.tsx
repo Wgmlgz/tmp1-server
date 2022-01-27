@@ -12,10 +12,8 @@ import axios from 'axios'
 import { ColumnsType } from 'antd/lib/table'
 import { ICategory } from '../categories/Categories'
 import ProductsForm, { IProductFull } from './ProductsForm'
-import Search from 'antd/lib/input/Search'
 import moment from 'moment'
 import Barcodes from './Barcodes'
-import React from 'react'
 import CSS from 'csstype'
 
 const { Option } = Select

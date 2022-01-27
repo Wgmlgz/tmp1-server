@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import ProductMove, { IProductMove } from '../models/products_move'
+import ProductMove from '../models/products_move'
 import mongoose from 'mongoose'
 import { IUser } from '../models/user'
 

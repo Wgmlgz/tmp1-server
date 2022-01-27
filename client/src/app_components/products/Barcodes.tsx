@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useRef } from 'react'
+import { FC, useCallback, useEffect, useRef } from 'react'
 import jsPDF from 'jspdf'
 import JsBarcode from 'jsbarcode'
 import { Button, Card, message } from 'antd'

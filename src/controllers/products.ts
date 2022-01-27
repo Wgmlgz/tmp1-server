@@ -2,11 +2,10 @@ import { Request, Response } from 'express'
 import multer from 'multer'
 import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
-import Product, { IProduct } from '../models/product'
+import Product from '../models/product'
 import { IUser } from '../models/user'
 import { resizeImg1024, resizeImg150 } from '../util/imgs'
 import mongoose from 'mongoose'
-// import { enshureAdmin } from './auth'
 
 const UPLOAD_FILES_DIR = './upload/products'
 const storage = multer.diskStorage({

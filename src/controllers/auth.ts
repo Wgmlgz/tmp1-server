@@ -10,22 +10,6 @@ import {
   REFRESH_TOKEN_EXPIRES,
   REFRESH_TOKEN_SECRET,
 } from '../config/env'
-import mongoose from 'mongoose'
-
-// export const authenticateToken = (
-//   req: any,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   const token = req.cookies['access-token']
-
-//   if (!token) return res.status(401)
-//   jwt.verify(token, ACCESS_TOKEN_SECRET as string, (err: any, user: any) => {
-//     if (err) res.status(401)
-//     else req.user = user
-//     next()
-//   })
-// }
 
 export const authenticateUser = (
   req: any,

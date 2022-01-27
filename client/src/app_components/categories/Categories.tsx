@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Form, Input, Button, message, Tag, Table, Card, Select } from 'antd'
 import {
   categories_url,
@@ -49,7 +49,6 @@ export default function Categories() {
     const img = imgs[0]
     if (img) setImg(img)
   }
-
 
   const columns: ColumnsType<ICategoryFull> = [
     {
