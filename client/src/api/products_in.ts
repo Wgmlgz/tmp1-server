@@ -4,7 +4,6 @@ import { url } from './api'
 
 export const products_in_url = `${url}/api/products_in`
 
-/** Warehouses */
 export const getProductsIn = () => axios.get(`${products_in_url}`)
 export const createProductIn = (product_in: IProductIn) =>
   axios.post(`${products_in_url}`, product_in)
