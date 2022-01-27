@@ -1,7 +1,11 @@
 import { Button, Card, message } from 'antd'
 import Table, { ColumnsType } from 'antd/lib/table'
 import React, { useEffect, useState } from 'react'
-import { IProductOut, IProductOutFull, ProductsOutForm } from './ProductsOutForm'
+import {
+  IProductOut,
+  IProductOutFull,
+  ProductsOutForm,
+} from './ProductsOutForm'
 
 import {
   PlusCircleOutlined,
@@ -19,7 +23,6 @@ import { IWarehouseFull } from './WarehouseForm'
 import { getProducts, getWarehouses } from '../../api/api'
 import { IProductFull } from '../products/ProductsForm'
 import moment from 'moment'
-
 
 export default function ProductsOut() {
   const [products_out, setProductsOut] = useState<IProductOutFull[]>([])
@@ -176,7 +179,10 @@ export default function ProductsOut() {
               onCancel={() => setEditedProductOutId('')}
               onSubmit={async (data: IProductOut) => {
                 try {
-                  const res = await updateProductOut(edited_product_out_id, data)
+                  const res = await updateProductOut(
+                    edited_product_out_id,
+                    data
+                  )
                   await fetchProductsOut()
                   message.success(res.data)
                   setEditedProductOutId('')
@@ -192,21 +198,19 @@ export default function ProductsOut() {
           </div>
         </div>
       )}
-      <div style={{ width: 'fit-content' }}>
-        <Card
-          title='Списания'
-          extra={
-            <Button
-              type='primary'
-              onClick={() => {
-                setProductOutCreation(true)
-              }}>
-              <PlusCircleOutlined /> списание
-            </Button>
-          }>
-          <Table dataSource={products_out} columns={columns} />
-        </Card>
-      </div>
+      <Card
+        title='Списания'
+        extra={
+          <Button
+            type='primary'
+            onClick={() => {
+              setProductOutCreation(true)
+            }}>
+            <PlusCircleOutlined /> списание
+          </Button>
+        }>
+        <Table dataSource={products_out} columns={columns} />
+      </Card>
     </>
   )
 }

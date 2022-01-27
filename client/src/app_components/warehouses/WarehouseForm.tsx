@@ -25,19 +25,23 @@ const WarehouseForm: FC<Props> = ({
   warehouse,
 }) => (
   <Card title={header}>
-    <Form name='normal_login' className='login-form' onFinish={onSubmit} initialValues={warehouse}>
+    <Form
+      name='normal_login'
+      className='login-form'
+      onFinish={onSubmit}
+      initialValues={warehouse}>
       <Form.Item
         name='name'
         rules={[
           {
             required: true,
-            message: 'Please input warehouse name!',
+            message: 'Пожалуйста, введите название склада!',
           },
         ]}>
-        <Input placeholder='Name' />
+        <Input placeholder='Имя' />
       </Form.Item>
       <Form.Item name='descriptrion'>
-        <Input.TextArea placeholder='Descriptrion' />
+        <Input.TextArea placeholder='Описание' />
       </Form.Item>
       <Form.Item>
         <Button style={{ width: '100%' }} type='primary' htmlType='submit'>
@@ -47,7 +51,7 @@ const WarehouseForm: FC<Props> = ({
       {onCancel && (
         <Form.Item>
           <Button style={{ width: '100%' }} onClick={onCancel}>
-            Cancel
+            Отмена
           </Button>
         </Form.Item>
       )}

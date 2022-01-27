@@ -8,6 +8,11 @@ import {
   removeWarehouse,
   updateWarehouse,
 } from '../../api/api'
+import {
+  PlusCircleOutlined,
+  DeleteOutlined,
+  EditOutlined,
+} from '@ant-design/icons'
 import WarehouseForm, { IWarehouseFull } from './WarehouseForm'
 
 export default function Warehouses() {
@@ -18,46 +23,42 @@ export default function Warehouses() {
 
   const columns: ColumnsType<IWarehouseFull> = [
     {
-      title: 'Name',
+      title: 'Название',
       dataIndex: 'name',
       key: 'name',
     },
     {
-      title: 'Descriptrion',
+      title: 'Описание',
       dataIndex: 'descriptrion',
       key: 'descriptrion',
     },
     {
-      title: 'Delete',
-      key: 'remove',
+      title: '',
+      key: 'edit',
       render: (text, record, index) => (
-        <Button
-          onClick={async () => {
-            try {
-              const res = await removeWarehouse(record._id)
-              message.success(res.data)
-              fetchWarehouses()
-            } catch (err) {
-              if (axios.isAxiosError(err)) {
-                message.error(err.response?.data)
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <Button
+            onClick={async () => {
+              try {
+                const res = await removeWarehouse(record._id)
+                message.success(res.data)
+                fetchWarehouses()
+              } catch (err) {
+                if (axios.isAxiosError(err)) {
+                  message.error(err.response?.data)
+                }
               }
-            }
-          }}>
-          Detele
-        </Button>
-      ),
-    },
-    {
-      title: 'Edit',
-      key: 'remove',
-      render: (text, record, index) => (
-        <Button
-          onClick={() => {
-            setEditedWarehouseId(record._id)
-            setEditedWarehouse(record)
-          }}>
-          Edit
-        </Button>
+            }}>
+            <DeleteOutlined />
+          </Button>
+          <Button
+            onClick={() => {
+              setEditedWarehouseId(record._id)
+              setEditedWarehouse(record)
+            }}>
+            <EditOutlined />
+          </Button>
+        </div>
       ),
     },
   ]
@@ -94,12 +95,12 @@ export default function Warehouses() {
                 }
               }
             }}
-            header='Create new warehouse'
-            button='Create new warehouse'
+            header='Создать новый склад'
+            button='Создать новый склад'
           />
         </div>
-        <div style={{ width: 'fit-content' }}>
-          <Card title='All categories'>
+        <div style={{ flexGrow: '1' }}>
+          <Card title='Все склады'>
             <Table dataSource={warehouses} columns={columns} />
           </Card>
         </div>
@@ -123,17 +124,15 @@ export default function Warehouses() {
           }}>
           <div onClick={e => e.stopPropagation()}>
             <WarehouseForm
-              header='Edit product'
-              button='Edit'
+              header='Изменить склад'
+              button='Изменить'
               onCancel={() => setEditedWarehouseId('')}
               warehouse={edited_warehouse}
               onSubmit={async warehouse => {
                 try {
-                  console.log(warehouse)
-
                   await updateWarehouse(edited_warehouse_id, warehouse)
                   await fetchWarehouses()
-                  message.success('Product updated')
+                  message.success('Склад обновлен')
                 } catch (err) {
                   if (axios.isAxiosError(err)) {
                     String(err.response?.data)

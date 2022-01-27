@@ -207,21 +207,19 @@ export default function ProductsIn() {
           </div>
         </div>
       )}
-      <div style={{ width: 'fit-content' }}>
-        <Card
-          title='Оприходования'
-          extra={
-            <Button
-              type='primary'
-              onClick={() => {
-                setProductInCreation(true)
-              }}>
-              <PlusCircleOutlined /> оприходование
-            </Button>
-          }>
-          <Table dataSource={products_in} columns={columns} />
-        </Card>
-      </div>
+      <Card
+        title='Оприходования'
+        extra={
+          <Button
+            type='primary'
+            onClick={() => {
+              setProductInCreation(true)
+            }}>
+            <PlusCircleOutlined /> оприходование
+          </Button>
+        }>
+        <Table dataSource={products_in} columns={columns} />
+      </Card>
     </>
   )
 }

@@ -53,17 +53,17 @@ export default function Categories() {
 
   const columns: ColumnsType<ICategoryFull> = [
     {
-      title: 'Name',
+      title: 'Название',
       dataIndex: 'name',
       key: 'name',
     },
     {
-      title: 'Descriptrion',
+      title: 'Описание',
       dataIndex: 'descriptrion',
       key: 'descriptrion',
     },
     {
-      title: 'Image',
+      title: 'Изображение',
       dataIndex: 'img',
       key: 'img',
       render: (text, record, index) =>
@@ -72,7 +72,7 @@ export default function Categories() {
         ),
     },
     {
-      title: 'Tags',
+      title: 'Теги',
       dataIndex: 'tags',
       key: 'tags',
       render: (text, record, index) => (
@@ -80,12 +80,12 @@ export default function Categories() {
       ),
     },
     {
-      title: 'Parent category',
+      title: 'Родительская категория',
       dataIndex: 'parent',
       key: 'parent',
     },
     {
-      title: 'Delete',
+      title: 'Удалить',
       key: 'remove',
       render: (text, record, index) => (
         <Button
@@ -125,20 +125,20 @@ export default function Categories() {
   return (
     <div style={{ display: 'flex', gap: '20px' }}>
       <div style={{ width: '300px' }}>
-        <Card title='Create new category'>
+        <Card title='Создать новую категорию'>
           <Form name='normal_login' className='login-form' onFinish={onFinish}>
             <Form.Item
               name='name'
               rules={[
                 {
                   required: true,
-                  message: 'Please input category name!',
+                  message: 'Пожалуйста, введите название категории!',
                 },
               ]}>
               <Input placeholder='Name' />
             </Form.Item>
             <Form.Item name='descriptrion'>
-              <Input placeholder='Descriptrion' />
+              <Input placeholder='Описание' />
             </Form.Item>
             <Form.Item>
               <Input
@@ -149,7 +149,7 @@ export default function Categories() {
               />
             </Form.Item>
             <Form.Item>
-              <label style={{ fontWeight: 'bold' }}>Tags: </label>
+              <label style={{ fontWeight: 'bold' }}>Теги: </label>
 
               {tags.map(tag => (
                 <Tag>{tag}</Tag>
@@ -158,7 +158,7 @@ export default function Categories() {
             <Form.Item name='tags'>
               <Input
                 ref={input_tags_ref}
-                placeholder='Comma separated tags'
+                placeholder='Теги, разделенные запятыми'
                 type='text'
                 onInput={e => {
                   const s = input_tags_ref.current?.input.value
@@ -173,7 +173,7 @@ export default function Categories() {
               />
             </Form.Item>
             <Form.Item name='parent'>
-              <Select>
+              <Select placeholder='Родительская категория'>
                 {categories.map(s => (
                   <Option value={s.name}>{s.name}</Option>
                 ))}
@@ -184,14 +184,14 @@ export default function Categories() {
                 style={{ width: '100%' }}
                 type='primary'
                 htmlType='submit'>
-                Create new category
+                Создать новую категорию
               </Button>
             </Form.Item>
           </Form>
         </Card>
       </div>
       <div style={{ width: 'fit-content' }}>
-        <Card title='All categories'>
+        <Card title='Все категории'>
           <Table dataSource={categories} columns={columns} />
         </Card>
       </div>

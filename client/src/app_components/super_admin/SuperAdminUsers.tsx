@@ -30,12 +30,12 @@ const SuperAdminUsers: FC = () => {
 
   const columns: ColumnsType<IUser> = [
     {
-      title: 'email',
+      title: 'Электронная почта',
       dataIndex: 'email',
       key: 'email',
     },
     {
-      title: 'admin',
+      title: 'Админ',
       dataIndex: 'admin',
       key: 'admin',
       render: (text, record, index) => (
@@ -62,7 +62,7 @@ const SuperAdminUsers: FC = () => {
       ),
     },
     {
-      title: 'super_admin',
+      title: 'Супер админ',
       dataIndex: 'super_admin',
       key: 'super_admin',
       render: (text, record, index) => (
@@ -76,7 +76,7 @@ const SuperAdminUsers: FC = () => {
 
   return (
     <div style={{ display: 'grid', width: 'fit-content', gap: '20px' }}>
-      <Card title='All users'>
+      <Card title='Список пользователей'>
         <Table dataSource={users} columns={columns} />
       </Card>
     </div>

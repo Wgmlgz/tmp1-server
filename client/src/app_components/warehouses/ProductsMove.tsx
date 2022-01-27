@@ -170,8 +170,8 @@ export default function ProductsMove() {
                   }
                 }
               }}
-              header='Новое списание'
-              button='Создать новое списание'
+              header='Новое перемещение'
+              button='Создать новое перемещение'
             />
           </div>
         </div>
@@ -201,27 +201,25 @@ export default function ProductsMove() {
                   }
                 }
               }}
-              header='Обновить списание'
-              button='Обновить списание'
+              header='Обновить перемещение'
+              button='Обновить перемещение'
             />
           </div>
         </div>
       )}
-      <div style={{ width: 'fit-content' }}>
-        <Card
-          title='Списания'
-          extra={
-            <Button
-              type='primary'
-              onClick={() => {
-                setProductMoveCreation(true)
-              }}>
-              <PlusCircleOutlined /> списание
-            </Button>
-          }>
-          <Table dataSource={products_move} columns={columns} />
-        </Card>
-      </div>
+      <Card
+        title='Перемещения'
+        extra={
+          <Button
+            type='primary'
+            onClick={() => {
+              setProductMoveCreation(true)
+            }}>
+            <PlusCircleOutlined /> перемещение
+          </Button>
+        }>
+        <Table dataSource={products_move} columns={columns} />
+      </Card>
     </>
   )
 }

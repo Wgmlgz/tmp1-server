@@ -53,7 +53,7 @@ export default function Dashboard() {
             gap: '20px',
           }}>
           <div style={{ fontWeight: 'bold', color: 'white', fontSize: '2em' }}>
-            NAME
+            ЗАГОЛОВОК
           </div>
           <div
             style={{
@@ -72,7 +72,7 @@ export default function Dashboard() {
               } catch {}
               window.location.replace('/login')
             }}>
-            logout
+            выйти
           </Button>
         </div>
       </Header>
@@ -81,14 +81,14 @@ export default function Dashboard() {
           <div className='logo' />
           <Menu theme='dark' defaultSelectedKeys={['1']} mode='inline'>
             <Menu.Item key='1' icon={<UserOutlined />}>
-              <Link to='/dashboard/users'>Users</Link>
+              <Link to='/dashboard/users'>Пользователи</Link>
             </Menu.Item>
-            <SubMenu key='sub1' icon={<AppstoreOutlined />} title='Products'>
+            <SubMenu key='sub1' icon={<AppstoreOutlined />} title='Продукты'>
               <Menu.Item key='2' icon={<AppstoreOutlined />}>
-                <Link to='/dashboard/products'>Products</Link>
+                <Link to='/dashboard/products'>Продукты</Link>
               </Menu.Item>
               <Menu.Item key='3' icon={<UnorderedListOutlined />}>
-                <Link to='/dashboard/categories'>Categories</Link>
+                <Link to='/dashboard/categories'>Категории</Link>
               </Menu.Item>
             </SubMenu>
             <SubMenu key='sub2' icon={<PicCenterOutlined />} title='Склады'>

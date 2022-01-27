@@ -45,23 +45,19 @@ const LoginForm: FC = () => {
           }}
           onFinish={onFinish}>
           <Form.Item>
-            {err_msg && (
-              <Alert type='error' message={err_msg}>
-                aboba
-              </Alert>
-            )}
+            {err_msg && <Alert type='error' message={err_msg} />}
           </Form.Item>
           <Form.Item
             name='email'
             rules={[
               {
                 required: true,
-                message: 'Please input your Email!',
+                message: 'Пожалуйста, введите свой адрес электронной почты!',
               },
             ]}>
             <Input
               prefix={<UserOutlined className='site-form-item-icon' />}
-              placeholder='Email'
+              placeholder='Электронная почта'
             />
           </Form.Item>
           <Form.Item
@@ -69,20 +65,20 @@ const LoginForm: FC = () => {
             rules={[
               {
                 required: true,
-                message: 'Please input your Password!',
+                message: 'Пожалуйста, введите свой пароль!',
               },
             ]}>
             <Input
               prefix={<LockOutlined className='site-form-item-icon' />}
               type='password'
-              placeholder='Password'
+              placeholder='Пароль'
             />
           </Form.Item>
           <Form.Item>
             <Button style={{ width: '100%' }} type='primary' htmlType='submit'>
-              Log in
+              Войти
             </Button>
-            Or <a href='/register'>register now!</a>
+            Или <a href='/register'>зарегистрируйтесь сейчас!</a>
           </Form.Item>
         </Form>
       </div>

@@ -162,44 +162,51 @@ const ProductsForm: FC<Props> = ({
           }}>
           <div style={{ overflowY: 'auto', maxHeight: '80vh' }}>
             <Collapse defaultActiveKey={['1']}>
-              <Panel header='Data' key='1'>
-                <Form.Item label='Type' name='type'>
-                  <Input defaultValue={product?.type} placeholder='Type' />
+              <Panel header='Информация' key='1'>
+                <Form.Item label='Тип' name='type'>
+                  <Input defaultValue={product?.type} placeholder='Тип' />
                 </Form.Item>
-                <Form.Item label='Category' name='category'>
-                  <Select defaultValue={product?.category}>
+                <Form.Item label='Категория' name='category'>
+                  <Select
+                    defaultValue={product?.category}
+                    placeholder='Категория'>
                     {categories.map(s => (
                       <Option value={s}>{s}</Option>
                     ))}
                   </Select>
                 </Form.Item>
-                <Form.Item label='Article' name='article'>
+                <Form.Item label='Артикул' name='article'>
                   <Input
                     defaultValue={product?.article}
-                    placeholder='Article'
+                    placeholder='Артикул'
                   />
                 </Form.Item>
-                <Form.Item label='Barcode' name='barcode'>
+                <Form.Item label='Штрихкод' name='barcode'>
                   <Input
                     defaultValue={product?.barcode}
-                    placeholder='Barcode'
+                    placeholder='Штрихкод'
                   />
                 </Form.Item>
               </Panel>
-              <Panel header='Description' key='2'>
+              <Panel header='Описание' key='2'>
                 <Form.Item
-                  label='Name'
+                  label='Название'
                   name='name'
-                  rules={[{ required: true, message: 'Please input name!' }]}>
-                  <Input defaultValue={product?.name} placeholder='Name' />
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Пожалуйста, введите Название!',
+                    },
+                  ]}>
+                  <Input defaultValue={product?.name} placeholder='Название' />
                 </Form.Item>
-                <Form.Item label='Description' name='description'>
+                <Form.Item label='Описание' name='description'>
                   <Input.TextArea
                     defaultValue={product?.description}
-                    placeholder='Description'
+                    placeholder='Описание'
                   />
                 </Form.Item>
-                <Form.Item label='Tags'>
+                <Form.Item label='Теги'>
                   {tags.map(tag => (
                     <Tag>{tag}</Tag>
                   ))}
@@ -208,7 +215,7 @@ const ProductsForm: FC<Props> = ({
                   <Input
                     defaultValue={product?.tags?.join(',')}
                     ref={input_tags_ref}
-                    placeholder='Comma separated tags'
+                    placeholder='Теги, разделенные запятыми'
                     type='text'
                     onInput={e => {
                       const s = input_tags_ref.current?.input.value
@@ -222,8 +229,8 @@ const ProductsForm: FC<Props> = ({
                   />
                 </Form.Item>
               </Panel>
-              <Panel header='Media' key='3'>
-                <Form.Item label='Images' name='imgs'>
+              <Panel header='Медиа' key='3'>
+                <Form.Item label='Изображения' name='imgs'>
                   <Input
                     type='file'
                     accept='.png, .jpg, .jpeg'
@@ -233,118 +240,126 @@ const ProductsForm: FC<Props> = ({
                     onChange={e => e.target.files && setImgs(e.target.files)}
                   />
                 </Form.Item>
-                <Form.Item label='Youtube video 1' name='yt1'>
+                <Form.Item label='Видео на Youtube 1' name='yt1'>
                   <Input
                     defaultValue={product?.videos?.at(0)}
-                    placeholder='Youtube video 1'
+                    placeholder='Видео на Youtube 1'
                   />
                 </Form.Item>
-                <Form.Item label='Youtube video 2' name='yt2'>
+                <Form.Item label='Видео на Youtube 2' name='yt2'>
                   <Input
                     defaultValue={product?.videos?.at(1)}
-                    placeholder='Youtube video 2'
+                    placeholder='Видео на Youtube 2'
                   />
                 </Form.Item>
-                <Form.Item label='Youtube video 3' name='yt3'>
+                <Form.Item label='Видео на Youtube 3' name='yt3'>
                   <Input
                     defaultValue={product?.videos?.at(2)}
-                    placeholder='Youtube video 3'
+                    placeholder='Видео на Youtube 3'
                   />
                 </Form.Item>
               </Panel>
-              <Panel header='Prices' key='4'>
+              <Panel header='Цены' key='4'>
                 <Form.Item
-                  label='Buy price'
+                  label='Закупочная цена'
                   name='buy_price'
                   rules={[
-                    { required: true, message: 'Please input buy price!' },
+                    {
+                      required: true,
+                      message: 'Пожалуйста, введите закупочную цену!',
+                    },
                   ]}>
                   <InputNumber
                     defaultValue={product?.buy_price}
-                    placeholder='Buy price'
+                    placeholder='Закупочная цена'
                   />
                 </Form.Item>
                 <Form.Item
-                  label='Delivery price'
+                  label='Цена доставки'
                   name='delivery_price'
                   rules={[
-                    { required: true, message: 'Please input delivery price!' },
+                    {
+                      required: true,
+                      message: 'Пожалуйста, введите цену доставки!',
+                    },
                   ]}>
                   <InputNumber
                     defaultValue={product?.delivery_price}
-                    placeholder='Delivery price'
+                    placeholder='Цена доставки'
                   />
                 </Form.Item>
               </Panel>
-              <Panel header='Dimentions' key='5'>
+              <Panel header='Размеры' key='5'>
                 <Form.Item
-                  label='Height'
+                  label='Высота'
                   name='height'
-                  rules={[{ required: true, message: 'Please input height!' }]}>
+                  rules={[
+                    { required: true, message: 'Пожалуйста, введите высоту!' },
+                  ]}>
                   <InputNumber
                     defaultValue={product?.height}
-                    placeholder='Height'
+                    placeholder='Высота'
                   />
                 </Form.Item>
                 <Form.Item
-                  label='Length'
+                  label='Длина'
                   name='length'
-                  rules={[{ required: true, message: 'Please input length!' }]}>
+                  rules={[
+                    { required: true, message: 'Пожалуйста, введите длинну!' },
+                  ]}>
                   <InputNumber
                     defaultValue={product?.length}
-                    placeholder='Length'
+                    placeholder='Длина'
                   />
                 </Form.Item>
                 <Form.Item
-                  label='Width'
+                  label='Ширина'
                   name='width'
-                  rules={[{ required: true, message: 'Please input width!' }]}>
+                  rules={[
+                    { required: true, message: 'Пожалуйста, введите ширина!' },
+                  ]}>
                   <InputNumber
                     defaultValue={product?.width}
-                    placeholder='Width'
+                    placeholder='Ширина'
                   />
                 </Form.Item>
                 <Form.Item
-                  label='Weight'
+                  label='Вес'
                   name='weight'
-                  rules={[{ required: true, message: 'Please input weight!' }]}>
+                  rules={[
+                    { required: true, message: 'Пожалуйста, введите вес!' },
+                  ]}>
                   <InputNumber
                     addonAfter='g'
                     defaultValue={product?.weight}
-                    placeholder='Weight'
+                    placeholder='Вес'
                   />
                 </Form.Item>
               </Panel>
-              <Panel header='Origins' key='6'>
-                <Form.Item label='Brand' name='brand'>
-                  <Input defaultValue={product?.brand} placeholder='Brand' />
+              <Panel header='Происхождение' key='6'>
+                <Form.Item label='Бренд' name='brand'>
+                  <Input defaultValue={product?.brand} placeholder='Бренд' />
                 </Form.Item>
-                <Form.Item label='Count' name='count'>
+                <Form.Item label='Количество' name='count'>
                   <InputNumber
                     defaultValue={product?.count}
-                    placeholder='Count'
+                    placeholder='Количество'
                   />
                 </Form.Item>
-                <Form.Item label='Provider' name='provider'>
+                <Form.Item label='Поставщик' name='provider'>
                   <Input
                     defaultValue={product?.provider}
-                    placeholder='Provider'
+                    placeholder='Поставщик'
                   />
                 </Form.Item>
-                <Form.Item label='Address' name='address'>
-                  <Input
-                    defaultValue={product?.address}
-                    placeholder='Address'
-                  />
+                <Form.Item label='Адрес' name='address'>
+                  <Input defaultValue={product?.address} placeholder='Адрес' />
                 </Form.Item>
-                <Form.Item label='Mark' name='mark'>
-                  <Input defaultValue={product?.mark} placeholder='Mark' />
+                <Form.Item label='Заметка' name='mark'>
+                  <Input defaultValue={product?.mark} placeholder='Заметка' />
                 </Form.Item>
-                <Form.Item label='Country' name='country'>
-                  <Input
-                    defaultValue={product?.country}
-                    placeholder='country'
-                  />
+                <Form.Item label='Страна' name='country'>
+                  <Input defaultValue={product?.country} placeholder='Страна' />
                 </Form.Item>
               </Panel>
             </Collapse>
@@ -360,7 +375,7 @@ const ProductsForm: FC<Props> = ({
             {onCancel && (
               <Form.Item>
                 <Button style={{ width: '100%' }} onClick={onCancel}>
-                  Cancel
+                  Отмена
                 </Button>
               </Form.Item>
             )}

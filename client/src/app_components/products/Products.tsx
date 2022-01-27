@@ -81,7 +81,7 @@ const Products = () => {
 
   const columns: ColumnsType<IProductFull> = [
     {
-      title: 'Image',
+      title: 'Изображение',
       dataIndex: 'img',
       key: 'type',
       render: (text, record, index) =>
@@ -95,12 +95,12 @@ const Products = () => {
         ),
     },
     {
-      title: 'Article',
+      title: 'Артикул',
       dataIndex: 'article',
       key: 'article',
     },
     {
-      title: 'Name (click to edit)',
+      title: 'Имя (нажмите, чтобы изменить)',
       dataIndex: 'name',
       key: 'name',
       sorter: (a, b) => a.delivery_price.localeCompare(b.delivery_price),
@@ -115,19 +115,19 @@ const Products = () => {
       ),
     },
     {
-      title: 'Buy price',
+      title: 'Закупочная цена',
       dataIndex: 'buy_price',
       key: 'buy_price',
       sorter: (a, b) => a.buy_price.localeCompare(b.buy_price),
     },
     {
-      title: 'Delivery price',
+      title: 'Цена доставки',
       dataIndex: 'delivery_price',
       key: 'delivery_price',
       sorter: (a, b) => a.delivery_price.localeCompare(b.delivery_price),
     },
     {
-      title: 'Created',
+      title: 'Создан',
       dataIndex: 'created',
       key: 'created',
       render: (text, record, index) =>
@@ -135,7 +135,7 @@ const Products = () => {
       sorter: (a, b) => moment(a.created).unix() - moment(b.created).unix(),
     },
     {
-      title: 'Count',
+      title: 'Количество',
       dataIndex: 'count',
       key: 'count',
     },
@@ -162,17 +162,17 @@ const Products = () => {
       )}
       <div style={{ width: '100%' }}>
         <Card
-          title='All products'
+          title='Все продукты'
           extra={
             <div style={{ display: 'flex', gap: '20px' }}>
               <Button
                 onClick={() => {
                   setBarcodesCreation(true)
                 }}>
-                Print labels
+                Напечатать штрихкоды
               </Button>
               <Input.Search
-                placeholder='search by name'
+                placeholder='поиск по имени'
                 onSearch={async e => {
                   try {
                     const res = await searchProducts(e)
@@ -189,15 +189,15 @@ const Products = () => {
                 onClick={() => {
                   setProductCreation(true)
                 }}>
-                Create new product
+                Создать новый продукт
               </Button>
               <Select
-                placeholder='Filter by category'
+                placeholder='Фильтр по категориям'
                 style={{ width: '200px' }}
                 onChange={e => {
                   setActiveCategory(e)
                 }}>
-                <Option value=''>All</Option>
+                <Option value=''>Все</Option>
                 {categories.map(s => (
                   <Option value={s}>{s}</Option>
                 ))}
@@ -225,14 +225,14 @@ const Products = () => {
           }}>
           <div onClick={e => e.stopPropagation()}>
             <ProductsForm
-              header='Create new product'
-              button='Create'
+              header='Создать новый продукт'
+              button='Создать'
               onSubmit={async product => {
                 try {
                   await createProduct(product)
                   await fetchProducts()
                   setProductCreation(false)
-                  message.success('Product created')
+                  message.success('Продукт создан')
                 } catch (err) {
                   if (axios.isAxiosError(err)) {
                     String(err.response?.data)
@@ -253,15 +253,15 @@ const Products = () => {
           }}>
           <div onClick={e => e.stopPropagation()}>
             <ProductsForm
-              header='Edit product'
-              button='Edit'
+              header='Изменить продукт'
+              button='Изменить'
               onCancel={() => setEditedProductId('')}
               product={edited_product}
               onSubmit={async product => {
                 try {
                   await updateProduct(product, edited_product_id)
                   await fetchProducts()
-                  message.success('Product updated')
+                  message.success('Продукт обновлен')
                 } catch (err) {
                   if (axios.isAxiosError(err)) {
                     String(err.response?.data)
