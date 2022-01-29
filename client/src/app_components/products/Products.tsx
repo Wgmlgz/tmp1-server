@@ -4,6 +4,7 @@ import {
   createProduct,
   getCategories,
   getProducts,
+  getWarehouses,
   products_url,
   searchProducts,
   updateProduct,
@@ -18,6 +19,8 @@ import CSS from 'csstype'
 
 import reactStringReplace from 'react-string-replace'
 import React from 'react'
+import { getRemains } from '../../api/remains'
+import { IWarehouseFull } from '../warehouses/WarehouseForm'
 
 export const highlightText = (str: string, search: string) => (
   <div>
@@ -46,6 +49,12 @@ const full_screen_card_style: CSS.Properties = {
   backgroundColor: '#22222222',
 }
 
+interface IRemain {
+  product: string
+  warehouse: string
+  quantity: number
+}
+
 const Products = () => {
   const [products, setProducts] = useState<IProductFull[]>([])
   const [product_creation, setProductCreation] = useState<boolean>(false)
@@ -61,6 +70,9 @@ const Products = () => {
   const [selected_products, setSelectedProducts] = useState<IProductFull[]>([])
 
   const [search_query, setSearchQuery] = useState<string>('')
+
+  /** maps product_id to warehouse-count */
+  const [remains_map, setRemainsMap] = useState(new Map<string, string>())
 
   useEffect(() => {
     const set = new Set(selected_row_keys)
@@ -81,10 +93,30 @@ const Products = () => {
       const res = await getProducts()
       setSearchQuery('')
       setProducts(res.data)
+
+      const res_warehouses = await getWarehouses()
+      const warehouses_map = new Map<string, string>(
+        res_warehouses.data.map((warehouse: IWarehouseFull) => [
+          warehouse._id,
+          warehouse.name,
+        ])
+      )
+
+      const remains_res = await getRemains()
+
+      const map = new Map<string, string>()
+      remains_res.data.forEach((remain: IRemain) => {
+        const str = `${warehouses_map.get(remain.warehouse)} - ${remain.quantity}`
+        const old = map.get(remain.product)
+        map.set(remain.product, old ? `${old}\n${str}` : str)
+      })
+      setRemainsMap(map)
+      console.log(map)
     } catch (err) {
       if (axios.isAxiosError(err)) {
         message.error(err.response?.data)
       }
+      console.log(err)
     }
   }
   useEffect(() => {
@@ -163,6 +195,11 @@ const Products = () => {
       title: 'Количество',
       dataIndex: 'count',
       key: 'count',
+      render: (text, record, index) => (
+        <div style={{ whiteSpace: 'pre-wrap' }}>
+          {remains_map.get(record._id)}
+        </div>
+      ),
     },
   ]
 

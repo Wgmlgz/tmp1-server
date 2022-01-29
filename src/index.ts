@@ -4,10 +4,11 @@ import cors from 'cors'
 
 import auth_routes from './routes/auth'
 import user_routes from './routes/user'
-import super_admin_routes from './routes/super_admin'
-import categories_routes from './routes/category'
+import remains_routes from './routes/remains'
 import products_routes from './routes/products'
+import categories_routes from './routes/category'
 import warehouses_routes from './routes/warehouse'
+import super_admin_routes from './routes/super_admin'
 import products_in_routes from './routes/products_in'
 import products_out_routes from './routes/products_out'
 import products_move_routes from './routes/products_move'
@@ -32,6 +33,7 @@ app.use('/api/auth', auth_routes)
 app.use('/api/user', user_routes)
 app.use('/api/super_admin', super_admin_routes)
 app.use('/api/categories', categories_routes)
+app.use('/api/remains', remains_routes)
 app.use('/api/products', products_routes)
 app.use('/api/warehouses', warehouses_routes)
 app.use('/api/products_in', products_in_routes)

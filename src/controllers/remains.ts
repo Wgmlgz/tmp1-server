@@ -62,3 +62,18 @@ export const changeRemains = async (
     )
   )
 }
+
+export const getRemains = async (req: Request, res: Response) => {
+  try {
+    const remains = await Remain.find()
+    const res_remains = remains.map(remain => ({
+      _id: remain._id,
+      quantity: remain.quantity,
+      warehouse: remain.warehouse,
+      product: remain.product,
+    }))
+    res.status(200).json(res_remains)
+  } catch (err: any) {
+    res.status(400).send(err.message)
+  }
+}
