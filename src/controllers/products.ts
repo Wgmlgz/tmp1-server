@@ -144,7 +144,7 @@ export const updateProduct = async (req: Request, res: Response) => {
     )
 
     const doc1 = await Product.findOne({ article: updated_product.article })
-    
+
     if (doc1 && doc1.id !== id)
       return res.status(400).send('Product with this article already exists')
 
@@ -172,7 +172,13 @@ export const searchProducts = async (req: Request, res: Response) => {
   try {
     const { str } = req.body
 
-    const products = await Product.find({ name: new RegExp(str, 'i') })
+    const products = await Product.find({
+      $or: [
+        { name: new RegExp(str, 'i') },
+        { article: new RegExp(str, 'i') },
+        { barcode: new RegExp(str, 'i') },
+      ],
+    })
 
     res.status(200).json(products)
   } catch (err: any) {

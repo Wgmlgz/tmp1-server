@@ -18,6 +18,7 @@ import moment, { locale } from 'moment'
 import { FC, useCallback, useEffect, useState } from 'react'
 import { getProducts, getWarehouses, searchProducts } from '../../api/api'
 import { createProductIn, getProductsIn } from '../../api/products_in'
+import { highlightText } from '../products/Products'
 import { IProductFull } from '../products/ProductsForm'
 import { IWarehouseFull } from './WarehouseForm'
 
@@ -68,6 +69,8 @@ export const ProductsInForm: FC<Props> = ({
 
   const [new_product_name, setNewProductName] = useState('')
 
+  const [search_query, setSearchQuery] = useState<string>('')
+
   const onFinish = async (data: IProductIn) => {
     data.products = products
     onSubmit(data)
@@ -112,26 +115,35 @@ export const ProductsInForm: FC<Props> = ({
       render: (text, record, index) =>
         index === edited_product ? (
           <AutoComplete
-            defaultValue={record.name}
-            options={search_products.map(product => ({
-              label: product.name,
-              value: product._id,
-            }))}
             style={{
-              width: 200,
+              width: 600,
             }}
+            defaultValue={record.name}
+            options={
+              search_products.map(product => ({
+                label: (
+                  <div>
+                    {highlightText(
+                      `${product.name} ${product.article} ${product.barcode}`,
+                      search_query
+                    )}
+                  </div>
+                ),
+                value: product._id,
+              })) as any
+            }
             onSelect={(
               data: string,
               { label, value }: { label: string; value: string }
             ) => {
               const new_products = products
               new_products[index].product = value
-              new_products[index].name = label
+              new_products[index].name = products_map.get(value) || ''
               setProducts(new_products)
               setEditedProduct(-1)
             }}
             onSearch={onSearch}
-            placeholder='input here'
+            placeholder='поиск'
           />
         ) : (
           <Typography.Link onClick={() => setEditedProduct(index)}>
@@ -176,6 +188,7 @@ export const ProductsInForm: FC<Props> = ({
     try {
       const res_products = await searchProducts(query)
       setSearchProducts(res_products.data)
+      setSearchQuery(query)
     } catch (err) {
       if (axios.isAxiosError(err)) {
         message.error(err.response?.data)
@@ -227,21 +240,34 @@ export const ProductsInForm: FC<Props> = ({
                 dataSource={products}
                 footer={() => (
                   <AutoComplete
-                    value={new_product_name}
-                    options={search_products.map(product => ({
-                      label: product.name,
-                      value: product._id,
-                    }))}
                     style={{
-                      width: 200,
+                      width: 600,
                     }}
+                    value={new_product_name}
+                    options={
+                      search_products.map(product => ({
+                        label: (
+                          <div>
+                            {highlightText(
+                              `${product.name} ${product.article} ${product.barcode}`,
+                              search_query
+                            )}
+                          </div>
+                        ),
+                        value: product._id,
+                      })) as any
+                    }
                     onSelect={(
                       data: string,
                       { label, value }: { label: string; value: string }
                     ) => {
                       setProducts([
                         ...products,
-                        { product: value, name: label, quantity: 0 },
+                        {
+                          product: value,
+                          name: products_map.get(value) || '',
+                          quantity: 0,
+                        },
                       ])
                       setNewProductName('')
                     }}
@@ -249,7 +275,7 @@ export const ProductsInForm: FC<Props> = ({
                       onSearch(e)
                       setNewProductName(e)
                     }}
-                    placeholder='input here'
+                    placeholder='поиск'
                   />
                 )}
               />

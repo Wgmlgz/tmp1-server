@@ -1,5 +1,5 @@
 import { Button, Card, Input, message, Select, Table } from 'antd'
-import { Key, useEffect, useState } from 'react'
+import { FC, Key, useEffect, useState } from 'react'
 import {
   createProduct,
   getCategories,
@@ -15,6 +15,21 @@ import ProductsForm, { IProductFull } from './ProductsForm'
 import moment from 'moment'
 import Barcodes from './Barcodes'
 import CSS from 'csstype'
+
+import reactStringReplace from 'react-string-replace'
+import React from 'react'
+
+export const highlightText = (str: string, search: string) => (
+  <div>
+    {search
+      ? reactStringReplace(str, new RegExp(`(${search})+`, 'g'), (match, i) => (
+          <span key={i} style={{ fontWeight: 'bold' }}>
+            {match}
+          </span>
+        ))
+      : str}
+  </div>
+)
 
 const { Option } = Select
 
@@ -45,6 +60,8 @@ const Products = () => {
   const [selected_row_keys, setSelectedRowKeys] = useState<Key[]>([])
   const [selected_products, setSelectedProducts] = useState<IProductFull[]>([])
 
+  const [search_query, setSearchQuery] = useState<string>('')
+
   useEffect(() => {
     const set = new Set(selected_row_keys)
     setSelectedProducts(products.filter(product => set.has(product._id)))
@@ -62,6 +79,7 @@ const Products = () => {
       )
 
       const res = await getProducts()
+      setSearchQuery('')
       setProducts(res.data)
     } catch (err) {
       if (axios.isAxiosError(err)) {
@@ -96,6 +114,15 @@ const Products = () => {
       title: 'Артикул',
       dataIndex: 'article',
       key: 'article',
+      render: (text, record, index) =>
+        highlightText(record.article || '', search_query),
+    },
+    {
+      title: 'Штрихкод',
+      dataIndex: 'barcode',
+      key: 'barcode',
+      render: (text, record, index) =>
+        highlightText(record.barcode || '', search_query),
     },
     {
       title: 'Имя (нажмите, чтобы изменить)',
@@ -108,7 +135,7 @@ const Products = () => {
             setEditedProductId(record._id)
             setEditedProduct(record)
           }}>
-          {record.name}
+          {highlightText(record.name || '', search_query)}
         </Button>
       ),
     },
@@ -170,10 +197,11 @@ const Products = () => {
                 Напечатать штрихкоды
               </Button>
               <Input.Search
-                placeholder='поиск по имени'
+                placeholder='поиск'
                 onSearch={async e => {
                   try {
                     const res = await searchProducts(e)
+                    setSearchQuery(e)
                     setProducts(res.data)
                   } catch (e) {
                     if (axios.isAxiosError(e)) {
