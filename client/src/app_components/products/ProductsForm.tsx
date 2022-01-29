@@ -35,7 +35,6 @@ export interface IProduct {
   width: number
   weight: number
   brand?: string
-  count?: number
   provider?: string
   address?: string
   mark?: string
@@ -89,7 +88,6 @@ const ProductsForm: FC<Props> = ({
     brand,
     buy_price,
     category,
-    count,
     delivery_price,
     description,
     height,
@@ -124,7 +122,6 @@ const ProductsForm: FC<Props> = ({
         width,
         weight,
         brand,
-        count,
         address,
         provider,
         mark,
@@ -339,12 +336,6 @@ const ProductsForm: FC<Props> = ({
               <Panel header='Происхождение' key='6'>
                 <Form.Item label='Бренд' name='brand'>
                   <Input defaultValue={product?.brand} placeholder='Бренд' />
-                </Form.Item>
-                <Form.Item label='Количество' name='count'>
-                  <InputNumber
-                    defaultValue={product?.count}
-                    placeholder='Количество'
-                  />
                 </Form.Item>
                 <Form.Item label='Поставщик' name='provider'>
                   <Input

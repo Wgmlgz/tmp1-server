@@ -18,7 +18,6 @@ export interface IProduct {
   width: number
   weight: number
   brand?: string
-  count?: number
   provider?: string
   address?: string
   mark?: string
@@ -93,9 +92,6 @@ const ProductSchema = new mongoose.Schema<IProduct>({
   brand: {
     type: String,
     maxLength: 100,
-  },
-  count: {
-    type: Number,
   },
   provider: {
     type: String,

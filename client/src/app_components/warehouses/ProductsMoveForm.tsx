@@ -204,7 +204,7 @@ export const ProductsMoveForm: FC<Props> = ({
             <div style={{ display: 'flex', gap: '20px' }}>
               <Form.Item
                 label='Склад отправления'
-                name='warehouse_to'
+                name='warehouse_from'
                 rules={[
                   { required: true, message: 'Пожалуйста выберете склад!' },
                 ]}>
@@ -218,7 +218,7 @@ export const ProductsMoveForm: FC<Props> = ({
               </Form.Item>
               <Form.Item
                 label='Склад доставки'
-                name='warehouse_from'
+                name='warehouse_to'
                 rules={[
                   { required: true, message: 'Пожалуйста выберете склад!' },
                 ]}>
