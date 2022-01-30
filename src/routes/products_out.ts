@@ -11,7 +11,7 @@ const router = express.Router()
 
 router.get('/', authenticateAdmin, getProductsOut)
 router.post('/', authenticateAdmin, createProductOut)
-router.patch('/:id', authenticateAdmin, updateProductOut)
-router.delete('/:id', authenticateAdmin, removeProductOut)
+// router.patch('/:id', authenticateAdmin, updateProductOut)
+// router.delete('/:id', authenticateAdmin, removeProductOut)
 
 export default router

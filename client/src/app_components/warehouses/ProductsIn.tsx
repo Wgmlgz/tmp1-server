@@ -121,40 +121,40 @@ export default function ProductsIn() {
         </p>
       ),
     },
-    {
-      title: '',
-      key: 'remove',
-      render: (text, record, index) => (
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <Popconfirm
-            title='Вы точно хотите удалить оприходование?'
-            onConfirm={async () => {
-              try {
-                const res = await removeProductIn(record._id)
-                message.success("Оприходование удалено")
-                fetchProductsIn()
-              } catch (err) {
-                if (axios.isAxiosError(err)) {
-                  message.error(err.response?.data)
-                }
-              }
-            }}
-            okText='Да'
-            cancelText='Нет'>
-            <Button>
-              <DeleteOutlined />
-            </Button>
-          </Popconfirm>
-          <Button
-            onClick={() => {
-              setEditedProductInId(record._id)
-              setEditedProductIn(record)
-            }}>
-            <EditOutlined />
-          </Button>
-        </div>
-      ),
-    },
+    // {
+    //   title: '',
+    //   key: 'remove',
+    //   render: (text, record, index) => (
+    //     <div style={{ display: 'flex', gap: '10px' }}>
+    //       <Popconfirm
+    //         title='Вы точно хотите удалить оприходование?'
+    //         onConfirm={async () => {
+    //           try {
+    //             const res = await removeProductIn(record._id)
+    //             message.success("Оприходование удалено")
+    //             fetchProductsIn()
+    //           } catch (err) {
+    //             if (axios.isAxiosError(err)) {
+    //               message.error(err.response?.data)
+    //             }
+    //           }
+    //         }}
+    //         okText='Да'
+    //         cancelText='Нет'>
+    //         <Button>
+    //           <DeleteOutlined />
+    //         </Button>
+    //       </Popconfirm>
+    //       <Button
+    //         onClick={() => {
+    //           setEditedProductInId(record._id)
+    //           setEditedProductIn(record)
+    //         }}>
+    //         <EditOutlined />
+    //       </Button>
+    //     </div>
+    //   ),
+    // },
   ]
   return (
     <>

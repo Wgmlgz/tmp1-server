@@ -118,40 +118,40 @@ export default function ProductsMove() {
         </p>
       ),
     },
-    {
-      title: '',
-      key: 'remove',
-      render: (text, record, index) => (
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <Popconfirm
-            title='Вы точно хотите удалить перемещение?'
-            onConfirm={async () => {
-              try {
-                const res = await removeProductMove(record._id)
-                message.success(res.data)
-                fetchProductsMove()
-              } catch (err) {
-                if (axios.isAxiosError(err)) {
-                  message.error(err.response?.data)
-                }
-              }
-            }}
-            okText='Да'
-            cancelText='Нет'>
-            <Button>
-              <DeleteOutlined />
-            </Button>
-          </Popconfirm>
-          <Button
-            onClick={() => {
-              setEditedProductMoveId(record._id)
-              setEditedProductMove(record)
-            }}>
-            <EditOutlined />
-          </Button>
-        </div>
-      ),
-    },
+    // {
+    //   title: '',
+    //   key: 'remove',
+    //   render: (text, record, index) => (
+    //     <div style={{ display: 'flex', gap: '10px' }}>
+    //       <Popconfirm
+    //         title='Вы точно хотите удалить перемещение?'
+    //         onConfirm={async () => {
+    //           try {
+    //             const res = await removeProductMove(record._id)
+    //             message.success(res.data)
+    //             fetchProductsMove()
+    //           } catch (err) {
+    //             if (axios.isAxiosError(err)) {
+    //               message.error(err.response?.data)
+    //             }
+    //           }
+    //         }}
+    //         okText='Да'
+    //         cancelText='Нет'>
+    //         <Button>
+    //           <DeleteOutlined />
+    //         </Button>
+    //       </Popconfirm>
+    //       <Button
+    //         onClick={() => {
+    //           setEditedProductMoveId(record._id)
+    //           setEditedProductMove(record)
+    //         }}>
+    //         <EditOutlined />
+    //       </Button>
+    //     </div>
+    //   ),
+    // },
   ]
   return (
     <>
