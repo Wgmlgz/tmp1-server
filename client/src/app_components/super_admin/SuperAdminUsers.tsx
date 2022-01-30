@@ -50,7 +50,7 @@ const SuperAdminUsers: FC = () => {
                 const new_users = [...users]
                 new_users[index].admin = new_admin
                 setUsers(new_users)
-                message.success('Saved')
+                message.success('Сохранено')
               } catch (err) {
                 if (axios.isAxiosError(err)) {
                   message.error(err.response?.data)

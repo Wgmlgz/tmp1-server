@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import ProductOut from '../models/products_out'
 import mongoose from 'mongoose'
 import { IUser } from '../models/user'
-import { changeRemains } from './remains'
+import { changeRemains, checkRemains } from './remains'
 
 export const createProductOut = async (req: Request, res: Response) => {
   try {
@@ -11,14 +11,15 @@ export const createProductOut = async (req: Request, res: Response) => {
     let { warehouse, date, comment, products } = req.body
     const user = req_user.id
 
-    const new_product_out = new ProductOut({
-      warehouse,
-      date,
-      user,
-      comment,
-      products,
-    })
-    await new_product_out.save()
+    await checkRemains(
+      products.map(
+        (product: { product: string; name: string; quantity: number }) => ({
+          warehouse,
+          product: product.product,
+          quantity_add: -product.quantity,
+        })
+      )
+    )
     await changeRemains(
       products.map(
         (product: { product: string; name: string; quantity: number }) => ({
@@ -28,6 +29,16 @@ export const createProductOut = async (req: Request, res: Response) => {
         })
       )
     )
+
+    const new_product_out = new ProductOut({
+      warehouse,
+      date,
+      user,
+      comment,
+      products,
+    })
+    await new_product_out.save()
+
     res.send('ProductOut created')
   } catch (err: any) {
     res.status(400).send(err.message)
@@ -69,6 +80,23 @@ export const updateProductOut = async (req: Request, res: Response) => {
     if (!old_product_out)
       return res.status(400).send(`ProductOut doens't Exists`)
 
+    await checkRemains(
+      old_product_out.products.map(product => ({
+        warehouse: old_product_out.warehouse,
+        product: product.product,
+        quantity_add: product.quantity,
+      }))
+    )
+    await checkRemains(
+      products.map(
+        (product: { product: string; name: string; quantity: number }) => ({
+          warehouse,
+          product: product.product,
+          quantity_add: -product.quantity,
+        })
+      )
+    )
+
     await changeRemains(
       old_product_out.products.map(product => ({
         warehouse: old_product_out.warehouse,
@@ -77,11 +105,6 @@ export const updateProductOut = async (req: Request, res: Response) => {
       }))
     )
 
-    await ProductOut.findByIdAndUpdate(
-      id,
-      { warehouse, date, comment, products, user },
-      { new: true }
-    )
     await changeRemains(
       products.map(
         (product: { product: string; name: string; quantity: number }) => ({
@@ -90,6 +113,11 @@ export const updateProductOut = async (req: Request, res: Response) => {
           quantity_add: -product.quantity,
         })
       )
+    )
+    await ProductOut.findByIdAndUpdate(
+      id,
+      { warehouse, date, comment, products, user },
+      { new: true }
     )
     res.send('ProductOut updated')
   } catch (err: any) {

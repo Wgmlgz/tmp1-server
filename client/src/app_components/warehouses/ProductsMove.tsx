@@ -1,6 +1,6 @@
-import { Button, Card, message } from 'antd'
+import { Button, Card, message, Popconfirm } from 'antd'
 import Table, { ColumnsType } from 'antd/lib/table'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   IProductMove,
   IProductMoveFull,
@@ -23,6 +23,7 @@ import { IWarehouseFull } from './WarehouseForm'
 import { getProducts, getWarehouses } from '../../api/api'
 import { IProductFull } from '../products/ProductsForm'
 import moment from 'moment'
+import FullscreenCard from '../FullscreenCard'
 
 export default function ProductsMove() {
   const [products_move, setProductsMove] = useState<IProductMoveFull[]>([])
@@ -122,8 +123,9 @@ export default function ProductsMove() {
       key: 'remove',
       render: (text, record, index) => (
         <div style={{ display: 'flex', gap: '10px' }}>
-          <Button
-            onClick={async () => {
+          <Popconfirm
+            title='Вы точно хотите удалить перемещение?'
+            onConfirm={async () => {
               try {
                 const res = await removeProductMove(record._id)
                 message.success(res.data)
@@ -133,9 +135,13 @@ export default function ProductsMove() {
                   message.error(err.response?.data)
                 }
               }
-            }}>
-            <DeleteOutlined />
-          </Button>
+            }}
+            okText='Да'
+            cancelText='Нет'>
+            <Button>
+              <DeleteOutlined />
+            </Button>
+          </Popconfirm>
           <Button
             onClick={() => {
               setEditedProductMoveId(record._id)
@@ -150,62 +156,50 @@ export default function ProductsMove() {
   return (
     <>
       {product_move_cteation && (
-        <div
-          className='full-screen-card-style'
-          onClick={() => {
-            setProductMoveCreation(false)
-          }}>
-          <div onClick={e => e.stopPropagation()}>
-            <ProductsMoveForm
-              onCancel={() => setProductMoveCreation(false)}
-              onSubmit={async (data: IProductMove) => {
-                try {
-                  const res = await createProductMove(data)
-                  await fetchProductsMove()
-                  message.success(res.data)
-                  setProductMoveCreation(false)
-                } catch (err) {
-                  if (axios.isAxiosError(err)) {
-                    message.error(err.response?.data)
-                  }
+        <FullscreenCard onCancel={() => setProductMoveCreation(false)}>
+          <ProductsMoveForm
+            onCancel={() => setProductMoveCreation(false)}
+            onSubmit={async (data: IProductMove) => {
+              try {
+                const res = await createProductMove(data)
+                await fetchProductsMove()
+                message.success(res.data)
+                setProductMoveCreation(false)
+              } catch (err) {
+                if (axios.isAxiosError(err)) {
+                  message.error(err.response?.data)
                 }
-              }}
-              header='Новое перемещение'
-              button='Создать новое перемещение'
-            />
-          </div>
-        </div>
+              }
+            }}
+            header='Новое перемещение'
+            button='Создать новое перемещение'
+          />
+        </FullscreenCard>
       )}
       {edited_product_move_id && (
-        <div
-          className='full-screen-card-style'
-          onClick={() => {
-            setEditedProductMoveId('')
-          }}>
-          <div onClick={e => e.stopPropagation()}>
-            <ProductsMoveForm
-              product_move={edited_product_move}
-              onCancel={() => setEditedProductMoveId('')}
-              onSubmit={async (data: IProductMove) => {
-                try {
-                  const res = await updateProductMove(
-                    edited_product_move_id,
-                    data
-                  )
-                  await fetchProductsMove()
-                  message.success(res.data)
-                  setEditedProductMoveId('')
-                } catch (err) {
-                  if (axios.isAxiosError(err)) {
-                    message.error(err.response?.data)
-                  }
+        <FullscreenCard onCancel={() => setEditedProductMoveId('')}>
+          <ProductsMoveForm
+            product_move={edited_product_move}
+            onCancel={() => setEditedProductMoveId('')}
+            onSubmit={async (data: IProductMove) => {
+              try {
+                const res = await updateProductMove(
+                  edited_product_move_id,
+                  data
+                )
+                await fetchProductsMove()
+                message.success(res.data)
+                setEditedProductMoveId('')
+              } catch (err) {
+                if (axios.isAxiosError(err)) {
+                  message.error(err.response?.data)
                 }
-              }}
-              header='Обновить перемещение'
-              button='Обновить перемещение'
-            />
-          </div>
-        </div>
+              }
+            }}
+            header='Обновить перемещение'
+            button='Обновить перемещение'
+          />
+        </FullscreenCard>
       )}
       <Card
         title='Перемещения'

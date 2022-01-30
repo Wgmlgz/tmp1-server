@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import 'antd/dist/antd.css'
-import { Button, Layout, Menu } from 'antd'
+import { Button, Layout, Menu, message } from 'antd'
 import {
   UnorderedListOutlined,
   UserOutlined,
@@ -23,12 +23,16 @@ const { SubMenu } = Menu
 
 export default function Dashboard() {
   const [collapsed, setCollapsed] = useState(false)
-  const [user, setUser] = useState('loading...')
+  const [user, setUser] = useState<any>('loading...')
 
   const setup = useCallback(async () => {
     try {
       let res = await getUser()
       setUser(res.data)
+      if (!res.data.admin && !res.data.super_admin) {
+        window.location.replace('/login')
+        message.error('Вы не админ')
+      }
     } catch (err) {
       window.location.replace('/login')
     }
@@ -62,7 +66,7 @@ export default function Dashboard() {
               fontSize: '1.2em',
               marginLeft: 'auto',
             }}>
-            {user}
+            {user.email}
           </div>
           <Button
             type='primary'
@@ -80,9 +84,11 @@ export default function Dashboard() {
         <Sider collapsible collapsed={collapsed} onCollapse={onCollapse}>
           <div className='logo' />
           <Menu theme='dark' defaultSelectedKeys={['1']} mode='inline'>
-            <Menu.Item key='1' icon={<UserOutlined />}>
-              <Link to='/dashboard/users'>Пользователи</Link>
-            </Menu.Item>
+            {user.super_admin && (
+              <Menu.Item key='1' icon={<UserOutlined />}>
+                <Link to='/dashboard/users'>Пользователи</Link>
+              </Menu.Item>
+            )}
             <SubMenu key='sub1' icon={<AppstoreOutlined />} title='Продукты'>
               <Menu.Item key='2' icon={<AppstoreOutlined />}>
                 <Link to='/dashboard/products'>Продукты</Link>
@@ -109,17 +115,15 @@ export default function Dashboard() {
         </Sider>
         <Content style={{ margin: '20px' }}>
           <div>
-            <div>
-              <Routes>
-                <Route path='/users' element={<SuperAdminUsers />} />
-                <Route path='/categories' element={<Categories />} />
-                <Route path='/products' element={<Products />} />
-                <Route path='/warehouses' element={<Warehouses />} />
-                <Route path='/products_in' element={<ProductsIn />} />
-                <Route path='/products_out' element={<ProductsOut />} />
-                <Route path='/products_move' element={<ProductsMove />} />
-              </Routes>
-            </div>
+            <Routes>
+              <Route path='/categories' element={<Categories />} />
+              <Route path='/users' element={<SuperAdminUsers />} />
+              <Route path='/products' element={<Products />} />
+              <Route path='/warehouses' element={<Warehouses />} />
+              <Route path='/products_in' element={<ProductsIn />} />
+              <Route path='/products_out' element={<ProductsOut />} />
+              <Route path='/products_move' element={<ProductsMove />} />
+            </Routes>
           </div>
         </Content>
       </Layout>

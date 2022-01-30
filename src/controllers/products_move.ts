@@ -70,6 +70,21 @@ export const removeProductMove = async (req: Request, res: Response) => {
     const product_move = await ProductMove.findById(id)
     if (!product_move) throw new Error('ProductMove not found')
 
+    await checkRemains(
+      product_move.products.map(product => ({
+        warehouse: product_move.warehouse_from,
+        product: product.product,
+        quantity_add: product.quantity,
+      }))
+    )
+    await checkRemains(
+      product_move.products.map(product => ({
+        warehouse: product_move.warehouse_to,
+        product: product.product,
+        quantity_add: -product.quantity,
+      }))
+    )
+
     await changeRemains(
       product_move.products.map(product => ({
         warehouse: product_move.warehouse_from,
@@ -106,6 +121,39 @@ export const updateProductMove = async (req: Request, res: Response) => {
     if (!old_product_move)
       return res.status(400).send(`ProductMove doens't Exists`)
 
+    await checkRemains(
+      old_product_move.products.map(product => ({
+        warehouse: old_product_move.warehouse_from,
+        product: product.product,
+        quantity_add: product.quantity,
+      }))
+    )
+    await checkRemains(
+      old_product_move.products.map(product => ({
+        warehouse: old_product_move.warehouse_to,
+        product: product.product,
+        quantity_add: -product.quantity,
+      }))
+    )
+    await checkRemains(
+      products.map(
+        (product: { product: string; name: string; quantity: number }) => ({
+          warehouse: warehouse_from,
+          product: product.product,
+          quantity_add: -product.quantity,
+        })
+      )
+    )
+    await checkRemains(
+      products.map(
+        (product: { product: string; name: string; quantity: number }) => ({
+          warehouse: warehouse_to,
+          product: product.product,
+          quantity_add: product.quantity,
+        })
+      )
+    )
+
     await changeRemains(
       old_product_move.products.map(product => ({
         warehouse: old_product_move.warehouse_from,
@@ -119,11 +167,6 @@ export const updateProductMove = async (req: Request, res: Response) => {
         product: product.product,
         quantity_add: -product.quantity,
       }))
-    )
-    await ProductMove.findByIdAndUpdate(
-      id,
-      { warehouse_to, warehouse_from, date, comment, products, user },
-      { new: true }
     )
     await changeRemains(
       products.map(
@@ -142,6 +185,12 @@ export const updateProductMove = async (req: Request, res: Response) => {
           quantity_add: product.quantity,
         })
       )
+    )
+
+    await ProductMove.findByIdAndUpdate(
+      id,
+      { warehouse_to, warehouse_from, date, comment, products, user },
+      { new: true }
     )
     res.send('ProductMove updated')
   } catch (err: any) {

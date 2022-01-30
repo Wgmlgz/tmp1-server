@@ -1,19 +1,16 @@
-import { Button, Card, Form, Input, message, Table } from 'antd'
+import { Button, Card, message, Popconfirm, Table } from 'antd'
 import { ColumnsType } from 'antd/lib/table'
 import axios from 'axios'
-import React, { FC, useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   createWarehouse,
   getWarehouses,
   removeWarehouse,
   updateWarehouse,
 } from '../../api/api'
-import {
-  PlusCircleOutlined,
-  DeleteOutlined,
-  EditOutlined,
-} from '@ant-design/icons'
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import WarehouseForm, { IWarehouseFull } from './WarehouseForm'
+import FullscreenCard from '../FullscreenCard'
 
 export default function Warehouses() {
   const [warehouses, setWarehouses] = useState<IWarehouseFull[]>([])
@@ -37,8 +34,9 @@ export default function Warehouses() {
       key: 'edit',
       render: (text, record, index) => (
         <div style={{ display: 'flex', gap: '10px' }}>
-          <Button
-            onClick={async () => {
+          <Popconfirm
+            title='Вы точно хотите удалить склад?'
+            onConfirm={async () => {
               try {
                 const res = await removeWarehouse(record._id)
                 message.success(res.data)
@@ -48,9 +46,13 @@ export default function Warehouses() {
                   message.error(err.response?.data)
                 }
               }
-            }}>
-            <DeleteOutlined />
-          </Button>
+            }}
+            okText='Да'
+            cancelText='Нет'>
+            <Button>
+              <DeleteOutlined />
+            </Button>
+          </Popconfirm>
           <Button
             onClick={() => {
               setEditedWarehouseId(record._id)
@@ -87,7 +89,7 @@ export default function Warehouses() {
             onSubmit={async warehouse => {
               try {
                 const res = await createWarehouse(warehouse)
-                message.success('saved')
+                message.success('Сохранено')
                 fetchWarehouses()
               } catch (err) {
                 if (axios.isAxiosError(err)) {
@@ -106,44 +108,27 @@ export default function Warehouses() {
         </div>
       </div>
       {edited_warehouse_id && (
-        <div
-          style={{
-            position: 'fixed',
-            left: 0,
-            top: 0,
-            width: '100%',
-            height: '100%',
-            zIndex: '100',
-            display: 'grid',
-            placeItems: 'center',
-            backdropFilter: 'blur(4px)',
-            backgroundColor: '#22222222',
-          }}
-          onClick={() => {
-            setEditedWarehouseId('')
-          }}>
-          <div onClick={e => e.stopPropagation()}>
-            <WarehouseForm
-              header='Изменить склад'
-              button='Изменить'
-              onCancel={() => setEditedWarehouseId('')}
-              warehouse={edited_warehouse}
-              onSubmit={async warehouse => {
-                try {
-                  await updateWarehouse(edited_warehouse_id, warehouse)
-                  await fetchWarehouses()
-                  message.success('Склад обновлен')
-                } catch (err) {
-                  if (axios.isAxiosError(err)) {
-                    String(err.response?.data)
-                      .split(',')
-                      .forEach(msg => message.error(msg))
-                  }
+        <FullscreenCard onCancel={() => setEditedWarehouseId('')}>
+          <WarehouseForm
+            header='Изменить склад'
+            button='Изменить'
+            onCancel={() => setEditedWarehouseId('')}
+            warehouse={edited_warehouse}
+            onSubmit={async warehouse => {
+              try {
+                await updateWarehouse(edited_warehouse_id, warehouse)
+                await fetchWarehouses()
+                message.success('Склад обновлен')
+              } catch (err) {
+                if (axios.isAxiosError(err)) {
+                  String(err.response?.data)
+                    .split(',')
+                    .forEach(msg => message.error(msg))
                 }
-              }}
-            />
-          </div>
-        </div>
+              }
+            }}
+          />
+        </FullscreenCard>
       )}
     </>
   )

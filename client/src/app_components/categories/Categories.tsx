@@ -1,5 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Form, Input, Button, message, Tag, Table, Card, Select } from 'antd'
+import {
+  Form,
+  Input,
+  Button,
+  message,
+  Tag,
+  Table,
+  Card,
+  Select,
+  Popconfirm,
+} from 'antd'
 import {
   categories_url,
   createCategory,
@@ -8,6 +18,11 @@ import {
 } from '../../api/api'
 import axios from 'axios'
 import { ColumnsType } from 'antd/lib/table'
+import {
+  PlusCircleOutlined,
+  DeleteOutlined,
+  EditOutlined,
+} from '@ant-design/icons'
 
 const { Option } = Select
 
@@ -35,7 +50,7 @@ export default function Categories() {
 
     try {
       const res = await createCategory(category)
-      message.success('saved')
+      message.success('Сохранено')
       fetchCategories()
     } catch (err) {
       if (axios.isAxiosError(err)) {
@@ -87,20 +102,25 @@ export default function Categories() {
       title: 'Удалить',
       key: 'remove',
       render: (text, record, index) => (
-        <Button
-          onClick={async () => {
+        <Popconfirm
+          title='Вы точно хотите удалить категорию?'
+          onConfirm={async () => {
             try {
               const res = await removeCategory(record._id)
-              message.success(res.data)
+              message.success("Категория удалена")
               fetchCategories()
             } catch (err) {
               if (axios.isAxiosError(err)) {
                 message.error(err.response?.data)
               }
             }
-          }}>
-          Detele
-        </Button>
+          }}
+          okText='Да'
+          cancelText='Нет'>
+          <Button>
+            <DeleteOutlined />
+          </Button>
+        </Popconfirm>
       ),
     },
   ]
@@ -134,7 +154,7 @@ export default function Categories() {
                   message: 'Пожалуйста, введите название категории!',
                 },
               ]}>
-              <Input placeholder='Name' />
+              <Input placeholder='Название' />
             </Form.Item>
             <Form.Item name='descriptrion'>
               <Input placeholder='Описание' />

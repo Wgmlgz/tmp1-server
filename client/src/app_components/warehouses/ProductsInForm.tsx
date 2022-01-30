@@ -14,10 +14,9 @@ import {
 } from 'antd'
 import { ColumnsType } from 'antd/lib/table'
 import axios from 'axios'
-import moment, { locale } from 'moment'
-import { FC, useCallback, useEffect, useState } from 'react'
+import moment from 'moment'
+import { FC, useEffect, useState } from 'react'
 import { getProducts, getWarehouses, searchProducts } from '../../api/api'
-import { createProductIn, getProductsIn } from '../../api/products_in'
 import { highlightText } from '../products/Products'
 import { IProductFull } from '../products/ProductsForm'
 import { IWarehouseFull } from './WarehouseForm'
@@ -157,6 +156,7 @@ export const ProductsInForm: FC<Props> = ({
       key: 'quantity',
       render: (text, record, index) => (
         <InputNumber
+          min={0}
           value={record.quantity}
           onChange={e => {
             const new_products = [...products]

@@ -267,7 +267,8 @@ const ProductsForm: FC<Props> = ({
                     },
                   ]}>
                   <InputNumber
-                    defaultValue={product?.buy_price}
+                    min={0}
+                    defaultValue={Number(product?.buy_price)}
                     placeholder='Закупочная цена'
                   />
                 </Form.Item>
@@ -281,7 +282,8 @@ const ProductsForm: FC<Props> = ({
                     },
                   ]}>
                   <InputNumber
-                    defaultValue={product?.delivery_price}
+                    min={0}
+                    defaultValue={Number(product?.delivery_price)}
                     placeholder='Цена доставки'
                   />
                 </Form.Item>
@@ -294,6 +296,7 @@ const ProductsForm: FC<Props> = ({
                     { required: true, message: 'Пожалуйста, введите высоту!' },
                   ]}>
                   <InputNumber
+                    min={0}
                     defaultValue={product?.height}
                     placeholder='Высота'
                   />
@@ -305,6 +308,7 @@ const ProductsForm: FC<Props> = ({
                     { required: true, message: 'Пожалуйста, введите длинну!' },
                   ]}>
                   <InputNumber
+                    min={0}
                     defaultValue={product?.length}
                     placeholder='Длина'
                   />
@@ -316,6 +320,7 @@ const ProductsForm: FC<Props> = ({
                     { required: true, message: 'Пожалуйста, введите ширина!' },
                   ]}>
                   <InputNumber
+                    min={0}
                     defaultValue={product?.width}
                     placeholder='Ширина'
                   />
@@ -327,6 +332,7 @@ const ProductsForm: FC<Props> = ({
                     { required: true, message: 'Пожалуйста, введите вес!' },
                   ]}>
                   <InputNumber
+                    min={0}
                     addonAfter='g'
                     defaultValue={product?.weight}
                     placeholder='Вес'

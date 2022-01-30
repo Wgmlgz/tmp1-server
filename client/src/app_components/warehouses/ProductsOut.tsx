@@ -1,4 +1,4 @@
-import { Button, Card, message } from 'antd'
+import { Button, Card, message, Popconfirm } from 'antd'
 import Table, { ColumnsType } from 'antd/lib/table'
 import React, { useEffect, useState } from 'react'
 import {
@@ -23,6 +23,7 @@ import { IWarehouseFull } from './WarehouseForm'
 import { getProducts, getWarehouses } from '../../api/api'
 import { IProductFull } from '../products/ProductsForm'
 import moment from 'moment'
+import FullscreenCard from '../FullscreenCard'
 
 export default function ProductsOut() {
   const [products_out, setProductsOut] = useState<IProductOutFull[]>([])
@@ -113,8 +114,9 @@ export default function ProductsOut() {
       key: 'remove',
       render: (text, record, index) => (
         <div style={{ display: 'flex', gap: '10px' }}>
-          <Button
-            onClick={async () => {
+          <Popconfirm
+            title='Вы точно хотите удалить списание?'
+            onConfirm={async () => {
               try {
                 const res = await removeProductOut(record._id)
                 message.success(res.data)
@@ -124,9 +126,13 @@ export default function ProductsOut() {
                   message.error(err.response?.data)
                 }
               }
-            }}>
-            <DeleteOutlined />
-          </Button>
+            }}
+            okText='Да'
+            cancelText='Нет'>
+            <Button>
+              <DeleteOutlined />
+            </Button>
+          </Popconfirm>
           <Button
             onClick={() => {
               setEditedProductOutId(record._id)
@@ -141,62 +147,47 @@ export default function ProductsOut() {
   return (
     <>
       {product_out_cteation && (
-        <div
-          className='full-screen-card-style'
-          onClick={() => {
-            setProductOutCreation(false)
-          }}>
-          <div onClick={e => e.stopPropagation()}>
-            <ProductsOutForm
-              onCancel={() => setProductOutCreation(false)}
-              onSubmit={async (data: IProductOut) => {
-                try {
-                  const res = await createProductOut(data)
-                  await fetchProductsOut()
-                  message.success(res.data)
-                  setProductOutCreation(false)
-                } catch (err) {
-                  if (axios.isAxiosError(err)) {
-                    message.error(err.response?.data)
-                  }
+        <FullscreenCard onCancel={() => setProductOutCreation(false)}>
+          <ProductsOutForm
+            onCancel={() => setProductOutCreation(false)}
+            onSubmit={async (data: IProductOut) => {
+              try {
+                const res = await createProductOut(data)
+                await fetchProductsOut()
+                message.success(res.data)
+                setProductOutCreation(false)
+              } catch (err) {
+                if (axios.isAxiosError(err)) {
+                  message.error(err.response?.data)
                 }
-              }}
-              header='Новое списание'
-              button='Создать новое списание'
-            />
-          </div>
-        </div>
+              }
+            }}
+            header='Новое списание'
+            button='Создать новое списание'
+          />
+        </FullscreenCard>
       )}
       {edited_product_out_id && (
-        <div
-          className='full-screen-card-style'
-          onClick={() => {
-            setEditedProductOutId('')
-          }}>
-          <div onClick={e => e.stopPropagation()}>
-            <ProductsOutForm
-              product_out={edited_product_out}
-              onCancel={() => setEditedProductOutId('')}
-              onSubmit={async (data: IProductOut) => {
-                try {
-                  const res = await updateProductOut(
-                    edited_product_out_id,
-                    data
-                  )
-                  await fetchProductsOut()
-                  message.success(res.data)
-                  setEditedProductOutId('')
-                } catch (err) {
-                  if (axios.isAxiosError(err)) {
-                    message.error(err.response?.data)
-                  }
+        <FullscreenCard onCancel={() => setEditedProductOutId('')}>
+          <ProductsOutForm
+            product_out={edited_product_out}
+            onCancel={() => setEditedProductOutId('')}
+            onSubmit={async (data: IProductOut) => {
+              try {
+                const res = await updateProductOut(edited_product_out_id, data)
+                await fetchProductsOut()
+                message.success(res.data)
+                setEditedProductOutId('')
+              } catch (err) {
+                if (axios.isAxiosError(err)) {
+                  message.error(err.response?.data)
                 }
-              }}
-              header='Обновить списание'
-              button='Обновить списание'
-            />
-          </div>
-        </div>
+              }
+            }}
+            header='Обновить списание'
+            button='Обновить списание'
+          />
+        </FullscreenCard>
       )}
       <Card
         title='Списания'

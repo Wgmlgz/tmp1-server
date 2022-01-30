@@ -1,13 +1,13 @@
 import axios from 'axios'
-import { login } from '../api/api'
+import { getUser, login } from '../api/api'
 import 'antd/dist/antd.css'
-import { Form, Input, Button, Alert } from 'antd'
+import { Form, Input, Button, Alert, message } from 'antd'
 import { FC, useState } from 'react'
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
 
 const LoginForm: FC = () => {
   const [err_msg, setErrMsg] = useState('')
-
+  const [user, setUser] = useState<any>()
   const onFinish = async ({
     email,
     password,
@@ -19,7 +19,13 @@ const LoginForm: FC = () => {
     try {
       const res = await login(email, password)
       setErrMsg('')
-      window.location.replace('/dashboard')
+      const user = await getUser()
+      setUser(user.data)
+      if (!user.data.admin && !user.data.super_admin) {
+        message.error('Вы не админ')
+      } else {
+        window.location.replace('/dashboard')
+      }
     } catch (err) {
       if (axios.isAxiosError(err)) {
         console.log(err)

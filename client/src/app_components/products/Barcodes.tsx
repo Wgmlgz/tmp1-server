@@ -20,16 +20,19 @@ const Barcodes: FC<Props> = ({ barcodes }) => {
   const renderBarcode = useCallback(
     (barcode: Barcode, x: number, y: number) => {
       try {
-        JsBarcode(tmp_canvas_ref.current).EAN13(barcode.barcode, {}).render()
+        JsBarcode(tmp_canvas_ref.current)
+          .EAN13(barcode.barcode, { width: 1.8, height: 50 })
+          .render()
         const ctx = canvas_ref.current?.getContext('2d')
         if (!ctx) return
         tmp_canvas_ref.current &&
-          ctx.drawImage(tmp_canvas_ref.current, x, y + 40)
+          ctx.drawImage(tmp_canvas_ref.current, x, y + 60)
 
         ctx.fillStyle = '#000'
-        ctx.font = '20px monospace'
-        ctx.fillText(barcode.name, x, y)
-        ctx.fillText(barcode.article, x, y + 30)
+        ctx.font = '15px serif'
+        ctx.fillText(barcode.name, x + 10, y + 25, 200)
+        ctx.fillText(`Артикул: ${barcode.article}`, x + 10, y + 50, 200)
+        ctx.strokeRect(x, y, 220, 152)
       } catch (err: any) {
         message.error(err)
       }
@@ -49,13 +52,14 @@ const Barcodes: FC<Props> = ({ barcodes }) => {
     ctx.fillStyle = '#fff'
     ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-    barcodes.forEach((barcode, i) => renderBarcode(barcode, 30, 250 * i + 40))
+    barcodes.forEach((barcode, i) => renderBarcode(barcode, 30, 190 * i + 30))
   }, [barcodes, renderBarcode])
 
   return (
     <>
       <canvas ref={tmp_canvas_ref} hidden={true} />
-      <Card style={{ width: 'fit-content', height: '80vh', overflowY: 'scroll' }}>
+      <Card
+        style={{ width: 'fit-content', height: '80vh', overflowY: 'scroll' }}>
         <div>
           <canvas ref={canvas_ref} />
         </div>

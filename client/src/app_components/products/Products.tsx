@@ -1,4 +1,4 @@
-import { Button, Card, Input, message, Select, Table } from 'antd'
+import { Button, Card, Input, message, Popconfirm, Select, Table } from 'antd'
 import { FC, Key, useEffect, useState } from 'react'
 import {
   createProduct,
@@ -21,6 +21,7 @@ import reactStringReplace from 'react-string-replace'
 import React from 'react'
 import { getRemains } from '../../api/remains'
 import { IWarehouseFull } from '../warehouses/WarehouseForm'
+import FullscreenCard from '../FullscreenCard'
 
 export const highlightText = (str: string, search: string) => (
   <div>
@@ -35,19 +36,6 @@ export const highlightText = (str: string, search: string) => (
 )
 
 const { Option } = Select
-
-const full_screen_card_style: CSS.Properties = {
-  position: 'fixed',
-  left: 0,
-  top: 0,
-  width: '100%',
-  height: '100%',
-  zIndex: '100',
-  display: 'grid',
-  placeItems: 'center',
-  backdropFilter: 'blur(4px)',
-  backgroundColor: '#22222222',
-}
 
 interface IRemain {
   product: string
@@ -106,7 +94,9 @@ const Products = () => {
 
       const map = new Map<string, string>()
       remains_res.data.forEach((remain: IRemain) => {
-        const str = `${warehouses_map.get(remain.warehouse)} - ${remain.quantity}`
+        const str = `${warehouses_map.get(remain.warehouse)} - ${
+          remain.quantity
+        }`
         const old = map.get(remain.product)
         map.set(remain.product, old ? `${old}\n${str}` : str)
       })
@@ -160,7 +150,7 @@ const Products = () => {
       title: 'Имя (нажмите, чтобы изменить)',
       dataIndex: 'name',
       key: 'name',
-      sorter: (a, b) => a.delivery_price.localeCompare(b.delivery_price),
+      sorter: (a, b) => a.name.localeCompare(b.name),
       render: (text, record, index) => (
         <Button
           onClick={() => {
@@ -175,13 +165,15 @@ const Products = () => {
       title: 'Закупочная цена',
       dataIndex: 'buy_price',
       key: 'buy_price',
-      sorter: (a, b) => a.buy_price.localeCompare(b.buy_price),
+      sorter: (a, b) =>
+        Number.parseInt(a.buy_price) - Number.parseInt(b.buy_price),
     },
     {
       title: 'Цена доставки',
       dataIndex: 'delivery_price',
       key: 'delivery_price',
-      sorter: (a, b) => a.delivery_price.localeCompare(b.delivery_price),
+      sorter: (a, b) =>
+        Number.parseInt(a.delivery_price) - Number.parseInt(b.delivery_price),
     },
     {
       title: 'Создан',
@@ -206,21 +198,18 @@ const Products = () => {
   return (
     <>
       {barcodes_creation && (
-        <div
-          style={full_screen_card_style}
-          onClick={() => {
+        <FullscreenCard
+          onCancel={() => {
             setBarcodesCreation(false)
           }}>
-          <div onClick={e => e.stopPropagation()}>
-            <Barcodes
-              barcodes={selected_products.map(product => ({
-                barcode: product.barcode || '',
-                name: product.name || '',
-                article: product.article || '',
-              }))}
-            />
-          </div>
-        </div>
+          <Barcodes
+            barcodes={selected_products.map(product => ({
+              barcode: product.barcode || '',
+              name: product.name || '',
+              article: product.article || '',
+            }))}
+          />
+        </FullscreenCard>
       )}
       <div style={{ width: '100%' }}>
         <Card
@@ -281,61 +270,48 @@ const Products = () => {
         </Card>
       </div>
       {product_creation && (
-        <div
-          style={full_screen_card_style}
-          onClick={() => {
-            setProductCreation(false)
-          }}>
-          <div onClick={e => e.stopPropagation()}>
-            <ProductsForm
-              header='Создать новый продукт'
-              button='Создать'
-              onSubmit={async product => {
-                try {
-                  await createProduct(product)
-                  await fetchProducts()
-                  setProductCreation(false)
-                  message.success('Продукт создан')
-                } catch (err) {
-                  if (axios.isAxiosError(err)) {
-                    String(err.response?.data)
-                      .split(',')
-                      .forEach(msg => message.error(msg))
-                  }
+        <FullscreenCard onCancel={() => setProductCreation(false)}>
+          <ProductsForm
+            header='Создать новый продукт'
+            button='Создать'
+            onSubmit={async product => {
+              try {
+                await createProduct(product)
+                await fetchProducts()
+                setProductCreation(false)
+                message.success('Продукт создан')
+              } catch (err) {
+                if (axios.isAxiosError(err)) {
+                  String(err.response?.data)
+                    .split(',')
+                    .forEach(msg => message.error(msg))
                 }
-              }}
-            />
-          </div>
-        </div>
+              }
+            }}
+          />
+        </FullscreenCard>
       )}
       {edited_product_id && (
-        <div
-          style={full_screen_card_style}
-          onClick={() => {
-            setEditedProductId('')
-          }}>
-          <div onClick={e => e.stopPropagation()}>
-            <ProductsForm
-              header='Изменить продукт'
-              button='Изменить'
-              onCancel={() => setEditedProductId('')}
-              product={edited_product}
-              onSubmit={async product => {
-                try {
-                  await updateProduct(product, edited_product_id)
-                  await fetchProducts()
-                  message.success('Продукт обновлен')
-                } catch (err) {
-                  if (axios.isAxiosError(err)) {
-                    String(err.response?.data)
-                      .split(',')
-                      .forEach(msg => message.error(msg))
-                  }
+        <FullscreenCard onCancel={() => setEditedProductId('')}>
+          <ProductsForm
+            header='Изменить продукт'
+            button='Изменить'
+            product={edited_product}
+            onSubmit={async product => {
+              try {
+                await updateProduct(product, edited_product_id)
+                await fetchProducts()
+                message.success('Продукт обновлен')
+              } catch (err) {
+                if (axios.isAxiosError(err)) {
+                  String(err.response?.data)
+                    .split(',')
+                    .forEach(msg => message.error(msg))
                 }
-              }}
-            />
-          </div>
-        </div>
+              }
+            }}
+          />
+        </FullscreenCard>
       )}
     </>
   )

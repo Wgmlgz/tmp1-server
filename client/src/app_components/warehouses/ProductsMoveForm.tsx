@@ -158,6 +158,7 @@ export const ProductsMoveForm: FC<Props> = ({
       key: 'quantity',
       render: (text, record, index) => (
         <InputNumber
+          min={0}
           value={record.quantity}
           onChange={e => {
             const new_products = [...products]
