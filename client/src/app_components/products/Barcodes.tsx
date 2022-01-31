@@ -58,9 +58,9 @@ const Barcodes: FC<Props> = ({ barcodes }) => {
   return (
     <>
       <canvas ref={tmp_canvas_ref} hidden={true} />
-      <Card
-        style={{ width: 'fit-content', height: '80vh', overflowY: 'scroll' }}>
-        <div>
+      <Card>
+        <div
+          style={{ width: 'fit-content', height: '60vh', overflowY: 'scroll' }}>
           <canvas ref={canvas_ref} />
         </div>
         <div style={{ display: 'grid', placeItems: 'center' }}>

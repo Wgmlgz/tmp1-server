@@ -261,14 +261,20 @@ export const ProductsOutForm: FC<Props> = ({
                       data: string,
                       { label, value }: { label: string; value: string }
                     ) => {
-                      setProducts([
-                        ...products,
-                        {
-                          product: value,
-                          name: products_map.get(value) || '',
-                          quantity: 0,
-                        },
-                      ])
+                      let add = true
+                      products.forEach(product => {
+                        if (product.product === value) add = false
+                      })
+                      if (add)
+                        setProducts([
+                          ...products,
+                          {
+                            product: value,
+                            name: products_map.get(value) || '',
+                            quantity: 0,
+                          },
+                        ])
+                      else message.info('Продукт уже довавлен')
                       setNewProductName('')
                     }}
                     onSearch={e => {
