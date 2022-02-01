@@ -57,7 +57,7 @@ export default function Dashboard() {
             gap: '20px',
           }}>
           <div style={{ fontWeight: 'bold', color: 'white', fontSize: '2em' }}>
-            ЗАГОЛОВОК
+            MIRACLUS
           </div>
           <div
             style={{

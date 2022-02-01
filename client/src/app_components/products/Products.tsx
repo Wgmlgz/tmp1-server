@@ -23,6 +23,9 @@ import { getRemains } from '../../api/remains'
 import { IWarehouseFull } from '../warehouses/WarehouseForm'
 import FullscreenCard from '../FullscreenCard'
 
+import ExcelJS from 'exceljs'
+import { saveAs } from 'file-saver'
+
 export const highlightText = (str: string, search: string) => (
   <div>
     {search
@@ -41,6 +44,16 @@ interface IRemain {
   product: string
   warehouse: string
   quantity: number
+}
+
+async function saveFile(fileName: string, workbook: ExcelJS.Workbook) {
+  const xls64 = await workbook.xlsx.writeBuffer({ base64: true } as any)
+  saveAs(
+    new Blob([xls64], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    }),
+    fileName
+  )
 }
 
 const Products = () => {
@@ -243,6 +256,57 @@ const Products = () => {
           title='Все продукты'
           extra={
             <div style={{ display: 'flex', gap: '20px' }}>
+              <Button
+                onClick={async () => {
+                  const workbook = new ExcelJS.Workbook()
+                  const worksheet = workbook.addWorksheet('My Sheet')
+
+                  worksheet.columns = [
+                    { header: 'type', key: 'type' },
+                    { header: 'category', key: 'category' },
+                    { header: 'article', key: 'article' },
+                    { header: 'name', key: 'name' },
+                    { header: 'description', key: 'description' },
+                    { header: 'tags', key: 'tags' },
+                    { header: 'imgs', key: 'imgs' },
+                    { header: 'imgs_big', key: 'imgs_big' },
+                    { header: 'imgs_small', key: 'imgs_small' },
+                    { header: 'videos', key: 'videos' },
+                    { header: 'buy_price', key: 'buy_price' },
+                    { header: 'delivery_price', key: 'delivery_price' },
+                    { header: 'height', key: 'height' },
+                    { header: 'length', key: 'length' },
+                    { header: 'width', key: 'width' },
+                    { header: 'weight', key: 'weight' },
+                    { header: 'brand', key: 'brand' },
+                    { header: 'provider', key: 'provider' },
+                    { header: 'address', key: 'address' },
+                    { header: 'mark', key: 'mark' },
+                    { header: 'country', key: 'country' },
+                    { header: 'created', key: 'created' },
+                    { header: 'user_creator_id', key: 'user_creator_id' },
+                    { header: 'changed', key: 'changed' },
+                    { header: 'user_changed_id', key: 'user_changed_id' },
+                    { header: 'barcode', key: 'barcode' },
+                  ]
+                  selected_products.forEach((product: any) => {
+                    worksheet.addRow({
+                      ...product,
+                      created: new Date(product.created),
+                      changed: new Date(product.changed),
+                      videos: product.videos?.join('; '),
+                      tags: product.tags?.join('; '),
+                      imgs: product.imgs?.join('; '),
+                      imgs_big: product.imgs_big?.join('; '),
+                      imgs_small: product.imgs_small?.join('; '),
+                    })
+                  })
+                  saveFile('fileNameXXX', workbook)
+
+                  console.log(worksheet)
+                }}>
+                excel
+              </Button>
               <Popconfirm
                 onCancel={() => {}}
                 onConfirm={async () => {

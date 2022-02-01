@@ -14,7 +14,7 @@ const storage = multer.diskStorage({
     cb(null, UPLOAD_FILES_DIR)
   },
   filename(req, file, cb) {
-    cb(null, uuidv4() + '-' + Date.now() + path.extname(file.originalname))
+    cb(null, `${uuidv4()}-${Date.now()}-orig.jpg`)
   },
 })
 
@@ -49,11 +49,11 @@ const parseReqToProduct = (req: Request) => {
 
   // @ts-ignore
   req.files?.forEach(i => {
-    const orig_path = i.path,
-      small_path = `${uuidv4()}-${Date.now()}-small-${path.extname(
-        i.originalname
-      )}`,
-      big_path = `${uuidv4()}-${Date.now()}-big-${path.extname(i.originalname)}`
+    console.log('aboba', i);
+    
+    const orig_path = i.filename,
+      small_path = `${uuidv4()}-${Date.now()}-small.jpg`,
+      big_path = `${uuidv4()}-${Date.now()}-big.jpg`
     resizeImg1024(i.path, i.destination + '/' + big_path)
     resizeImg150(i.path, i.destination + '/' + small_path)
 
@@ -178,7 +178,7 @@ export const removeProducts = async (req: Request, res: Response) => {
     await Promise.all(
       products.map(async (product: string) => {
         await Product.findByIdAndRemove(product)
-        await RemainModel.remove({ product })
+        await RemainModel.deleteMany({ product })
       })
     )
     res.status(200).json('Products deleated')
