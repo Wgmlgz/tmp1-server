@@ -5,6 +5,7 @@ import {
   Input,
   InputNumber,
   message,
+  Popconfirm,
   Select,
   Tag,
 } from 'antd'
@@ -53,6 +54,7 @@ export interface IProductFull extends IProduct {
 interface Props {
   onSubmit: (product: IProduct) => any
   onCancel?: () => any
+  onRemove?: () => any
   header: string
   button: string
   product?: IProductFull
@@ -61,6 +63,7 @@ interface Props {
 const ProductsForm: FC<Props> = ({
   onSubmit,
   onCancel,
+  onRemove,
   header,
   button,
   product,
@@ -369,6 +372,22 @@ const ProductsForm: FC<Props> = ({
                 {button}
               </Button>
             </Form.Item>
+            {onRemove && (
+              <Form.Item>
+                <Popconfirm
+                  onCancel={() => {}}
+                  onConfirm={onRemove}
+                  title={`Вы точно хотите безвозвратно удалить продукт?`}
+                  okText='Да'
+                  cancelText='Нет'>
+                  <Button
+                    style={{ width: '100%', backgroundColor: '#ff5555' }}
+                  >
+                    Удалить
+                  </Button>
+                </Popconfirm>
+              </Form.Item>
+            )}
             {onCancel && (
               <Form.Item>
                 <Button style={{ width: '100%' }} onClick={onCancel}>

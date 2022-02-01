@@ -6,6 +6,7 @@ import Product from '../models/product'
 import { IUser } from '../models/user'
 import { resizeImg1024, resizeImg150 } from '../util/imgs'
 import mongoose from 'mongoose'
+import RemainModel from '../models/remains'
 
 const UPLOAD_FILES_DIR = './upload/products'
 const storage = multer.diskStorage({
@@ -165,6 +166,22 @@ export const getProduct = async (req: Request, res: Response) => {
 
     const product = await Product.findById(id)
     res.status(200).json(product)
+  } catch (err: any) {
+    res.status(400).send(err.message)
+  }
+}
+
+export const removeProducts = async (req: Request, res: Response) => {
+  try {
+    const { products } = req.body
+
+    await Promise.all(
+      products.map(async (product: string) => {
+        await Product.findByIdAndRemove(product)
+        await RemainModel.remove({ product })
+      })
+    )
+    res.status(200).json('Products deleated')
   } catch (err: any) {
     res.status(400).send(err.message)
   }

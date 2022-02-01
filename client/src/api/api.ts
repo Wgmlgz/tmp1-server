@@ -71,6 +71,8 @@ export const getProducts = (pageNumber: number, nPerPage: number) =>
   axios.get(`${products_url}/page/${pageNumber}/${nPerPage}`)
 export const getProduct = (id: string) =>
   axios.get(`${products_url}/product/${id}`)
+export const removeProducts = (ids: string[]) =>
+  axios.post(`${products_url}/remove`, { products: ids })
 export const getProductName = async (id: string): Promise<string> => {
   const product = await getProduct(id)
   return product.data.name

@@ -9,6 +9,7 @@ import {
   updateProduct,
   upload,
   getProduct,
+  removeProducts,
 } from '../controllers/products'
 
 const router = express.Router()
@@ -21,6 +22,7 @@ router.patch(
   updateProduct
 )
 router.get('/product/:id', authenticateAdmin, getProduct)
+router.post('/remove', authenticateAdmin, removeProducts)
 router.get('/page/:pageNumber/:nPerPage', authenticateAdmin, getProducts)
 router.get('/img/:id', getImg)
 router.get('/count', authenticateAdmin, getCount)

@@ -1,5 +1,5 @@
 import { Button, Card, Input, message, Popconfirm, Select, Table } from 'antd'
-import { FC, Key, useEffect, useState } from 'react'
+import { Key, useEffect, useState } from 'react'
 import {
   createProduct,
   getCategories,
@@ -7,6 +7,7 @@ import {
   getProductsCount,
   getWarehouses,
   products_url,
+  removeProducts,
   searchProducts,
   updateProduct,
 } from '../../api/api'
@@ -16,10 +17,8 @@ import { ICategory } from '../categories/Categories'
 import ProductsForm, { IProductFull } from './ProductsForm'
 import moment from 'moment'
 import Barcodes from './Barcodes'
-import CSS from 'csstype'
 
 import reactStringReplace from 'react-string-replace'
-import React from 'react'
 import { getRemains } from '../../api/remains'
 import { IWarehouseFull } from '../warehouses/WarehouseForm'
 import FullscreenCard from '../FullscreenCard'
@@ -63,10 +62,7 @@ const Products = () => {
   /** maps product_id to warehouse-count */
   const [remains_map, setRemainsMap] = useState(new Map<string, string>())
 
-  const [pagination, setPagination] = useState<TablePaginationConfig>({
-    current: 1,
-    pageSize: 2,
-  })
+  const [pagination, setPagination] = useState<TablePaginationConfig>({})
   // fetch
   const [loading, setLoading] = useState(false)
 
@@ -247,6 +243,26 @@ const Products = () => {
           title='Все продукты'
           extra={
             <div style={{ display: 'flex', gap: '20px' }}>
+              <Popconfirm
+                onCancel={() => {}}
+                onConfirm={async () => {
+                  try {
+                    await removeProducts(
+                      selected_products.map(product => product._id)
+                    )
+                    await fetchProducts()
+                    message.success('Продукты удалены')
+                  } catch (e) {
+                    if (axios.isAxiosError(e)) {
+                      message.error(e.response?.data)
+                    }
+                  }
+                }}
+                title={`Вы точно хотите безвозвратно удалить ${selected_products.length} продуктов?`}
+                okText='Да'
+                cancelText='Нет'>
+                <Button>Удалить продукты</Button>
+              </Popconfirm>
               <Button
                 onClick={() => {
                   setBarcodesCreation(true)
@@ -298,7 +314,10 @@ const Products = () => {
             dataSource={active_products.map(t => ({ ...t, key: t._id }))}
             columns={columns}
             loading={loading}
-            pagination={pagination}
+            pagination={{
+              ...pagination,
+              pageSizeOptions: ['50', '100', '200'],
+            }}
             onChange={fetchProductsPagination}
           />
         </Card>
@@ -341,6 +360,18 @@ const Products = () => {
                   String(err.response?.data)
                     .split(',')
                     .forEach(msg => message.error(msg))
+                }
+              }
+            }}
+            onRemove={async () => {
+              try {
+                await removeProducts([edited_product?._id ?? ''])
+                await fetchProducts()
+                setEditedProductId('')
+                message.success('Продукт удален')
+              } catch (e) {
+                if (axios.isAxiosError(e)) {
+                  message.error(e.response?.data)
                 }
               }
             }}
