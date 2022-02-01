@@ -20,7 +20,7 @@ import {
 } from '../../api/products_move'
 import axios from 'axios'
 import { IWarehouseFull } from './WarehouseForm'
-import { getProducts, getWarehouses } from '../../api/api'
+import { getWarehouses } from '../../api/api'
 import { IProductFull } from '../products/ProductsForm'
 import moment from 'moment'
 import FullscreenCard from '../FullscreenCard'
@@ -31,7 +31,6 @@ export default function ProductsMove() {
     useState<boolean>(false)
 
   const [warehouses_map, setWarehousesMap] = useState(new Map<string, string>())
-  const [products_map, setProductsMap] = useState(new Map<string, string>())
 
   const [edited_product_move_id, setEditedProductMoveId] = useState<string>('')
   const [edited_product_move, setEditedProductMove] =
@@ -53,20 +52,12 @@ export default function ProductsMove() {
     const setup = async () => {
       try {
         const res_warehouses = await getWarehouses()
-        const res_products = await getProducts()
+
         setWarehousesMap(
           new Map<string, string>(
             res_warehouses.data.map((warehouse: IWarehouseFull) => [
               warehouse._id,
               warehouse.name,
-            ])
-          )
-        )
-        setProductsMap(
-          new Map<string, string>(
-            res_products.data.map((product: IProductFull) => [
-              product._id,
-              product.name,
             ])
           )
         )
@@ -110,10 +101,7 @@ export default function ProductsMove() {
       render: (text, record, index) => (
         <p style={{ whiteSpace: 'pre' }}>
           {record.products
-            .map(
-              product =>
-                `${products_map.get(product.product)}  ${product.quantity}`
-            )
+            .map(product => `${product.name}  ${product.quantity}`)
             .join('\n')}
         </p>
       ),

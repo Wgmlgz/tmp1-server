@@ -4,13 +4,14 @@ import {
   createProduct,
   getCategories,
   getProducts,
+  getProductsCount,
   getWarehouses,
   products_url,
   searchProducts,
   updateProduct,
 } from '../../api/api'
 import axios from 'axios'
-import { ColumnsType } from 'antd/lib/table'
+import { ColumnsType, TablePaginationConfig } from 'antd/lib/table'
 import { ICategory } from '../categories/Categories'
 import ProductsForm, { IProductFull } from './ProductsForm'
 import moment from 'moment'
@@ -62,6 +63,13 @@ const Products = () => {
   /** maps product_id to warehouse-count */
   const [remains_map, setRemainsMap] = useState(new Map<string, string>())
 
+  const [pagination, setPagination] = useState<TablePaginationConfig>({
+    current: 1,
+    pageSize: 2,
+  })
+  // fetch
+  const [loading, setLoading] = useState(false)
+
   useEffect(() => {
     const set = new Set(selected_row_keys)
     setSelectedProducts(products.filter(product => set.has(product._id)))
@@ -78,7 +86,11 @@ const Products = () => {
         categories_res.data.map((category: ICategory) => category.name)
       )
 
-      const res = await getProducts()
+      const res = await getProducts(
+        pagination.current ?? 0,
+        pagination.pageSize ?? 10
+      )
+      setPagination({ ...pagination, total: (await getProductsCount()).data })
       setSearchQuery('')
       setProducts(res.data)
 
@@ -195,6 +207,25 @@ const Products = () => {
     },
   ]
 
+  const fetchProductsPagination = async (pagination: TablePaginationConfig) => {
+    try {
+      setLoading(true)
+      const res = await getProducts(
+        pagination.current ?? 0,
+        pagination.pageSize ?? 10
+      )
+      const res_count = await getProductsCount()
+      setPagination({
+        pageSize: pagination.pageSize || 1,
+        current: pagination.current || 1,
+        total: res_count.data,
+      })
+      console.log(pagination)
+
+      setProducts(res.data)
+      setLoading(false)
+    } catch (err) {}
+  }
   return (
     <>
       {barcodes_creation && (
@@ -266,6 +297,9 @@ const Products = () => {
             }}
             dataSource={active_products.map(t => ({ ...t, key: t._id }))}
             columns={columns}
+            loading={loading}
+            pagination={pagination}
+            onChange={fetchProductsPagination}
           />
         </Card>
       </div>

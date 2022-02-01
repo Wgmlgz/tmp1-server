@@ -3,6 +3,7 @@ import ProductMove from '../models/products_move'
 import mongoose from 'mongoose'
 import { IUser } from '../models/user'
 import { changeRemains, checkRemains } from './remains'
+import Product from '../models/product'
 
 export const createProductMove = async (req: Request, res: Response) => {
   try {
@@ -201,15 +202,23 @@ export const updateProductMove = async (req: Request, res: Response) => {
 export const getProductsMove = async (req: Request, res: Response) => {
   try {
     const categories = await ProductMove.find()
-    const res_products_move = categories.map(product_move => ({
-      _id: product_move._id,
-      warehouse_to: product_move.warehouse_to,
-      warehouse_from: product_move.warehouse_from,
-      date: product_move.date,
-      user: product_move.user,
-      comment: product_move.comment,
-      products: product_move.products,
-    }))
+    const res_products_move = await Promise.all(
+      categories.map(async product_move => ({
+        _id: product_move._id,
+        warehouse_to: product_move.warehouse_to,
+        warehouse_from: product_move.warehouse_from,
+        date: product_move.date,
+        user: product_move.user,
+        comment: product_move.comment,
+        products: await Promise.all(
+          product_move.products.map(async product => ({
+            product: product.product,
+            quantity: product.quantity,
+            name: (await Product.findById(product.product))?.name,
+          }))
+        ),
+      }))
+    )
     res.status(200).json(res_products_move)
   } catch (err: any) {
     res.status(400).send(err.message)

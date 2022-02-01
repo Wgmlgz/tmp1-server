@@ -1,23 +1,17 @@
-import { Button, Card, message, Popconfirm } from 'antd'
+import { Button, Card, message } from 'antd'
 import Table, { ColumnsType } from 'antd/lib/table'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { IProductIn, IProductInFull, ProductsInForm } from './ProductsInForm'
 
-import {
-  PlusCircleOutlined,
-  DeleteOutlined,
-  EditOutlined,
-} from '@ant-design/icons'
+import { PlusCircleOutlined } from '@ant-design/icons'
 import {
   createProductIn,
   getProductsIn,
-  removeProductIn,
   updateProductIn,
 } from '../../api/products_in'
 import axios from 'axios'
 import { IWarehouseFull } from './WarehouseForm'
-import { getProducts, getWarehouses } from '../../api/api'
-import { IProductFull } from '../products/ProductsForm'
+import { getWarehouses } from '../../api/api'
 import moment from 'moment'
 import FullscreenCard from '../FullscreenCard'
 
@@ -42,7 +36,6 @@ export default function ProductsIn() {
   const [product_in_cteation, setProductInCreation] = useState<boolean>(false)
 
   const [warehouses_map, setWarehousesMap] = useState(new Map<string, string>())
-  const [products_map, setProductsMap] = useState(new Map<string, string>())
 
   const [edited_product_in_id, setEditedProductInId] = useState<string>('')
   const [edited_product_in, setEditedProductIn] = useState<IProductInFull>()
@@ -63,20 +56,11 @@ export default function ProductsIn() {
     const setup = async () => {
       try {
         const res_warehouses = await getWarehouses()
-        const res_products = await getProducts()
         setWarehousesMap(
           new Map<string, string>(
             res_warehouses.data.map((warehouse: IWarehouseFull) => [
               warehouse._id,
               warehouse.name,
-            ])
-          )
-        )
-        setProductsMap(
-          new Map<string, string>(
-            res_products.data.map((product: IProductFull) => [
-              product._id,
-              product.name,
             ])
           )
         )
@@ -113,10 +97,7 @@ export default function ProductsIn() {
       render: (text, record, index) => (
         <p style={{ whiteSpace: 'pre' }}>
           {record.products
-            .map(
-              product =>
-                `${products_map.get(product.product)}  ${product.quantity}`
-            )
+            .map(product => `${product.name}  ${product.quantity}`)
             .join('\n')}
         </p>
       ),
@@ -166,7 +147,7 @@ export default function ProductsIn() {
               try {
                 const res = await createProductIn(data)
                 await fetchProductsIn()
-                message.success("Оприходование создано")
+                message.success('Оприходование создано')
                 setProductInCreation(false)
               } catch (err) {
                 if (axios.isAxiosError(err)) {
@@ -188,7 +169,7 @@ export default function ProductsIn() {
               try {
                 const res = await updateProductIn(edited_product_in_id, data)
                 await fetchProductsIn()
-                message.success("Обновлено")
+                message.success('Обновлено')
                 setEditedProductInId('')
               } catch (err) {
                 if (axios.isAxiosError(err)) {

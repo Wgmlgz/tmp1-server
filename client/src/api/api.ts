@@ -67,10 +67,21 @@ export const createCategory = (category: ICategory) => {
 }
 
 /** Products */
-export const getProducts = () => axios.get(`${products_url}`)
+export const getProducts = (pageNumber: number, nPerPage: number) =>
+  axios.get(`${products_url}/page/${pageNumber}/${nPerPage}`)
+export const getProduct = (id: string) =>
+  axios.get(`${products_url}/product/${id}`)
+export const getProductName = async (id: string): Promise<string> => {
+  const product = await getProduct(id)
+  return product.data.name
+}
+export const getProductsCount = () => axios.get(`${products_url}/count`)
 
-export const searchProducts = (str: string) =>
-  axios.post(`${products_url}/search`, { str })
+export const searchProducts = (
+  str: string,
+  pageNumber: number = 0,
+  nPerPage: number = 1000000
+) => axios.post(`${products_url}/search/${pageNumber}/${nPerPage}`, { str })
 
 export const removeProduct = (id: string) =>
   axios.delete(`${products_url}/${id}`)

@@ -159,9 +159,35 @@ export const updateProduct = async (req: Request, res: Response) => {
   }
 }
 
+export const getProduct = async (req: Request, res: Response) => {
+  try {
+    let { id } = req.params
+
+    const product = await Product.findById(id)
+    res.status(200).json(product)
+  } catch (err: any) {
+    res.status(400).send(err.message)
+  }
+}
+
 export const getProducts = async (req: Request, res: Response) => {
   try {
+    let { pageNumber, nPerPage }: any = req.params
+
+    pageNumber = parseInt(pageNumber)
+    nPerPage = parseInt(nPerPage)
+
     const products = await Product.find()
+      .skip(pageNumber > 0 ? (pageNumber - 1) * nPerPage : 0)
+      .limit(nPerPage)
+    res.status(200).json(products)
+  } catch (err: any) {
+    res.status(400).send(err.message)
+  }
+}
+export const getCount = async (req: Request, res: Response) => {
+  try {
+    const products = await Product.count()
     res.status(200).json(products)
   } catch (err: any) {
     res.status(400).send(err.message)
@@ -172,15 +198,26 @@ export const searchProducts = async (req: Request, res: Response) => {
   try {
     const { str } = req.body
 
-    const products = await Product.find({
-      $or: [
-        { name: new RegExp(str, 'i') },
-        { article: new RegExp(str, 'i') },
-        { barcode: new RegExp(str, 'i') },
-      ],
-    })
+    let { pageNumber, nPerPage }: any = req.params
 
-    res.status(200).json(products)
+    pageNumber = parseInt(pageNumber)
+    nPerPage = parseInt(nPerPage)
+
+    if (str) {
+      const products = await Product.find({
+        $or: [
+          { name: new RegExp(str, 'i') },
+          { article: new RegExp(str, 'i') },
+          { barcode: new RegExp(str, 'i') },
+        ],
+      })
+        .skip(pageNumber > 0 ? (pageNumber - 1) * nPerPage : 0)
+        .limit(nPerPage)
+
+      res.status(200).json(products)
+    } else {
+      res.status(200).json([])
+    }
   } catch (err: any) {
     res.status(400).send(err.message)
   }

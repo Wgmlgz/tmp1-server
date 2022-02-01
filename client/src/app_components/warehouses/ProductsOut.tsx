@@ -15,13 +15,11 @@ import {
 import {
   createProductOut,
   getProductsOut,
-  removeProductOut,
   updateProductOut,
 } from '../../api/products_out'
 import axios from 'axios'
 import { IWarehouseFull } from './WarehouseForm'
-import { getProducts, getWarehouses } from '../../api/api'
-import { IProductFull } from '../products/ProductsForm'
+import { getWarehouses } from '../../api/api'
 import moment from 'moment'
 import FullscreenCard from '../FullscreenCard'
 
@@ -30,7 +28,6 @@ export default function ProductsOut() {
   const [product_out_cteation, setProductOutCreation] = useState<boolean>(false)
 
   const [warehouses_map, setWarehousesMap] = useState(new Map<string, string>())
-  const [products_map, setProductsMap] = useState(new Map<string, string>())
 
   const [edited_product_out_id, setEditedProductOutId] = useState<string>('')
   const [edited_product_out, setEditedProductOut] = useState<IProductOutFull>()
@@ -51,7 +48,7 @@ export default function ProductsOut() {
     const setup = async () => {
       try {
         const res_warehouses = await getWarehouses()
-        const res_products = await getProducts()
+        // const res_products = await getProducts()
         setWarehousesMap(
           new Map<string, string>(
             res_warehouses.data.map((warehouse: IWarehouseFull) => [
@@ -60,14 +57,14 @@ export default function ProductsOut() {
             ])
           )
         )
-        setProductsMap(
-          new Map<string, string>(
-            res_products.data.map((product: IProductFull) => [
-              product._id,
-              product.name,
-            ])
-          )
-        )
+        // setProductsMap(
+        //   new Map<string, string>(
+        //     res_products.data.map((product: IProductFull) => [
+        //       product._id,
+        //       product.name,
+        //     ])
+        //   )
+        // )
       } catch (err) {
         if (axios.isAxiosError(err)) {
           message.error(err.response?.data)
@@ -101,10 +98,7 @@ export default function ProductsOut() {
       render: (text, record, index) => (
         <p style={{ whiteSpace: 'pre' }}>
           {record.products
-            .map(
-              product =>
-                `${products_map.get(product.product)}  ${product.quantity}`
-            )
+            .map(product => `${product.name}  ${product.quantity}`)
             .join('\n')}
         </p>
       ),

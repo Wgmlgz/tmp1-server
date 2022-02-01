@@ -3,6 +3,7 @@ import ProductIn from '../models/products_in'
 import mongoose from 'mongoose'
 import { IUser } from '../models/user'
 import { changeRemains, checkRemains } from './remains'
+import Product from '../models/product'
 
 export const createProductIn = async (req: Request, res: Response) => {
   try {
@@ -134,14 +135,22 @@ export const updateProductIn = async (req: Request, res: Response) => {
 export const getProductsIn = async (req: Request, res: Response) => {
   try {
     const categories = await ProductIn.find()
-    const res_products_in = categories.map(product_in => ({
-      _id: product_in._id,
-      warehouse: product_in.warehouse,
-      date: product_in.date,
-      user: product_in.user,
-      comment: product_in.comment,
-      products: product_in.products,
-    }))
+    const res_products_in = await Promise.all(
+      categories.map(async product_in => ({
+        _id: product_in._id,
+        warehouse: product_in.warehouse,
+        date: product_in.date,
+        user: product_in.user,
+        comment: product_in.comment,
+        products: await Promise.all(
+          product_in.products.map(async product => ({
+            product: product.product,
+            quantity: product.quantity,
+            name: (await Product.findById(product.product))?.name,
+          }))
+        ),
+      }))
+    )
     res.status(200).json(res_products_in)
   } catch (err: any) {
     res.status(400).send(err.message)

@@ -14,10 +14,9 @@ import {
 } from 'antd'
 import { ColumnsType } from 'antd/lib/table'
 import axios from 'axios'
-import moment, { locale } from 'moment'
-import { FC, useCallback, useEffect, useState } from 'react'
-import { getProducts, getWarehouses, searchProducts } from '../../api/api'
-import { createProductMove, getProductsMove } from '../../api/products_move'
+import moment from 'moment'
+import { FC,  useEffect, useState } from 'react'
+import { getProductName, getWarehouses, searchProducts } from '../../api/api'
 import { highlightText } from '../products/Products'
 import { IProductFull } from '../products/ProductsForm'
 import { IWarehouseFull } from './WarehouseForm'
@@ -33,6 +32,7 @@ export interface IProductMove {
   products: {
     product: string
     quantity: number
+    name: string
   }[]
 }
 
@@ -64,7 +64,6 @@ export const ProductsMoveForm: FC<Props> = ({
   const [warehouses, setWarehouses] = useState<IWarehouseFull[]>([])
   const [search_products, setSearchProducts] = useState<IProductFull[]>([])
   const [products, setProducts] = useState<ProductMovefo[]>([])
-  const [products_map, setProductsMap] = useState(new Map<string, string>())
 
   const [edited_product, setEditedProduct] = useState(-1)
 
@@ -82,23 +81,7 @@ export const ProductsMoveForm: FC<Props> = ({
       try {
         const res_warehouses = await getWarehouses()
         setWarehouses(res_warehouses.data)
-        const res_products = await getProducts()
-
-        const new_products_map = new Map<string, string>(
-          res_products.data.map((product: IProductFull) => [
-            product._id,
-            product.name,
-          ])
-        )
-
-        product_move &&
-          setProducts(
-            product_move.products.map(product => ({
-              ...product,
-              name: new_products_map.get(product.product) || product.product,
-            }))
-          )
-        setProductsMap(new_products_map)
+        product_move && setProducts(product_move.products)
       } catch (err) {
         if (axios.isAxiosError(err)) {
           message.error(err.response?.data)
@@ -133,13 +116,13 @@ export const ProductsMoveForm: FC<Props> = ({
                 value: product._id,
               })) as any
             }
-            onSelect={(
+            onSelect={async (
               data: string,
               { label, value }: { label: string; value: string }
             ) => {
               const new_products = products
               new_products[index].product = value
-              new_products[index].name = products_map.get(value) || ''
+              new_products[index].name = await getProductName(value)
               setProducts(new_products)
               setEditedProduct(-1)
             }}
@@ -274,7 +257,7 @@ export const ProductsMoveForm: FC<Props> = ({
                         value: product._id,
                       })) as any
                     }
-                    onSelect={(
+                    onSelect={async (
                       data: string,
                       { label, value }: { label: string; value: string }
                     ) => {
@@ -282,7 +265,7 @@ export const ProductsMoveForm: FC<Props> = ({
                         ...products,
                         {
                           product: value,
-                          name: products_map.get(value) || '',
+                          name: await getProductName(value),
                           quantity: 0,
                         },
                       ])
