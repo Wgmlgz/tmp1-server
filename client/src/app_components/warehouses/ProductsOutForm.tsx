@@ -16,11 +16,7 @@ import { ColumnsType } from 'antd/lib/table'
 import axios from 'axios'
 import moment from 'moment'
 import { FC, useEffect, useState } from 'react'
-import {
-  getProductName,
-  getWarehouses,
-  searchProducts,
-} from '../../api/api'
+import { getProductName, getWarehouses, searchProducts } from '../../api/api'
 import { highlightText } from '../products/Products'
 import { IProductFull } from '../products/ProductsForm'
 import { IWarehouseFull } from './WarehouseForm'
@@ -275,7 +271,7 @@ export const ProductsOutForm: FC<Props> = ({
                           ...products,
                           {
                             product: value,
-                            name: products_map.get(value) || '',
+                            name: await getProductName(value),
                             quantity: 0,
                           },
                         ])
