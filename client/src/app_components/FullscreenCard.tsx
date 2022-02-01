@@ -20,6 +20,7 @@ const FullscreenCard: FC<{ children: ReactNode; onCancel: () => any }> = ({
   onCancel,
 }) => (
   <Popconfirm
+    placement='left'
     title='Вы точно хотите отменить изменения?'
     onConfirm={onCancel}
     okText='Да'

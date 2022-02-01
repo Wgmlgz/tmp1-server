@@ -12,15 +12,15 @@ export const createProductIn = async (req: Request, res: Response) => {
     let { warehouse, date, comment, products } = req.body
     const user = req_user.id
 
-    await checkRemains(
-      products.map(
-        (product: { product: string; name: string; quantity: number }) => ({
-          warehouse,
-          product: product.product,
-          quantity_add: product.quantity,
-        })
-      )
-    )
+    // await checkRemains(
+    //   products.map(
+    //     (product: { product: string; name: string; quantity: number }) => ({
+    //       warehouse,
+    //       product: product.product,
+    //       quantity_add: product.quantity,
+    //     })
+    //   )
+    // )
     await changeRemains(
       products.map(
         (product: { product: string; name: string; quantity: number }) => ({

@@ -40,16 +40,16 @@ app.use('/api/products_in', products_in_routes)
 app.use('/api/products_out', products_out_routes)
 app.use('/api/products_move', products_move_routes)
 
-if (NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../client/build')))
+// if (NODE_ENV === 'production') {
+//   app.use(express.static(path.join(__dirname, '../client/build')))
 
-  app.get('/static/*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/build', req.url))
-  })
-  app.get('/*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/build', 'index.html'))
-  })
-}
+//   app.get('/static/*', (req, res) => {
+//     res.sendFile(path.join(__dirname, '../client/build', req.url))
+//   })
+//   app.get('/*', (req, res) => {
+//     res.sendFile(path.join(__dirname, '../client/build', 'index.html'))
+//   })
+// }
 
 mongoose
   .connect(MONGO_CONNECTION_URL)

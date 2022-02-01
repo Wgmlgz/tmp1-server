@@ -250,14 +250,20 @@ export const ProductsInForm: FC<Props> = ({
                       data: string,
                       { label, value }: { label: string; value: string }
                     ) => {
-                      setProducts([
-                        ...products,
-                        {
-                          product: value,
-                          name: await getProductName(value),
-                          quantity: 0,
-                        },
-                      ])
+                      let add = true
+                      products.forEach(product => {
+                        if (product.product === value) add = false
+                      })
+                      if (add)
+                        setProducts([
+                          ...products,
+                          {
+                            product: value,
+                            name: await getProductName(value),
+                            quantity: 0,
+                          },
+                        ])
+                      else message.info('Продукт уже довавлен')
                       setNewProductName('')
                     }}
                     onSearch={e => {
