@@ -1,5 +1,14 @@
-import { Button, Card, Input, message, Popconfirm, Select, Table } from 'antd'
-import { Key, useEffect, useState } from 'react'
+import {
+  Button,
+  Card,
+  Input,
+  message,
+  Popconfirm,
+  Select,
+  Table,
+  Typography,
+} from 'antd'
+import { Key, useEffect, useRef, useState } from 'react'
 import {
   createProduct,
   getCategories,
@@ -24,7 +33,7 @@ import { IWarehouseFull } from '../warehouses/WarehouseForm'
 import FullscreenCard from '../FullscreenCard'
 
 import ExcelJS from 'exceljs'
-import { saveAs } from 'file-saver'
+import { exportProducts } from './Excel'
 
 export const highlightText = (str: string, search: string) => (
   <div>
@@ -44,16 +53,6 @@ interface IRemain {
   product: string
   warehouse: string
   quantity: number
-}
-
-async function saveFile(fileName: string, workbook: ExcelJS.Workbook) {
-  const xls64 = await workbook.xlsx.writeBuffer({ base64: true } as any)
-  saveAs(
-    new Blob([xls64], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    }),
-    fileName
-  )
 }
 
 const Products = () => {
@@ -252,121 +251,82 @@ const Products = () => {
         </FullscreenCard>
       )}
       <div style={{ width: '100%' }}>
-        <Card
-          title='Все продукты'
-          extra={
-            <div style={{ display: 'flex', gap: '20px' }}>
-              <Button
-                onClick={async () => {
-                  const workbook = new ExcelJS.Workbook()
-                  const worksheet = workbook.addWorksheet('My Sheet')
-
-                  worksheet.columns = [
-                    { header: 'type', key: 'type' },
-                    { header: 'category', key: 'category' },
-                    { header: 'article', key: 'article' },
-                    { header: 'name', key: 'name' },
-                    { header: 'description', key: 'description' },
-                    { header: 'tags', key: 'tags' },
-                    { header: 'imgs', key: 'imgs' },
-                    { header: 'imgs_big', key: 'imgs_big' },
-                    { header: 'imgs_small', key: 'imgs_small' },
-                    { header: 'videos', key: 'videos' },
-                    { header: 'buy_price', key: 'buy_price' },
-                    { header: 'delivery_price', key: 'delivery_price' },
-                    { header: 'height', key: 'height' },
-                    { header: 'length', key: 'length' },
-                    { header: 'width', key: 'width' },
-                    { header: 'weight', key: 'weight' },
-                    { header: 'brand', key: 'brand' },
-                    { header: 'provider', key: 'provider' },
-                    { header: 'address', key: 'address' },
-                    { header: 'mark', key: 'mark' },
-                    { header: 'country', key: 'country' },
-                    { header: 'created', key: 'created' },
-                    { header: 'user_creator_id', key: 'user_creator_id' },
-                    { header: 'changed', key: 'changed' },
-                    { header: 'user_changed_id', key: 'user_changed_id' },
-                    { header: 'barcode', key: 'barcode' },
-                  ]
-                  selected_products.forEach((product: any) => {
-                    worksheet.addRow({
-                      ...product,
-                      created: new Date(product.created),
-                      changed: new Date(product.changed),
-                      videos: product.videos?.join('; '),
-                      tags: product.tags?.join('; '),
-                      imgs: product.imgs?.join('; '),
-                      imgs_big: product.imgs_big?.join('; '),
-                      imgs_small: product.imgs_small?.join('; '),
-                    })
-                  })
-                  saveFile('fileNameXXX', workbook)
-
-                  console.log(worksheet)
-                }}>
-                excel
-              </Button>
-              <Popconfirm
-                onCancel={() => {}}
-                onConfirm={async () => {
-                  try {
-                    await removeProducts(
-                      selected_products.map(product => product._id)
-                    )
-                    await fetchProducts()
-                    message.success('Продукты удалены')
-                  } catch (e) {
-                    if (axios.isAxiosError(e)) {
-                      message.error(e.response?.data)
-                    }
+        <Card>
+          <div
+            style={{
+              display: 'flex',
+              gap: '20px',
+              flexWrap: 'wrap',
+            }}>
+            <p style={{ fontWeight: 'bold', fontSize: '20px' }}>Все продукты</p>
+            <Popconfirm
+              onCancel={() => {}}
+              onConfirm={async () => {
+                try {
+                  await removeProducts(
+                    selected_products.map(product => product._id)
+                  )
+                  await fetchProducts()
+                  message.success('Продукты удалены')
+                } catch (e) {
+                  if (axios.isAxiosError(e)) {
+                    message.error(e.response?.data)
                   }
-                }}
-                title={`Вы точно хотите безвозвратно удалить ${selected_products.length} продуктов?`}
-                okText='Да'
-                cancelText='Нет'>
-                <Button>Удалить продукты</Button>
-              </Popconfirm>
-              <Button
-                onClick={() => {
-                  setBarcodesCreation(true)
-                }}>
-                Напечатать штрихкоды
-              </Button>
-              <Input.Search
-                placeholder='поиск'
-                onSearch={async e => {
-                  try {
-                    const res = await searchProducts(e)
-                    setSearchQuery(e)
-                    setProducts(res.data)
-                  } catch (e) {
-                    if (axios.isAxiosError(e)) {
-                      message.error(e.response?.data)
-                    }
+                }
+              }}
+              title={`Вы точно хотите безвозвратно удалить ${selected_products.length} продуктов?`}
+              okText='Да'
+              cancelText='Нет'>
+              <Button>Удалить продукты</Button>
+            </Popconfirm>
+            <Button
+              onClick={() => {
+                setBarcodesCreation(true)
+              }}>
+              Напечатать штрихкоды
+            </Button>
+            <Input.Search
+              style={{ maxWidth: '500px' }}
+              placeholder='поиск'
+              onSearch={async e => {
+                try {
+                  const res = await searchProducts(e)
+                  setSearchQuery(e)
+                  setProducts(res.data)
+                } catch (e) {
+                  if (axios.isAxiosError(e)) {
+                    message.error(e.response?.data)
                   }
-                }}
-              />
-              <Button
-                style={{ backgroundColor: '#98f379' }}
-                onClick={() => {
-                  setProductCreation(true)
-                }}>
-                Создать новый продукт
-              </Button>
-              <Select
-                placeholder='Фильтр по категориям'
-                style={{ width: '200px' }}
-                onChange={e => {
-                  setActiveCategory(e)
-                }}>
-                <Option value=''>Все</Option>
-                {categories.map(s => (
-                  <Option value={s}>{s}</Option>
-                ))}
-              </Select>
-            </div>
-          }>
+                }
+              }}
+            />
+            <Button
+              style={{ backgroundColor: '#98f379' }}
+              onClick={() => {
+                setProductCreation(true)
+              }}>
+              Создать новый продукт
+            </Button>
+            <Select
+              placeholder='Фильтр по категориям'
+              style={{ width: '200px' }}
+              onChange={e => {
+                setActiveCategory(e)
+              }}>
+              <Option value=''>Все</Option>
+              {categories.map(s => (
+                <Option value={s}>{s}</Option>
+              ))}
+            </Select>
+            <Button
+              onClick={() => {
+                exportProducts(selected_products)
+              }}>
+              Экспорт excel
+            </Button>
+          </div>
+          <br />
+
           <Table
             rowSelection={{
               selectedRowKeys: selected_row_keys,

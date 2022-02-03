@@ -8,13 +8,17 @@ import {
   searchProducts,
   updateProduct,
   upload,
+  createExcelProducts,
   getProduct,
   removeProducts,
+  getExcelImports,
 } from '../controllers/products'
 
 const router = express.Router()
 
 router.post('/', [authenticateAdmin, upload.array('imgs', 12)], createProduct)
+router.post('/excel', authenticateAdmin, createExcelProducts)
+router.get('/excel', authenticateAdmin, getExcelImports)
 router.post('/search/:pageNumber/:nPerPage', authenticateAdmin, searchProducts)
 router.patch(
   '/:id',

@@ -2,19 +2,25 @@ import { Request, Response } from 'express'
 import multer from 'multer'
 import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
-import Product from '../models/product'
+import Product, { IProduct, IProductExcel } from '../models/product'
 import { IUser } from '../models/user'
-import { resizeImg1024, resizeImg150 } from '../util/imgs'
+import { downloadImage, resizeImg1024, resizeImg150 } from '../util/imgs'
 import mongoose from 'mongoose'
 import RemainModel from '../models/remains'
+import ExcelImport from '../models/excel_import'
 
 const UPLOAD_FILES_DIR = './upload/products'
+
+const genOrigPath = () => `${uuidv4()}-${Date.now()}-orig.jpg`
+const genSmallPath = () => `${uuidv4()}-${Date.now()}-small.jpg`
+const genBigPath = () => `${uuidv4()}-${Date.now()}-big.jpg`
+
 const storage = multer.diskStorage({
   destination(req, file, cb) {
     cb(null, UPLOAD_FILES_DIR)
   },
   filename(req, file, cb) {
-    cb(null, `${uuidv4()}-${Date.now()}-orig.jpg`)
+    cb(null, genOrigPath())
   },
 })
 
@@ -49,11 +55,11 @@ const parseReqToProduct = (req: Request) => {
 
   // @ts-ignore
   req.files?.forEach(i => {
-    console.log('aboba', i);
-    
+    console.log('aboba', i)
+
     const orig_path = i.filename,
-      small_path = `${uuidv4()}-${Date.now()}-small.jpg`,
-      big_path = `${uuidv4()}-${Date.now()}-big.jpg`
+      small_path = genSmallPath(),
+      big_path = genBigPath()
     resizeImg1024(i.path, i.destination + '/' + big_path)
     resizeImg150(i.path, i.destination + '/' + small_path)
 
@@ -243,4 +249,103 @@ export const searchProducts = async (req: Request, res: Response) => {
 export const getImg = async (req: Request, res: Response) => {
   const { id } = req.params
   res.sendFile(`./upload/products/${id}`, { root: process.cwd() })
+}
+
+const createProductExcel = async (
+  product: IProductExcel,
+  import_id: string,
+  user: IUser & { id: string }
+) => {
+  try {
+    product.imgs = []
+    product.imgs_small = []
+    product.imgs_big = []
+    await Promise.allSettled(
+      product.upload_imgs.map(async url => {
+        try {
+          const orig_path = genOrigPath(),
+            small_path = genSmallPath(),
+            big_path = genBigPath()
+
+          console.log(url)
+
+          await downloadImage(url, `${UPLOAD_FILES_DIR}/${orig_path}`)
+          await resizeImg1024(
+            `${UPLOAD_FILES_DIR}/${orig_path}`,
+            `${UPLOAD_FILES_DIR}/${big_path}`
+          )
+          await resizeImg150(
+            `${UPLOAD_FILES_DIR}/${orig_path}`,
+            `${UPLOAD_FILES_DIR}/${small_path}`
+          )
+          product.imgs?.push(orig_path)
+          product.imgs_small?.push(small_path)
+          product.imgs_big?.push(big_path)
+        } catch (err) {
+          await ExcelImport.findByIdAndUpdate(import_id, {
+            $push: { import_errors: `Загрузка изображения ${url} не удалась` },
+          })
+        }
+      })
+    )
+    const new_product = new Product(product)
+    new_product.created = new Date()
+    new_product.user_creator_id = user.id
+    await new_product.save()
+    await ExcelImport.findByIdAndUpdate(import_id, {
+      $push: { done: new_product.id },
+    })
+    console.log('done', new_product)
+  } catch (err) {
+    try {
+      let msg = 'Неизвестная ошибка'
+      if (err instanceof Error)
+        msg = `Ошибка в строке ${product?.excel_row} : ${err.message}`
+      await ExcelImport.findByIdAndUpdate(import_id, {
+        $push: { import_errors: err },
+        $inc: { failed: 1 },
+      })
+      import_id
+    } catch (err) {
+      console.log(err)
+    }
+  }
+}
+
+export const createExcelProducts = async (req: Request, res: Response) => {
+  try {
+    const { products }: { products: any[] } = req.body
+
+    const new_excel_import = new ExcelImport({
+      date: new Date(),
+      done: [],
+      import_errors: [],
+      total: products.length,
+      failed: 0,
+    })
+    await new_excel_import.save()
+    const to_remove = await Promise.all(
+      (
+        await ExcelImport.find({}).sort('-date').skip(5)
+      ).map(async item => await ExcelImport.findByIdAndRemove(item.id))
+    )
+    console.log(to_remove)
+
+    products.forEach((product: any) =>
+      createProductExcel(product, new_excel_import._id, (req as any).user)
+    )
+    res.status(200).json('Import started')
+  } catch (err: any) {
+    res.status(400).send(err.message)
+  }
+}
+
+export const getExcelImports = async (req: Request, res: Response) => {
+  try {
+    const excel_imports = await ExcelImport.find({})
+
+    res.status(200).json(excel_imports)
+  } catch (err: any) {
+    res.status(400).send(err.message)
+  }
 }

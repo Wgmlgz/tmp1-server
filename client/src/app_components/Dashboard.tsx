@@ -5,6 +5,7 @@ import {
   UnorderedListOutlined,
   UserOutlined,
   AppstoreOutlined,
+  ImportOutlined,
 } from '@ant-design/icons'
 import { getUser, logout } from '../api/api'
 import SuperAdminUsers from './super_admin/SuperAdminUsers'
@@ -17,6 +18,7 @@ import Warehouses from './warehouses/Warehouses'
 import ProductsIn from './warehouses/ProductsIn'
 import ProductsOut from './warehouses/ProductsOut'
 import ProductsMove from './warehouses/ProductsMove'
+import Import from './excel/Import'
 
 const { Header, Content, Sider } = Layout
 const { SubMenu } = Menu
@@ -111,6 +113,9 @@ export default function Dashboard() {
                 <Link to='/dashboard/products_move'>Перемещения</Link>
               </Menu.Item>
             </SubMenu>
+            <Menu.Item key='8' icon={<ImportOutlined />}>
+              <Link to='/dashboard/import'>Импорт</Link>
+            </Menu.Item>
           </Menu>
         </Sider>
         <Content style={{ margin: '20px' }}>
@@ -123,6 +128,7 @@ export default function Dashboard() {
               <Route path='/products_in' element={<ProductsIn />} />
               <Route path='/products_out' element={<ProductsOut />} />
               <Route path='/products_move' element={<ProductsMove />} />
+              <Route path='/import' element={<Import />} />
             </Routes>
           </div>
         </Content>

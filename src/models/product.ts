@@ -29,6 +29,11 @@ export interface IProduct {
   barcode?: string
 }
 
+export interface IProductExcel extends IProduct {
+  upload_imgs: string[]
+  excel_row: number
+}
+
 const ProductSchema = new mongoose.Schema<IProduct>({
   type: {
     type: String,

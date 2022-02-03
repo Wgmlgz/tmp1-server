@@ -129,6 +129,9 @@ export const createProduct = (product: IProduct) =>
   axios.post(`${products_url}`, productToFormData(product), {
     headers: { 'Content-Type': 'multipart/form-data' },
   })
+export const createExcelProducts = (products: IProduct[]) =>
+  axios.post(`${products_url}/excel`, { products })
+export const getExcelImports = () => axios.get(`${products_url}/excel`)
 
 export const updateProduct = (product: IProduct, id: string) =>
   axios.patch(`${products_url}/${id}`, productToFormData(product), {
