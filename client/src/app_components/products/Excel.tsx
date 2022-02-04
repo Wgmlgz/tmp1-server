@@ -36,6 +36,7 @@ export const exportProducts = (selected_products: IProductFull[]) => {
     { header: 'brand', key: 'brand' },
     { header: 'provider', key: 'provider' },
     { header: 'address', key: 'address' },
+    { header: 'warehouse', key: 'warehouse' },
     { header: 'mark', key: 'mark' },
     { header: 'country', key: 'country' },
     { header: 'created', key: 'created' },

@@ -44,8 +44,10 @@ const parseReqToProduct = (req: Request) => {
     weight,
     brand,
     address,
+    warehouse,
     provider,
     mark,
+    marketplace_data,
     country,
     barcode,
   } = req.body
@@ -56,7 +58,6 @@ const parseReqToProduct = (req: Request) => {
 
   // @ts-ignore
   req.files?.forEach(i => {
-    console.log('aboba', i)
 
     const orig_path = i.filename,
       small_path = genSmallPath(),
@@ -86,6 +87,7 @@ const parseReqToProduct = (req: Request) => {
     imgs_big,
     imgs_small,
     videos: videos && JSON.parse(videos),
+    marketplace_data: marketplace_data && JSON.parse(marketplace_data),
     buy_price,
     delivery_price,
     height,
@@ -94,6 +96,7 @@ const parseReqToProduct = (req: Request) => {
     weight,
     brand,
     address,
+    warehouse,
     provider,
     mark,
     country,
@@ -113,6 +116,7 @@ const parseReqToProduct = (req: Request) => {
   return product
 }
 
+const saveProduct = async (product: IProduct) => {}
 export const createProduct = async (req: Request, res: Response) => {
   try {
     const doc1 = await Product.findOne({ name: req.body.name })
@@ -128,6 +132,7 @@ export const createProduct = async (req: Request, res: Response) => {
     const user: IUser & { id: string } = (req as any).user
     new_product.user_creator_id = user.id
     await new_product.save()
+
     res.send('Product created')
   } catch (err: any) {
     res.status(400).send(err.message)
@@ -144,7 +149,6 @@ export const updateProduct = async (req: Request, res: Response) => {
     if (!old_product) return res.status(400).send(`Product doens't Exists`)
 
     const updated_product = parseReqToProduct(req)
-    console.log(updated_product)
 
     Object.keys(updated_product).forEach(key =>
       // @ts-ignore
@@ -263,8 +267,6 @@ const createProductExcel = async (
             small_path = genSmallPath(),
             big_path = genBigPath()
 
-          console.log(url)
-
           await downloadImage(url, `${UPLOAD_FILES_DIR}/${orig_path}`)
           await resizeImg1024(
             `${UPLOAD_FILES_DIR}/${orig_path}`,
@@ -296,7 +298,6 @@ const createProductExcel = async (
     await ExcelImport.findByIdAndUpdate(import_id, {
       $push: { done: new_product.id },
     })
-    console.log('done', new_product)
   } catch (err) {
     try {
       let msg = `Ошибка в строке ${product.excel_row} : `
@@ -333,7 +334,6 @@ export const createExcelProducts = async (req: Request, res: Response) => {
         await ExcelImport.find({}).sort('-date').skip(5)
       ).map(async item => await ExcelImport.findByIdAndRemove(item.id))
     )
-    console.log(to_remove)
 
     products.forEach((product: any) =>
       createProductExcel(product, new_excel_import._id, (req as any).user)

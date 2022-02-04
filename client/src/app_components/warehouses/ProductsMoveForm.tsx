@@ -65,12 +65,14 @@ export const ProductsMoveForm: FC<Props> = ({
           <div style={{ overflowY: 'auto', maxHeight: '80vh' }}>
             <div style={{ display: 'flex', gap: '20px' }}>
               <WarehouseSelect
+                required={true}
                 locked={!onSubmit}
                 label='Склад отправления'
                 name='warehouse_from'
                 default_value={product_move?.warehouse_from}
               />
               <WarehouseSelect
+                required={true}
                 locked={!onSubmit}
                 label='Склад доставки'
                 name='warehouse_to'

@@ -10,8 +10,15 @@ interface Props {
   label: string
   name: string
   locked?: boolean
+  required: boolean
 }
-const WarehouseSelect: FC<Props> = ({ default_value, label, name, locked }) => {
+const WarehouseSelect: FC<Props> = ({
+  default_value,
+  label,
+  name,
+  locked,
+  required,
+}) => {
   const [warehouses, setWarehouses] = useState<IWarehouseFull[]>([])
 
   useEffect(() => {
@@ -31,10 +38,18 @@ const WarehouseSelect: FC<Props> = ({ default_value, label, name, locked }) => {
     <Form.Item
       label={label}
       name={name}
-      rules={[{ required: true, message: 'Пожалуйста выберете склад!' }]}>
+      rules={
+        required
+          ? [{ required: true, message: 'Пожалуйста выберете склад!' }]
+          : undefined
+      }>
       {locked ? (
         <p style={{ paddingTop: '5px' }}>
-          {warehouses.filter(warehouse => warehouse._id === default_value).at(0)?.name}
+          {
+            warehouses
+              .filter(warehouse => warehouse._id === default_value)
+              .at(0)?.name
+          }
         </p>
       ) : (
         <Select defaultValue={default_value} style={{ width: '200px' }}>

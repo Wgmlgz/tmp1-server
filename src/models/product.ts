@@ -20,6 +20,7 @@ export interface IProduct {
   weight: number
   brand?: string
   provider?: string
+  warehouse?: string
   address?: string
   mark?: string
   country?: string
@@ -28,6 +29,9 @@ export interface IProduct {
   changed?: Date
   user_changed_id?: string
   barcode?: string
+  marketplace_data?: {
+    [id: string]: string
+  }
 }
 
 export interface IProductExcel extends IProduct {
@@ -107,6 +111,10 @@ const ProductSchema = new mongoose.Schema<IProduct>({
     type: String,
     maxLength: 200,
   },
+  warehouse: {
+    type: String,
+    maxLength: 50,
+  },
   address: {
     type: String,
     maxLength: 50,
@@ -131,6 +139,10 @@ const ProductSchema = new mongoose.Schema<IProduct>({
     unique: true,
     dropDups: true,
     type: String,
+  },
+  marketplace_data: {
+    type: Map,
+    of: String,
   },
 })
 ProductSchema.plugin(uniqueValidator, {
