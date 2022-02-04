@@ -1,12 +1,4 @@
-import {
-  Button,
-  Card,
-  Input,
-  message,
-  Popconfirm,
-  Select,
-  Table,
-} from 'antd'
+import { Button, Card, Input, message, Popconfirm, Select, Table } from 'antd'
 import { Key, useEffect, useState } from 'react'
 import {
   createProduct,
@@ -19,6 +11,7 @@ import {
   searchProducts,
   updateProduct,
 } from '../../api/api'
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import axios from 'axios'
 import { ColumnsType, TablePaginationConfig } from 'antd/lib/table'
 import { ICategory } from '../categories/Categories'
@@ -165,20 +158,15 @@ const Products = () => {
         highlightText(record.barcode || '', search_query),
     },
     {
-      title: 'Имя (нажмите, чтобы изменить)',
+      title: 'Имя',
       dataIndex: 'name',
       key: 'name',
       sorter: (a, b) => a.name.localeCompare(b.name),
       render: (text, record, index) => (
-        <Button
-          onClick={() => {
-            setEditedProductId(record._id)
-            setEditedProduct(record)
-          }}>
-          {highlightText(record.name || '', search_query)}
-        </Button>
+        <p>{highlightText(record.name || '', search_query)}</p>
       ),
     },
+
     {
       title: 'Закупочная цена',
       dataIndex: 'buy_price',
@@ -208,6 +196,43 @@ const Products = () => {
       render: (text, record, index) => (
         <div style={{ whiteSpace: 'pre-wrap' }}>
           {remains_map.get(record._id)}
+        </div>
+      ),
+    },
+    {
+      title: 'Изменить/Удалить',
+      dataIndex: 'name',
+      key: 'name',
+      render: (text, record, index) => (
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <Button
+            onClick={() => {
+              setEditedProductId(record._id)
+              setEditedProduct(record)
+            }}>
+            <EditOutlined />
+          </Button>
+          <Popconfirm
+            onCancel={() => {}}
+            onConfirm={async () => {
+              try {
+                await removeProducts([record?._id ?? ''])
+                await fetchProducts()
+                setEditedProductId('')
+                message.success('Продукт удален')
+              } catch (e) {
+                if (axios.isAxiosError(e)) {
+                  message.error(e.response?.data)
+                }
+              }
+            }}
+            title={`Вы точно хотите безвозвратно удалить продукт?`}
+            okText='Да'
+            cancelText='Нет'>
+            <Button>
+              <DeleteOutlined />
+            </Button>
+          </Popconfirm>
         </div>
       ),
     },

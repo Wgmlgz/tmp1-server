@@ -235,18 +235,18 @@ const ProductsForm: FC<Props> = ({
                       placeholder='Штрихкод'
                     />
                   </Form.Item>
-                  <Form.Item label='Адрес' name='address'>
-                    <Input
-                      defaultValue={product?.address}
-                      placeholder='Адрес'
-                    />
-                  </Form.Item>
                   <WarehouseSelect
                     required={false}
                     label='Склад'
                     name='warehouse'
                     default_value={product?.warehouse}
                   />
+                  <Form.Item label='Адрес' name='address'>
+                    <Input
+                      defaultValue={product?.address}
+                      placeholder='Адрес'
+                    />
+                  </Form.Item>
                 </Panel>
                 <Panel header='Маркетплейсы' key='7'>
                   <Table
