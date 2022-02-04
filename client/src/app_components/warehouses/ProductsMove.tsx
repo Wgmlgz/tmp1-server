@@ -1,4 +1,4 @@
-import { Button, Card, message, Popconfirm } from 'antd'
+import { Button, Card, message, Popconfirm, Popover } from 'antd'
 import Table, { ColumnsType } from 'antd/lib/table'
 import { useEffect, useState } from 'react'
 import {
@@ -104,6 +104,24 @@ export default function ProductsMove() {
             .map(product => `${product.name}  ${product.quantity}`)
             .join('\n')}
         </p>
+      ),
+    },
+    {
+      title: 'Подробнее',
+      key: 'remove',
+      render: (text, record, index) => (
+        <Popover
+          placement='left'
+          content={
+            <ProductsMoveForm
+              onCancel={() => setProductMoveCreation(false)}
+              header='Перемещение'
+              button='Создать новое списание'
+              product_move={record}
+            />
+          }>
+          <Button>Подробнее</Button>,
+        </Popover>
       ),
     },
     // {

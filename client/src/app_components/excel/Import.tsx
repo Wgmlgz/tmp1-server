@@ -88,6 +88,44 @@ const Page: FC = () => {
       sorter: (a, b) => moment(a.date).unix() - moment(b.date).unix(),
     },
     {
+      title: 'Успешно/Неуспешно/Всего',
+      dataIndex: 'date',
+      key: 'date',
+      defaultSortOrder: 'descend',
+      render: (text, record, index) => (
+        <p
+          style={{
+            textAlign: 'center',
+          }}>
+          <span
+            style={{
+              fontWeight: 'bold',
+              color: 'lightgreen',
+              textAlign: 'center',
+            }}>
+            {record.done.length}
+          </span>
+          {'/'}
+          <span
+            style={{
+              fontWeight: 'bold',
+              color: '#ff5555',
+              textAlign: 'center',
+            }}>
+            {record.failed}
+          </span>
+          {'/'}
+          <span
+            style={{
+              fontWeight: 'bold',
+              textAlign: 'center',
+            }}>
+            {record.total}
+          </span>
+        </p>
+      ),
+    },
+    {
       title: 'Ошибки',
       dataIndex: 'import_errors',
       key: 'import_errors',
@@ -105,7 +143,9 @@ const Page: FC = () => {
               dataSource={record.import_errors.map(str => ({ err: str }))}
             />
           }>
-          <Button type='primary'>Hover me</Button>
+          <Button type='primary' style={{ backgroundColor: '#ff5555' }}>
+            {record.import_errors.length}
+          </Button>
         </Popover>
       ),
     },
@@ -138,6 +178,7 @@ const Page: FC = () => {
   }
   useEffect(() => {
     fetchImports()
+    setInterval(() => fetchImports(), 1000)
   }, [])
   return (
     <div>

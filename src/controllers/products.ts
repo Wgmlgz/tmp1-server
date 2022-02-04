@@ -8,6 +8,7 @@ import { downloadImage, resizeImg1024, resizeImg150 } from '../util/imgs'
 import mongoose from 'mongoose'
 import RemainModel from '../models/remains'
 import ExcelImport from '../models/excel_import'
+import CategoryModel from '../models/category'
 
 const UPLOAD_FILES_DIR = './upload/products'
 
@@ -150,16 +151,11 @@ export const updateProduct = async (req: Request, res: Response) => {
       updated_product[key] === undefined ? delete updated_product[key] : {}
     )
 
-    const doc1 = await Product.findOne({ article: updated_product.article })
-
-    if (doc1 && doc1.id !== id)
-      return res.status(400).send('Product with this article already exists')
-
-    const doc2 = await Product.findOne({ name: updated_product.name })
-    if (doc2 && doc2.id !== id)
-      return res.status(400).send('Product with this name already Exists')
-
-    await Product.findByIdAndUpdate(id, updated_product, { new: true })
+    await Product.findByIdAndUpdate(id, updated_product, {
+      new: true,
+      runValidators: true,
+      context: 'query',
+    })
     res.send('Product updated')
   } catch (err: any) {
     res.status(400).send(err.message)
@@ -283,14 +279,19 @@ const createProductExcel = async (
           product.imgs_big?.push(big_path)
         } catch (err) {
           await ExcelImport.findByIdAndUpdate(import_id, {
-            $push: { import_errors: `Загрузка изображения ${url} не удалась` },
+            $push: {
+              import_errors: `Ошибка в строке ${product.excel_row} : Загрузка изображения ${url} не удалась`,
+            },
           })
         }
       })
     )
+    product.category = (await CategoryModel.findOne({ name: product.category }))
+      ? product.category
+      : ''
+    product.created = new Date()
+    product.user_creator_id = user.id
     const new_product = new Product(product)
-    new_product.created = new Date()
-    new_product.user_creator_id = user.id
     await new_product.save()
     await ExcelImport.findByIdAndUpdate(import_id, {
       $push: { done: new_product.id },
@@ -298,11 +299,14 @@ const createProductExcel = async (
     console.log('done', new_product)
   } catch (err) {
     try {
-      let msg = 'Неизвестная ошибка'
-      if (err instanceof Error)
-        msg = `Ошибка в строке ${product?.excel_row} : ${err.message}`
+      let msg = `Ошибка в строке ${product.excel_row} : `
+      if (err instanceof mongoose.Error) {
+        msg += `${err.message}`
+      } else if (err instanceof Error) {
+        msg += `${err.message}`
+      }
       await ExcelImport.findByIdAndUpdate(import_id, {
-        $push: { import_errors: err },
+        $push: { import_errors: msg },
         $inc: { failed: 1 },
       })
       import_id

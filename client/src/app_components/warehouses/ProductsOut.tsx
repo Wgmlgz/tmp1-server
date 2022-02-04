@@ -1,4 +1,4 @@
-import { Button, Card, message, Popconfirm } from 'antd'
+import { Button, Card, message, Popconfirm, Popover } from 'antd'
 import Table, { ColumnsType } from 'antd/lib/table'
 import React, { useEffect, useState } from 'react'
 import {
@@ -11,6 +11,7 @@ import {
   PlusCircleOutlined,
   DeleteOutlined,
   EditOutlined,
+  MoreOutlined,
 } from '@ant-design/icons'
 import {
   createProductOut,
@@ -48,7 +49,6 @@ export default function ProductsOut() {
     const setup = async () => {
       try {
         const res_warehouses = await getWarehouses()
-        // const res_products = await getProducts()
         setWarehousesMap(
           new Map<string, string>(
             res_warehouses.data.map((warehouse: IWarehouseFull) => [
@@ -57,14 +57,6 @@ export default function ProductsOut() {
             ])
           )
         )
-        // setProductsMap(
-        //   new Map<string, string>(
-        //     res_products.data.map((product: IProductFull) => [
-        //       product._id,
-        //       product.name,
-        //     ])
-        //   )
-        // )
       } catch (err) {
         if (axios.isAxiosError(err)) {
           message.error(err.response?.data)
@@ -101,6 +93,24 @@ export default function ProductsOut() {
             .map(product => `${product.name}  ${product.quantity}`)
             .join('\n')}
         </p>
+      ),
+    },
+    {
+      title: 'Подробнее',
+      key: 'remove',
+      render: (text, record, index) => (
+        <Popover
+          placement='left'
+          content={
+            <ProductsOutForm
+              onCancel={() => setProductOutCreation(false)}
+              header='Списание'
+              button='Создать новое списание'
+              product_out={record}
+            />
+          }>
+          <Button>Подробнее</Button>,
+        </Popover>
       ),
     },
     // {

@@ -6,9 +6,8 @@ import {
   Popconfirm,
   Select,
   Table,
-  Typography,
 } from 'antd'
-import { Key, useEffect, useRef, useState } from 'react'
+import { Key, useEffect, useState } from 'react'
 import {
   createProduct,
   getCategories,
@@ -32,7 +31,6 @@ import { getRemains } from '../../api/remains'
 import { IWarehouseFull } from '../warehouses/WarehouseForm'
 import FullscreenCard from '../FullscreenCard'
 
-import ExcelJS from 'exceljs'
 import { exportProducts } from './Excel'
 
 export const highlightText = (str: string, search: string) => (

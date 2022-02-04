@@ -1,27 +1,8 @@
-import {
-  AutoComplete,
-  Button,
-  Card,
-  ConfigProvider,
-  DatePicker,
-  Form,
-  Input,
-  InputNumber,
-  message,
-  Select,
-  Table,
-  Typography,
-} from 'antd'
-import { ColumnsType } from 'antd/lib/table'
-import axios from 'axios'
+import { Button, Card, DatePicker, Form, Input } from 'antd'
 import moment from 'moment'
-import { FC, useEffect, useState } from 'react'
-import { getProductName, getWarehouses, searchProducts } from '../../api/api'
-import { highlightText } from '../products/Products'
-import { IProductFull } from '../products/ProductsForm'
-import { IWarehouseFull } from './WarehouseForm'
-
-const { Option } = Select
+import { FC, useState } from 'react'
+import ProductsListForm, { ProductInfo } from './ProuctsListForm'
+import WarehouseSelect from './WarehouseSelect'
 
 export interface IProductMove {
   warehouse_to: string
@@ -41,7 +22,7 @@ export interface IProductMoveFull extends IProductMove {
 }
 
 interface Props {
-  onSubmit: (product: IProductMove) => any
+  onSubmit?: (product: IProductMove) => any
   onCancel: () => any
   header: string
   button: string
@@ -61,128 +42,12 @@ export const ProductsMoveForm: FC<Props> = ({
   button,
   product_move,
 }) => {
-  const [warehouses, setWarehouses] = useState<IWarehouseFull[]>([])
-  const [search_products, setSearchProducts] = useState<IProductFull[]>([])
   const [products, setProducts] = useState<ProductMovefo[]>([])
-
-  const [edited_product, setEditedProduct] = useState(-1)
-
-  const [new_product_name, setNewProductName] = useState('')
-
-  const [search_query, setSearchQuery] = useState<string>('')
 
   const onFinish = async (data: IProductMove) => {
     data.products = products
-    onSubmit(data)
+    onSubmit && onSubmit(data)
   }
-
-  useEffect(() => {
-    const setup = async () => {
-      try {
-        const res_warehouses = await getWarehouses()
-        setWarehouses(res_warehouses.data)
-        product_move && setProducts(product_move.products)
-      } catch (err) {
-        if (axios.isAxiosError(err)) {
-          message.error(err.response?.data)
-        }
-      }
-    }
-    setup()
-  }, [product_move])
-
-  const columns: ColumnsType<ProductMovefo> = [
-    {
-      title: 'Продукт',
-      dataIndex: 'product',
-      key: 'product',
-      render: (text, record, index) =>
-        index === edited_product ? (
-          <AutoComplete
-            style={{
-              width: 600,
-            }}
-            defaultValue={record.name}
-            options={
-              search_products.map(product => ({
-                label: (
-                  <div>
-                    {highlightText(
-                      `${product.name} ${product.article} ${product.barcode}`,
-                      search_query
-                    )}
-                  </div>
-                ),
-                value: product._id,
-              })) as any
-            }
-            onSelect={async (
-              data: string,
-              { label, value }: { label: string; value: string }
-            ) => {
-              const new_products = products
-              new_products[index].product = value
-              new_products[index].name = await getProductName(value)
-              setProducts(new_products)
-              setEditedProduct(-1)
-            }}
-            onSearch={onSearch}
-            placeholder='поиск'
-          />
-        ) : (
-          <Typography.Link onClick={() => setEditedProduct(index)}>
-            {record.name}
-          </Typography.Link>
-        ),
-    },
-    {
-      title: 'Количество',
-      dataIndex: 'quantity',
-      key: 'quantity',
-      render: (text, record, index) => (
-        <InputNumber
-          min={0}
-          value={record.quantity}
-          onChange={e => {
-            const new_products = [...products]
-            new_products[index].quantity = Number(e)
-            setProducts(new_products)
-            setEditedProduct(-1)
-          }}
-        />
-      ),
-    },
-    {
-      title: 'Удалить',
-      dataIndex: 'remove',
-      key: 'remove',
-      render: (text, record, index) => (
-        <Button
-          onClick={() => {
-            const new_products = [...products]
-            new_products.splice(index, 1)
-            setProducts(new_products)
-            setEditedProduct(-1)
-          }}>
-          Удалить
-        </Button>
-      ),
-    },
-  ]
-  const onSearch = async (query: string) => {
-    try {
-      const res_products = await searchProducts(query)
-      setSearchProducts(res_products.data)
-      setSearchQuery(query)
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        message.error(err.response?.data)
-      }
-    }
-  }
-  useEffect(() => {
-    onSearch('')
-  }, [edited_product])
 
   return (
     <Card title={header}>
@@ -199,100 +64,51 @@ export const ProductsMoveForm: FC<Props> = ({
         <Form.Item>
           <div style={{ overflowY: 'auto', maxHeight: '80vh' }}>
             <div style={{ display: 'flex', gap: '20px' }}>
-              <Form.Item
+              <WarehouseSelect
+                locked={!onSubmit}
                 label='Склад отправления'
                 name='warehouse_from'
-                rules={[
-                  { required: true, message: 'Пожалуйста выберете склад!' },
-                ]}>
-                <Select
-                  defaultValue={product_move?._id}
-                  style={{ width: '200px' }}>
-                  {warehouses.map(warehouse => (
-                    <Option value={warehouse._id}>{warehouse.name}</Option>
-                  ))}
-                </Select>
-              </Form.Item>
-              <Form.Item
+                default_value={product_move?.warehouse_from}
+              />
+              <WarehouseSelect
+                locked={!onSubmit}
                 label='Склад доставки'
                 name='warehouse_to'
-                rules={[
-                  { required: true, message: 'Пожалуйста выберете склад!' },
-                ]}>
-                <Select
-                  defaultValue={product_move?._id}
-                  style={{ width: '200px' }}>
-                  {warehouses.map(warehouse => (
-                    <Option value={warehouse._id}>{warehouse.name}</Option>
-                  ))}
-                </Select>
-              </Form.Item>
+                default_value={product_move?.warehouse_to}
+              />
               <Form.Item label='Дата' name='date'>
-                <DatePicker format='DD MM YYYY' />
+                {onSubmit ? (
+                  <DatePicker format='DD MM YYYY' />
+                ) : (
+                  <p style={{ paddingTop: '5px' }}>
+                    {moment(product_move?.date).format('DD MM YYYY')}
+                  </p>
+                )}
               </Form.Item>
             </div>
             <Form.Item label='Комметарий' name='comment'>
-              <Input.TextArea />
+              {onSubmit ? (
+                <Input.TextArea />
+              ) : (
+                <p style={{ paddingTop: '5px' }}>{product_move?.comment}</p>
+              )}
             </Form.Item>
-            <ConfigProvider renderEmpty={() => ''}>
-              <Table
-                columns={columns}
-                dataSource={products}
-                footer={() => (
-                  <AutoComplete
-                    style={{
-                      width: 600,
-                    }}
-                    value={new_product_name}
-                    options={
-                      search_products.map(product => ({
-                        label: (
-                          <div>
-                            {highlightText(
-                              `${product.name} ${product.article} ${product.barcode}`,
-                              search_query
-                            )}
-                          </div>
-                        ),
-                        value: product._id,
-                      })) as any
-                    }
-                    onSelect={async (
-                      data: string,
-                      { label, value }: { label: string; value: string }
-                    ) => {
-                      let add = true
-                      products.forEach(product => {
-                        if (product.product === value) add = false
-                      })
-                      if (add)
-                        setProducts([
-                          ...products,
-                          {
-                            product: value,
-                            name: await getProductName(value),
-                            quantity: 0,
-                          },
-                        ])
-                      else message.info('Продукт уже довавлен')
-                      setNewProductName('')
-                    }}
-                    onSearch={e => {
-                      onSearch(e)
-                      setNewProductName(e)
-                    }}
-                    placeholder='поиск'
-                  />
-                )}
-              />
-            </ConfigProvider>
+            <ProductsListForm
+              locked={!onSubmit}
+              default_products={product_move?.products}
+              onChange={(products: ProductInfo[]) => {
+                setProducts(products)
+              }}
+            />
           </div>
         </Form.Item>
-        <Form.Item>
-          <Button type='primary' htmlType='submit' style={{ width: '100%' }}>
-            {button}
-          </Button>
-        </Form.Item>
+        {onSubmit && (
+          <Form.Item>
+            <Button type='primary' htmlType='submit' style={{ width: '100%' }}>
+              {button}
+            </Button>
+          </Form.Item>
+        )}
       </Form>
     </Card>
   )

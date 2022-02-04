@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import uniqueValidator from 'mongoose-unique-validator'
 
 export interface IProduct {
   type?: string
@@ -44,11 +45,15 @@ const ProductSchema = new mongoose.Schema<IProduct>({
   },
   article: {
     type: String,
+    unique: true,
+    dropDups: true,
     maxLength: 100,
   },
   name: {
     type: String,
-    required: true,
+    unique: true,
+    dropDups: true,
+    required: [true, 'Введите имя'],
     maxLength: 100,
   },
   description: {
@@ -72,27 +77,27 @@ const ProductSchema = new mongoose.Schema<IProduct>({
   },
   buy_price: {
     type: String,
-    required: true,
+    required: [true, 'Введите закупочную цену'],
   },
   delivery_price: {
     type: String,
-    required: true,
+    required: [true, 'Введите цену доставки'],
   },
   height: {
     type: Number,
-    required: true,
+    required: [true, 'Введите высоту'],
   },
   length: {
     type: Number,
-    required: true,
+    required: [true, 'Введите длинну'],
   },
   width: {
     type: Number,
-    required: true,
+    required: [true, 'Введите ширину'],
   },
   weight: {
     type: Number,
-    required: true,
+    required: [true, 'Введите вес'],
   },
   brand: {
     type: String,
@@ -123,10 +128,14 @@ const ProductSchema = new mongoose.Schema<IProduct>({
     type: String,
   },
   barcode: {
+    unique: true,
+    dropDups: true,
     type: String,
   },
 })
-
+ProductSchema.plugin(uniqueValidator, {
+  message: 'Поле {PATH} должно быть уникальным.',
+})
 ProductSchema.index({ name: 'text' })
 
 const ProductModel = mongoose.model('Product', ProductSchema)

@@ -1,4 +1,4 @@
-import { Button, Card, message } from 'antd'
+import { Button, Card, message, Popover } from 'antd'
 import Table, { ColumnsType } from 'antd/lib/table'
 import { useEffect, useState } from 'react'
 import { IProductIn, IProductInFull, ProductsInForm } from './ProductsInForm'
@@ -97,9 +97,31 @@ export default function ProductsIn() {
       render: (text, record, index) => (
         <p style={{ whiteSpace: 'pre' }}>
           {record.products
-            .map(product => `${product.name}  ${product.quantity}`)
+            .filter((product, id) => id <= 3)
+            .map((product, id) => {
+              if (id === 3) return '...'
+              return `${product.name}  ${product.quantity}`
+            })
             .join('\n')}
         </p>
+      ),
+    },
+    {
+      title: 'Подробнее',
+      key: 'remove',
+      render: (text, record, index) => (
+        <Popover
+          placement='left'
+          content={
+            <ProductsInForm
+              onCancel={() => setProductInCreation(false)}
+              header='Списание'
+              button='Создать новое списание'
+              product_in={record}
+            />
+          }>
+          <Button>Подробнее</Button>,
+        </Popover>
       ),
     },
     // {
