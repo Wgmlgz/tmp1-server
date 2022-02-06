@@ -49,8 +49,6 @@ const ProductSchema = new mongoose.Schema<IProduct>({
   },
   article: {
     type: String,
-    unique: true,
-    dropDups: true,
     maxLength: 100,
   },
   name: {

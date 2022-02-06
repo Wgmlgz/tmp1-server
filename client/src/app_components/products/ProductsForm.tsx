@@ -94,26 +94,31 @@ const ProductsForm: FC<Props> = ({
     fetchCategories()
   }, [])
   useEffect(() => {
+    console.log(marketplace_data)
+  }, [marketplace_data])
+  useEffect(() => {
     setMarketplaceData([
-      ...Object.entries(product?.marketplace_data ?? {}),
-      ['Номенклатура Wildberries FBS', ''],
-      ['Штрихкод Wildberries FBS', ''],
-      ['Номенклатура Wildberries FBW', ''],
-      ['Штрихкод Wildberries FBW', ''],
-      ['Номенклатура Yandex FBS', ''],
-      ['Штрихкод Yandex FBS', ''],
-      ['Номенклатура Yandex FBY', ''],
-      ['Штрихкод Yandex FBY', ''],
-      ['Номенклатура Ozon FBS', ''],
-      ['Штрихкод Ozon FBS', ''],
-      ['Номенклатура Ozon FBO', ''],
-      ['Штрихкод Ozon FBO', ''],
-      ['Номенклатура Sber FBS', ''],
-      ['Штрихкод Sber FBS', ''],
-      ['Номенклатура AliExpress FBS', ''],
-      ['Штрихкод AliExpress FBS', ''],
-      ['Номенклатура KazanExpress FBK', ''],
-      ['Штрихкод KazanExpress FBK', ''],
+      ...Object.entries({
+        'Номенклатура Wildberries FBS': '',
+        'Штрихкод Wildberries FBS': '',
+        'Номенклатура Wildberries FBW': '',
+        'Штрихкод Wildberries FBW': '',
+        'Номенклатура Yandex FBS': '',
+        'Штрихкод Yandex FBS': '',
+        'Номенклатура Yandex FBY': '',
+        'Штрихкод Yandex FBY': '',
+        'Номенклатура Ozon FBS': '',
+        'Штрихкод Ozon FBS': '',
+        'Номенклатура Ozon FBO': '',
+        'Штрихкод Ozon FBO': '',
+        'Номенклатура Sber FBS': '',
+        'Штрихкод Sber FBS': '',
+        'Номенклатура AliExpress FBS': '',
+        'Штрихкод AliExpress FBS': '',
+        'Номенклатура KazanExpress FBK': '',
+        'Штрихкод KazanExpress FBK': '',
+        ...(product?.marketplace_data ?? {}),
+      }),
     ])
   }, [product])
 
@@ -166,6 +171,10 @@ const ProductsForm: FC<Props> = ({
         barcode,
         marketplace_data: Object.fromEntries(marketplace_data),
       }
+      console.log('555555', marketplace_data)
+
+      console.log(Object.fromEntries(marketplace_data))
+
       console.log(product)
 
       onSubmit(product)
@@ -270,7 +279,6 @@ const ProductsForm: FC<Props> = ({
                               const new_data = [...marketplace_data]
                               new_data[index][1] = s
                               setMarketplaceData(new_data)
-                              console.log(new_data)
                             }}
                           />
                         ),

@@ -12,6 +12,7 @@ import super_admin_routes from './routes/super_admin'
 import products_in_routes from './routes/products_in'
 import products_out_routes from './routes/products_out'
 import products_move_routes from './routes/products_move'
+import wildberries_routes from './routes/wildberries'
 
 import mongoose from 'mongoose'
 import cookieParser from 'cookie-parser'
@@ -39,6 +40,7 @@ app.use('/api/warehouses', warehouses_routes)
 app.use('/api/products_in', products_in_routes)
 app.use('/api/products_out', products_out_routes)
 app.use('/api/products_move', products_move_routes)
+app.use('/api/wildberries', wildberries_routes)
 
 // if (NODE_ENV === 'production') {
 //   app.use(express.static(path.join(__dirname, '../client/build')))

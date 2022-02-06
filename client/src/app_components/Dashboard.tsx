@@ -19,6 +19,9 @@ import ProductsIn from './warehouses/ProductsIn'
 import ProductsOut from './warehouses/ProductsOut'
 import ProductsMove from './warehouses/ProductsMove'
 import Import from './excel/Import'
+import WildberriesProducts from './marketplaces/wildberries/Products'
+import Settings from './marketplaces/wildberries/Settings'
+import Orders from './marketplaces/wildberries/Orders'
 
 const { Header, Content, Sider } = Layout
 const { SubMenu } = Menu
@@ -116,6 +119,31 @@ export default function Dashboard() {
             <Menu.Item key='8' icon={<ImportOutlined />}>
               <Link to='/dashboard/import'>Импорт</Link>
             </Menu.Item>
+            <SubMenu
+              key='sub3'
+              icon={<PicCenterOutlined />}
+              title='Маркетплейсы'>
+              <SubMenu
+                key='sub4'
+                icon={<PicCenterOutlined />}
+                title='Wildberries'>
+                <Menu.Item key='9' icon={<PicCenterOutlined />}>
+                  <Link to='/dashboard/marketplaces/wildberries/products'>
+                    Товары
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key='10' icon={<PicCenterOutlined />}>
+                  <Link to='/dashboard/marketplaces/wildberries/settings'>
+                    Настройки
+                  </Link>
+                </Menu.Item>
+                <Menu.Item key='11' icon={<PicCenterOutlined />}>
+                  <Link to='/dashboard/marketplaces/wildberries/orders'>
+                    Заказы
+                  </Link>
+                </Menu.Item>
+              </SubMenu>
+            </SubMenu>
           </Menu>
         </Sider>
         <Content style={{ margin: '20px' }}>
@@ -129,6 +157,18 @@ export default function Dashboard() {
               <Route path='/products_out' element={<ProductsOut />} />
               <Route path='/products_move' element={<ProductsMove />} />
               <Route path='/import' element={<Import />} />
+              <Route
+                path='/marketplaces/wildberries/products'
+                element={<WildberriesProducts />}
+              />
+              <Route
+                path='/marketplaces/wildberries/settings'
+                element={<Settings />}
+              />
+              <Route
+                path='/marketplaces/wildberries/orders'
+                element={<Orders />}
+              />
             </Routes>
           </div>
         </Content>
