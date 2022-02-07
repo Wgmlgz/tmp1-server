@@ -1,9 +1,15 @@
 import { Request, Response } from 'express'
 import Warehouse, { IWarehouse } from '../models/warehouse'
 import mongoose from 'mongoose'
-import { WILDBERRIES_API_KEY, WILDBERRIES_URL } from '../config/env'
+import {
+  WB_WAREHOUSE_ID,
+  WILDBERRIES_API_KEY,
+  WILDBERRIES_URL,
+} from '../config/env'
 import axios from 'axios'
 import ProductModel, { IProduct } from '../models/product'
+import RemainModel from '../models/remains'
+import fs from 'fs'
 
 interface IWilbberriesProduct {
   barcode: string
@@ -50,7 +56,7 @@ export const getWildberriesProducts = async (req: Request, res: Response) => {
 
     res.status(200).json(table)
   } catch (err: any) {
-    res.status(200).json(err.message)
+    res.status(400).json(err.message)
   }
 }
 
@@ -108,8 +114,57 @@ export const updateWildberriesSettings = async (
   res: Response
 ) => {
   try {
+    const { sender_warehouse, send_cron } = req.body
+    const old = JSON.parse(fs.readFileSync('settings.json', 'utf8'))
+    if (sender_warehouse) old.sender_warehouse = sender_warehouse
+    if (send_cron) old.send_cron = send_cron
+    fs.writeFileSync('settings.json', JSON.stringify(old, null, 2))
     res.status(200).send('settings updated')
   } catch (err: any) {
+    res.status(400).json(err.message)
+  }
+}
+
+export const updateWildberriesStocks = async () => {
+  const warehouse = JSON.parse(
+    fs.readFileSync('settings.json', 'utf8')
+  ).sender_warehouse
+  const wb_warehouse = WB_WAREHOUSE_ID
+  const remains = await RemainModel.find({ warehouse })
+
+  const sended_stocs = (
+    await Promise.all(
+      remains.map(async remain => ({
+        barcode: (
+          (
+            await ProductModel.findById(remain.product)
+          )?.marketplace_data as any
+        )?.get('Штрихкод Wildberries FBS'),
+        stock: remain.quantity,
+        warehouseId: wb_warehouse,
+      }))
+    )
+  ).filter(x => x.barcode)
+
+  const res = await axios.post(
+    `${WILDBERRIES_URL}/api/v2/stocks`,
+    sended_stocs,
+    {
+      headers: { Authorization: WILDBERRIES_API_KEY },
+    }
+  )
+  return Promise.resolve(res.data)
+}
+export const runUpdateWildberriesStocks = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const ans = await updateWildberriesStocks()
+    res.status(200).json(ans)
+  } catch (err: any) {
+    console.log(err)
+
     res.status(200).json(err.message)
   }
 }

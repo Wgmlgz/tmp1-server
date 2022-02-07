@@ -16,5 +16,10 @@ export const getWildberriesOrders = (
     params: { status, date_start, take, skip },
   })
 
-export const updateWildberriesSettings = () =>
-  axios.post(`${wildberries_url}/settings`, {})
+export const updateWildberriesSettings = (
+  sender_warehouse: string,
+  send_cron: string
+) => axios.post(`${wildberries_url}/settings`, { sender_warehouse, send_cron })
+
+export const runUpdateWildberriesStocks = () =>
+  axios.post(`${wildberries_url}/update`, {})

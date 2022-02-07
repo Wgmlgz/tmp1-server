@@ -14,3 +14,4 @@ export const CORS_ORIGIN = process.env.CORS_ORIGIN
 export const NODE_ENV = process.env.NODE_ENV || 'production'
 export const MAIN_WAREHOUSE_ID =
   process.env.MAIN_WAREHOUSE_ID || '61eda2d7f1a680d8e9adea70'
+export const WB_WAREHOUSE_ID = process.env.WB_WAREHOUSE_ID || 55190

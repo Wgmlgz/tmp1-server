@@ -69,7 +69,6 @@ export default function Warehouses() {
     try {
       const res = await getWarehouses()
       setWarehouses(res.data)
-      console.log(res.data)
     } catch (err) {
       if (axios.isAxiosError(err)) {
         message.error(err.response?.data)

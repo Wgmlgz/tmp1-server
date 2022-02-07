@@ -13,11 +13,12 @@ import products_in_routes from './routes/products_in'
 import products_out_routes from './routes/products_out'
 import products_move_routes from './routes/products_move'
 import wildberries_routes from './routes/wildberries'
-
+import cron from 'node-cron'
 import mongoose from 'mongoose'
 import cookieParser from 'cookie-parser'
 import { CORS_ORIGIN, MONGO_CONNECTION_URL, PORT, NODE_ENV } from './config/env'
-import path from 'path'
+import fs from 'fs'
+import { updateWildberriesStocks } from './controllers/wildberries'
 
 const app = express()
 app.use(cookieParser())
@@ -55,7 +56,16 @@ app.use('/api/wildberries', wildberries_routes)
 
 mongoose
   .connect(MONGO_CONNECTION_URL)
-  .then(() =>
+  .then(() => {
     app.listen(PORT, () => console.log(`server goes brrrrrr at ${PORT}`))
-  )
+    cron.schedule(
+      JSON.parse(fs.readFileSync('settings.json', 'utf8')).send_cron,
+      async () => {
+        console.log('updating stocks')
+
+        const res = await updateWildberriesStocks()
+        console.log('done', res)
+      }
+    )
+  })
   .catch(err => console.log(err.message))

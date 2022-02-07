@@ -166,7 +166,6 @@ const Page: FC = () => {
     try {
       const res = await getExcelImports()
       setImports(res.data)
-      console.log(imports)
     } catch (err) {
       if (axios.isAxiosError(err)) {
         message.error(err.response?.data)

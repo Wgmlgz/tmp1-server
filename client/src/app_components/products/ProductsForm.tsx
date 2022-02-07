@@ -93,9 +93,7 @@ const ProductsForm: FC<Props> = ({
   useEffect(() => {
     fetchCategories()
   }, [])
-  useEffect(() => {
-    console.log(marketplace_data)
-  }, [marketplace_data])
+
   useEffect(() => {
     setMarketplaceData([
       ...Object.entries({
@@ -270,7 +268,6 @@ const ProductsForm: FC<Props> = ({
                             defaultValue={record[1]}
                             onChange={e => {
                               const s = e.target.value
-                              console.log(s)
                               const new_data = [...marketplace_data]
                               new_data[index][1] = s
                               setMarketplaceData(new_data)

@@ -70,7 +70,6 @@ const Barcodes: FC<Props> = ({ barcodes }) => {
               const imgData = canvas_ref.current?.toDataURL('image/jpeg', 1.0)
               if (!imgData) return
               var pdf = new jsPDF()
-              console.log(imgData)
 
               pdf.addImage(imgData, 'JPEG', 0, 0, 0, 0)
               pdf.save('Labels.pdf')
