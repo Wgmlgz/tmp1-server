@@ -53,3 +53,35 @@ export const getWildberriesProducts = async (req: Request, res: Response) => {
     res.status(200).json(err.message)
   }
 }
+
+export const getWildberriesOrders = async (req: Request, res: Response) => {
+  try {
+    const orders = (
+      await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
+        headers: { Authorization: WILDBERRIES_API_KEY },
+        params: {
+          status: req.query.status,
+          date_start: req.query.date_start,
+          take: req.query.take,
+          skip: Number(req.query.skip),
+        },
+      })
+    ).data
+    res.status(200).send(orders)
+  } catch (err: any) {
+    console.log(err)
+    
+    res.status(400).json(err.message)
+  }
+}
+
+export const updateWildberriesSettings = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    res.status(200).send('settings updated')
+  } catch (err: any) {
+    res.status(200).json(err.message)
+  }
+}
