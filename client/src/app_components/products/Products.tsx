@@ -112,7 +112,6 @@ const Products = () => {
         map.set(remain.product, old ? `${old}\n${str}` : str)
       })
       setRemainsMap(map)
-      console.log(map)
     } catch (err) {
       if (axios.isAxiosError(err)) {
         message.error(err.response?.data)
@@ -251,7 +250,6 @@ const Products = () => {
         current: pagination.current || 1,
         total: res_count.data,
       })
-      console.log(pagination)
 
       setProducts(res.data)
       setLoading(false)
@@ -354,7 +352,6 @@ const Products = () => {
             rowSelection={{
               selectedRowKeys: selected_row_keys,
               onChange: selectedRowKeys => {
-                console.log('selectedRowKeys changed: ', selectedRowKeys)
                 setSelectedRowKeys(selectedRowKeys)
               },
             }}

@@ -72,7 +72,6 @@ export const removeCategory = async (req: Request, res: Response) => {
       return res.status(404).send(`No category with id: ${id}`)
     const old = await Category.findById(id)
     const old_name = old?.name
-    console.log(old_name)
 
     await Product.updateMany({}, [
       {

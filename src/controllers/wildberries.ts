@@ -62,15 +62,43 @@ export const getWildberriesOrders = async (req: Request, res: Response) => {
         params: {
           status: req.query.status,
           date_start: req.query.date_start,
-          take: req.query.take,
+          take: Number(req.query.take),
           skip: Number(req.query.skip),
         },
       })
     ).data
+    const warehouses = new Map<number, string>(
+      (
+        await axios.get(`${WILDBERRIES_URL}/api/v2/warehouses`, {
+          headers: { Authorization: WILDBERRIES_API_KEY },
+        })
+      ).data.map(({ id, name }: { id: number; name: string }) => [id, name])
+    )
+    const db_products = new Map<string, IProduct>(
+      (
+        await ProductModel.find({
+          'marketplace_data.Штрихкод Wildberries FBS': {
+            $in: orders.orders.map((item: any) => item.barcode),
+          },
+        })
+      ).map((product: any) => [
+        product.marketplace_data.get('Штрихкод Wildberries FBS'),
+        product,
+      ])
+    )
+    orders.orders.forEach((item: any) => {
+      item.warehouse = warehouses.get(item.storeId)
+      const db_product = db_products.get(item.barcode)
+      if (!db_product) return
+
+      item.name = db_product.name
+      db_product.imgs_small && (item.img = db_product.imgs_small[0])
+      item.brand = db_product.brand
+      item.article = db_product.article
+    })
+
     res.status(200).send(orders)
   } catch (err: any) {
-    console.log(err)
-    
     res.status(400).json(err.message)
   }
 }

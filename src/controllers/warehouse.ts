@@ -38,8 +38,6 @@ export const updateWarehouse = async (req: Request, res: Response) => {
     const { id } = req.params
     const { name, description } = req.body
 
-    console.log(name, description);
-    
     if (!mongoose.Types.ObjectId.isValid(id))
       return res.status(404).send(`No warehouse with id: ${id}`)
     const old_warehouse = await Warehouse.findById(id)

@@ -171,11 +171,6 @@ const ProductsForm: FC<Props> = ({
         barcode,
         marketplace_data: Object.fromEntries(marketplace_data),
       }
-      console.log('555555', marketplace_data)
-
-      console.log(Object.fromEntries(marketplace_data))
-
-      console.log(product)
 
       onSubmit(product)
     } catch (err) {

@@ -16,7 +16,6 @@ export default function RegisterForm() {
     email: string
     password: string
   }) => {
-    console.log(email, password)
     try {
       await register(email, password)
       setErrMsg('')

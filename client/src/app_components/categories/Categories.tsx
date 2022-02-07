@@ -46,7 +46,6 @@ export default function Categories() {
 
   const onFinish = async ({ name, descriptrion, parent }: ICategory) => {
     const category: ICategory = { name, descriptrion, img, tags, parent }
-    console.log(category)
 
     try {
       const res = await createCategory(category)
@@ -129,7 +128,6 @@ export default function Categories() {
     try {
       const res = await getCategories()
       setCategories(res.data)
-      console.log(res.data)
     } catch (err) {
       if (axios.isAxiosError(err)) {
         message.error(err.response?.data)

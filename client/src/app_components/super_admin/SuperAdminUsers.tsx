@@ -72,7 +72,6 @@ const SuperAdminUsers: FC = () => {
       ),
     },
   ]
-  console.log(users)
 
   return (
     <div style={{ display: 'grid', width: 'fit-content', gap: '20px' }}>

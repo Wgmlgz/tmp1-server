@@ -48,7 +48,6 @@ export const importProducts = (e: any, onDone: (products: any) => any) => {
               .split(';')
               .map((str: string) => str.trim())
               .filter((x: string) => !!x)
-            console.log(product.imgs)
 
             product.upload_imgs = product.imgs
               .split(';')

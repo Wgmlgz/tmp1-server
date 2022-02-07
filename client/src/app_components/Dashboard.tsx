@@ -48,7 +48,6 @@ export default function Dashboard() {
   }, [setup])
 
   const onCollapse = (collapsed: boolean) => {
-    console.log(collapsed)
     setCollapsed(collapsed)
   }
 
