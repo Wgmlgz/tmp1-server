@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 export interface IWarehouse {
   name: string
   descriptrion?: string
+  undeletable?: boolean
 }
 
 const WarehouseSchema = new mongoose.Schema<IWarehouse>({
@@ -12,6 +13,9 @@ const WarehouseSchema = new mongoose.Schema<IWarehouse>({
   },
   descriptrion: {
     type: String,
+  },
+  undeletable: {
+    type: Boolean,
   },
 })
 

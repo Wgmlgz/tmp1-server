@@ -49,7 +49,7 @@ export default function Warehouses() {
             }}
             okText='Да'
             cancelText='Нет'>
-            <Button>
+            <Button disabled={record.undeletable}>
               <DeleteOutlined />
             </Button>
           </Popconfirm>

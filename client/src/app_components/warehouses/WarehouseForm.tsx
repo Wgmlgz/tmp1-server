@@ -4,6 +4,7 @@ import { FC } from 'react'
 export interface IWarehouse {
   name: string
   descriptrion?: string
+  undeletable?: boolean
 }
 export interface IWarehouseFull extends IWarehouse {
   _id: string

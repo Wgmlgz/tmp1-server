@@ -12,3 +12,5 @@ export const MONGO_CONNECTION_URL = process.env.MONGO_CONNECTION_URL || ''
 export const PORT = process.env.PORT || '5000'
 export const CORS_ORIGIN = process.env.CORS_ORIGIN
 export const NODE_ENV = process.env.NODE_ENV || 'production'
+export const MAIN_WAREHOUSE_ID =
+  process.env.MAIN_WAREHOUSE_ID || '61eda2d7f1a680d8e9adea70'
