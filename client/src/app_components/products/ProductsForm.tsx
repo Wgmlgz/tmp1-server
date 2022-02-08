@@ -39,8 +39,6 @@ export interface IProduct {
   weight: number
   brand?: string
   provider?: string
-  address?: string
-  warehouse?: string
   mark?: string
   country?: string
   created?: Date
@@ -49,6 +47,9 @@ export interface IProduct {
   user_changed_id?: string
   barcode?: string
   marketplace_data?: {
+    [id: string]: string
+  }
+  addresses?: {
     [id: string]: string
   }
 }
@@ -80,6 +81,9 @@ const ProductsForm: FC<Props> = ({
   const [marketplace_data, setMarketplaceData] = useState<[string, string][]>(
     []
   )
+  const [addresses, setAddresses] = useState<any>({})
+  const [warehouse, setWarehouse] = useState<string>()
+  const [address, setAddress] = useState<string>('aboba')
 
   const input_tags_ref = useRef<Input>(null)
   const input_imgs_ref = useRef<Input>(null)
@@ -95,6 +99,11 @@ const ProductsForm: FC<Props> = ({
   }, [])
 
   useEffect(() => {
+    warehouse && setAddress(addresses[warehouse])
+  }, [warehouse])
+  useEffect(() => {
+    setAddresses({ ...product?.addresses })
+
     setMarketplaceData([
       ...Object.entries({
         'Номенклатура Wildberries FBS': '',
@@ -121,8 +130,6 @@ const ProductsForm: FC<Props> = ({
   }, [product])
 
   const onFinish = async ({
-    address,
-    warehouse,
     article,
     brand,
     buy_price,
@@ -161,13 +168,12 @@ const ProductsForm: FC<Props> = ({
         width,
         weight,
         brand,
-        address,
-        warehouse,
         provider,
         mark,
         country,
         barcode,
         marketplace_data: Object.fromEntries(marketplace_data),
+        addresses,
       }
 
       onSubmit(product)
@@ -196,8 +202,6 @@ const ProductsForm: FC<Props> = ({
             height: product?.height,
             length: product?.length,
             weight: product?.weight,
-            warehouse: product?.warehouse,
-            address: product?.address,
           }}>
           <div
             style={{
@@ -242,12 +246,24 @@ const ProductsForm: FC<Props> = ({
                   <WarehouseSelect
                     required={false}
                     label='Склад'
-                    name='warehouse'
-                    default_value={product?.warehouse}
+                    name='__warehouse__'
+                    onChange={s => {
+                      setWarehouse(s)
+                    }}
                   />
-                  <Form.Item label='Адрес' name='address'>
+                  <Form.Item label='Адрес'>
                     <Input
+                      value={address}
                       placeholder='Адрес'
+                      onChange={e => {
+                        if (warehouse)
+                          setAddresses({
+                            ...addresses,
+                            [warehouse]: e.target.value,
+                          })
+                        setAddress(e.target.value)
+                      }}
+                      disabled={!warehouse}
                     />
                   </Form.Item>
                 </Panel>

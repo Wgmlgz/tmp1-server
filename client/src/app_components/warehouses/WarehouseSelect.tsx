@@ -11,6 +11,7 @@ interface Props {
   name: string
   locked?: boolean
   required: boolean
+  onChange?: (str: string) => any
 }
 const WarehouseSelect: FC<Props> = ({
   default_value,
@@ -18,6 +19,7 @@ const WarehouseSelect: FC<Props> = ({
   name,
   locked,
   required,
+  onChange,
 }) => {
   const [warehouses, setWarehouses] = useState<IWarehouseFull[]>([])
 
@@ -52,7 +54,12 @@ const WarehouseSelect: FC<Props> = ({
           }
         </p>
       ) : (
-        <Select defaultValue={default_value} style={{ width: '200px' }}>
+        <Select
+          defaultValue={default_value}
+          style={{ width: '200px' }}
+          onChange={e => {
+            onChange && onChange(e)
+          }}>
           {warehouses.map(warehouse => (
             <Option value={warehouse._id}>{warehouse.name}</Option>
           ))}

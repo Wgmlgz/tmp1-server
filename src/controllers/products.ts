@@ -43,13 +43,12 @@ const parseReqToProduct = (req: Request) => {
     width,
     weight,
     brand,
-    address,
-    warehouse,
     provider,
     mark,
     marketplace_data,
     country,
     barcode,
+    addresses,
   } = req.body
 
   let imgs: string[] | undefined = [],
@@ -88,6 +87,7 @@ const parseReqToProduct = (req: Request) => {
     imgs_small,
     videos: videos && JSON.parse(videos),
     marketplace_data: marketplace_data && JSON.parse(marketplace_data),
+    addresses: addresses && JSON.parse(addresses),
     buy_price,
     delivery_price,
     height,
@@ -95,8 +95,6 @@ const parseReqToProduct = (req: Request) => {
     width,
     weight,
     brand,
-    address,
-    warehouse,
     provider,
     mark,
     country,
@@ -116,7 +114,6 @@ const parseReqToProduct = (req: Request) => {
   return product
 }
 
-const saveProduct = async (product: IProduct) => {}
 export const createProduct = async (req: Request, res: Response) => {
   try {
     const doc1 = await Product.findOne({ name: req.body.name })

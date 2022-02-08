@@ -20,8 +20,6 @@ export interface IProduct {
   weight: number
   brand?: string
   provider?: string
-  warehouse?: string
-  address?: string
   mark?: string
   country?: string
   created?: Date
@@ -30,6 +28,9 @@ export interface IProduct {
   user_changed_id?: string
   barcode?: string
   marketplace_data?: {
+    [id: string]: string
+  }
+  addresses?: {
     [id: string]: string
   }
 }
@@ -109,13 +110,9 @@ const ProductSchema = new mongoose.Schema<IProduct>({
     type: String,
     maxLength: 200,
   },
-  warehouse: {
-    type: String,
-    maxLength: 50,
-  },
-  address: {
-    type: String,
-    maxLength: 50,
+  addresses: {
+    type: Map,
+    of: String,
   },
   mark: {
     type: String,

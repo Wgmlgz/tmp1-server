@@ -125,6 +125,7 @@ const productToFormData = (product: IProduct) => {
   fd.append('tags', JSON.stringify(product.tags))
   fd.append('videos', JSON.stringify(product.videos))
   fd.append('marketplace_data', JSON.stringify(product.marketplace_data))
+  fd.append('addresses', JSON.stringify(product.addresses))
   return fd
 }
 export const createProduct = (product: IProduct) =>
