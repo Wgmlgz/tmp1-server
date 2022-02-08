@@ -1,4 +1,13 @@
-import { Button, Card, Input, message, Popconfirm, Select, Table } from 'antd'
+import {
+  Button,
+  Card,
+  Input,
+  message,
+  Popconfirm,
+  Select,
+  Table,
+  Tabs,
+} from 'antd'
 import { Key, useEffect, useMemo, useState } from 'react'
 
 import axios from 'axios'
@@ -6,7 +15,7 @@ import { ColumnsType, TablePaginationConfig } from 'antd/lib/table'
 import { getWildberriesOrders } from '../../../api/wildberries'
 import moment from 'moment'
 import { products_url } from '../../../api/api'
-
+const { TabPane } = Tabs
 interface IOrder {
   product: string
   warehouse: string
@@ -38,13 +47,13 @@ const Orders = () => {
     useState<TablePaginationConfig>(defaultPagination)
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    setPagination(defaultPagination)
-  }, [defaultPagination, status])
-
   const fetchProducts = async (pagination: TablePaginationConfig) => {
+    console.log(pagination)
+    setOrders({ orders: [], total: 0 })
     setLoading(true)
     try {
+      console.log(status)
+
       const res = await getWildberriesOrders(
         status,
         '2021-09-30T17:14:52+03:00',
@@ -60,8 +69,9 @@ const Orders = () => {
       console.log(err)
     }
     setLoading(false)
+    console.log(pagination)
   }
-  
+
   useEffect(() => {
     fetchProducts(pagination)
   }, [])
@@ -146,7 +156,9 @@ const Orders = () => {
       render: (text, record, index) => {
         if (status === 2) return ''
         moment.locale('ru')
-        let secs = moment(record.dateCreated).add(2, 'days').diff(moment())
+        let secs = Math.floor(
+          moment(record.dateCreated).add(2, 'days').diff(moment()) / 1000
+        )
         const neg = secs < 0
         if (neg)
           secs = Math.floor(
@@ -157,48 +169,60 @@ const Orders = () => {
         const mins = Math.floor(secs / 60) % 60
         secs = secs % 60
         return `${neg ? '- ' : ''}${
-          days ? days + ' дней ' : ''
+          days ? days + 'д ' : ''
         }${hours}:${mins}:${secs}`
       },
     },
   ]
 
+  useEffect(() => {
+    fetchProducts(pagination)
+  }, [status])
   return (
     <div style={{ width: '100%' }}>
       <Card>
-        <div style={{ display: 'flex' }}>
-          <Button
-            onClick={() => {
-              setStatus(0)
-              fetchProducts(pagination)
-            }}>
-            Новые заказы
-          </Button>
-          <Button
-            onClick={() => {
-              setStatus(1)
-              fetchProducts(pagination)
-            }}>
-            На сборке
-          </Button>
-          <Button
-            onClick={() => {
-              setStatus(2)
-              fetchProducts(pagination)
-            }}>
-            Собранные
-          </Button>
-        </div>
-        <br />
-        <Table
-          dataSource={orders.orders}
-          columns={columns}
-          loading={loading}
-          pagination={pagination}
-          onChange={pagination => {
-            fetchProducts(pagination)
-          }}
-        />
+        <Tabs
+          defaultActiveKey='1'
+          onChange={async e => {
+            console.log(e)
+
+            setPagination(defaultPagination)
+            setStatus(parseInt(e))
+          }}>
+          <TabPane tab='Новые заказы' key='0'>
+            <Table
+              dataSource={orders.orders}
+              columns={columns}
+              loading={loading}
+              pagination={pagination}
+              onChange={pagination => {
+                fetchProducts(pagination)
+              }}
+            />
+          </TabPane>
+          <TabPane tab='На сборке' key='1'>
+            <Table
+              dataSource={orders.orders}
+              columns={columns}
+              loading={loading}
+              pagination={pagination}
+              onChange={pagination => {
+                fetchProducts(pagination)
+              }}
+            />
+          </TabPane>
+          <TabPane tab='Собранные' key='2'>
+            <Table
+              dataSource={orders.orders}
+              columns={columns}
+              loading={loading}
+              pagination={pagination}
+              onChange={pagination => {
+                fetchProducts(pagination)
+              }}
+            />
+          </TabPane>
+        </Tabs>
       </Card>
     </div>
   )

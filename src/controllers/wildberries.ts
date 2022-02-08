@@ -52,6 +52,7 @@ export const getWildberriesProducts = async (req: Request, res: Response) => {
       db_product.imgs_small && (item.img = db_product.imgs_small[0])
       item.buy_price = db_product.buy_price
       item.delivery_price = db_product.delivery_price
+      item.article = db_product.article
     })
 
     res.status(200).json(table)
@@ -120,6 +121,14 @@ export const updateWildberriesSettings = async (
     if (send_cron) old.send_cron = send_cron
     fs.writeFileSync('settings.json', JSON.stringify(old, null, 2))
     res.status(200).send('settings updated')
+  } catch (err: any) {
+    res.status(400).json(err.message)
+  }
+}
+export const getWildberriesSettings = async (req: Request, res: Response) => {
+  try {
+    const old = JSON.parse(fs.readFileSync('settings.json', 'utf8'))
+    res.status(200).json(old)
   } catch (err: any) {
     res.status(400).json(err.message)
   }

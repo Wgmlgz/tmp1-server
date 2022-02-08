@@ -47,8 +47,8 @@ export default function WildberriesProducts() {
     },
     {
       title: 'Артикул',
-      dataIndex: 'nmId',
-      key: 'nmId',
+      dataIndex: 'article',
+      key: 'article',
     },
     {
       title: 'Изображение',
@@ -92,14 +92,15 @@ export default function WildberriesProducts() {
       title: 'Цена со скидкой на wb',
       dataIndex: 'discount',
       key: 'discount',
-      render: (text, record, index) => record.price - record.discount,
+      render: (text, record, index) =>
+        Math.round(record.price * ((100 - record.discount) / 100)),
     },
   ]
 
   return (
     <Card>
       <Table dataSource={products as any} columns={columns} />
-      <pre> {JSON.stringify(products, null, 2)}</pre>
+      {/* <pre> {JSON.stringify(products, null, 2)}</pre> */}
     </Card>
   )
 }

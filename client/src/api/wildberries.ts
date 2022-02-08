@@ -20,6 +20,8 @@ export const updateWildberriesSettings = (
   sender_warehouse: string,
   send_cron: string
 ) => axios.post(`${wildberries_url}/settings`, { sender_warehouse, send_cron })
+export const getWildberriesSettings = () =>
+  axios.get(`${wildberries_url}/settings`)
 
 export const runUpdateWildberriesStocks = () =>
   axios.post(`${wildberries_url}/update`, {})

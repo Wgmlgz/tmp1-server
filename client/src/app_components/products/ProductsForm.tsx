@@ -196,6 +196,8 @@ const ProductsForm: FC<Props> = ({
             height: product?.height,
             length: product?.length,
             weight: product?.weight,
+            warehouse: product?.warehouse,
+            address: product?.address,
           }}>
           <div
             style={{
@@ -245,7 +247,6 @@ const ProductsForm: FC<Props> = ({
                   />
                   <Form.Item label='Адрес' name='address'>
                     <Input
-                      defaultValue={product?.address}
                       placeholder='Адрес'
                     />
                   </Form.Item>
