@@ -5,6 +5,7 @@ import {
   getWildberriesOrders,
   runUpdateWildberriesStocks,
   getWildberriesSettings,
+  checkWildberriesConnection
 } from '../controllers/wildberries'
 import { authenticateAdmin, authenticateSuperAdmin } from '../controllers/auth'
 
@@ -15,5 +16,6 @@ router.get('/orders', authenticateAdmin, getWildberriesOrders)
 router.post('/settings', authenticateAdmin, updateWildberriesSettings)
 router.get('/settings', authenticateAdmin, getWildberriesSettings)
 router.post('/update', authenticateAdmin, runUpdateWildberriesStocks)
+router.get('/check', authenticateAdmin, checkWildberriesConnection)
 
 export default router

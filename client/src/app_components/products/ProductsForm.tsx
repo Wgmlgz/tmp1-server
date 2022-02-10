@@ -26,6 +26,7 @@ export interface IProduct {
   article?: string
   name: string
   description?: string
+  color?: string
   tags?: string[]
   imgs?: FileList
   imgs_big?: string[]
@@ -136,6 +137,7 @@ const ProductsForm: FC<Props> = ({
     category,
     delivery_price,
     description,
+    color,
     height,
     length,
     name,
@@ -158,6 +160,7 @@ const ProductsForm: FC<Props> = ({
         article,
         name,
         description,
+        color,
         tags,
         imgs,
         videos,
@@ -316,6 +319,12 @@ const ProductsForm: FC<Props> = ({
                     <Input.TextArea
                       defaultValue={product?.description}
                       placeholder='Описание'
+                    />
+                  </Form.Item>
+                  <Form.Item label='Цвет' name='color'>
+                    <Input.TextArea
+                      defaultValue={product?.color}
+                      placeholder='цвет'
                     />
                   </Form.Item>
                   <Form.Item label='Теги'>

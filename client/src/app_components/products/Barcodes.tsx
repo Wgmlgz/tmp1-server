@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useRef } from 'react'
+import { FC, useCallback, useEffect, useRef, useState } from 'react'
 import jsPDF from 'jspdf'
 import JsBarcode from 'jsbarcode'
 import { Button, Card, message } from 'antd'
@@ -7,6 +7,7 @@ export interface Barcode {
   barcode: string
   name: string
   article: string
+  color?: string
 }
 
 interface Props {
@@ -14,25 +15,56 @@ interface Props {
 }
 
 const Barcodes: FC<Props> = ({ barcodes }) => {
+  const [pdf, setPdf] = useState(new jsPDF())
   const canvas_ref = useRef<HTMLCanvasElement>(null)
   const tmp_canvas_ref = useRef<HTMLCanvasElement>(null)
 
   const renderBarcode = useCallback(
-    (barcode: Barcode, x: number, y: number) => {
+    (barcode: Barcode, x: number, y: number, scale: number) => {
       try {
         JsBarcode(tmp_canvas_ref.current)
-          .EAN13(barcode.barcode, { width: 1.8, height: 50 })
+          .EAN13(barcode.barcode, {
+            width: 1.8 * scale,
+            height: 50 * scale,
+            fontSize: 15 * scale,
+          })
           .render()
         const ctx = canvas_ref.current?.getContext('2d')
         if (!ctx) return
         tmp_canvas_ref.current &&
-          ctx.drawImage(tmp_canvas_ref.current, x, y + 60)
+          ctx.drawImage(tmp_canvas_ref.current, x + 10 * scale, y + 70 * scale)
 
         ctx.fillStyle = '#000'
-        ctx.font = '15px serif'
-        ctx.fillText(barcode.name, x + 10, y + 25, 200)
-        ctx.fillText(`Артикул: ${barcode.article}`, x + 10, y + 50, 200)
-        ctx.strokeRect(x, y, 220, 152)
+        ctx.font = `${15 * scale}px serif`
+        if (barcode.color) {
+          ctx.fillText(barcode.name, x + 10 * scale, y + 20 * scale, 200)
+          ctx.fillText(
+            `Артикул: ${barcode.article}`,
+            x + 10 * scale,
+            y + 40 * scale,
+            200 * scale
+          )
+          ctx.fillText(
+            `Цвет: ${barcode.color}`,
+            x + 10 * scale,
+            y + 60 * scale,
+            200 * scale
+          )
+        } else {
+          ctx.fillText(
+            barcode.name,
+            x + 10 * scale,
+            y + 25 * scale,
+            200 * scale
+          )
+          ctx.fillText(
+            `Артикул: ${barcode.article}`,
+            x + 10 * scale,
+            y + 50 * scale,
+            200 * scale
+          )
+        }
+        ctx.strokeRect(x, y, 220 * scale, 152 * scale)
       } catch (err: any) {
         message.error(err)
       }
@@ -41,18 +73,37 @@ const Barcodes: FC<Props> = ({ barcodes }) => {
   )
 
   useEffect(() => {
+    const scale = 4
+    const pdf = new jsPDF({
+      unit: 'mm',
+      orientation: 'landscape',
+      format: [58 * scale, 40 * scale],
+    })
     const canvas = canvas_ref.current
     if (!canvas) return
     const ctx = canvas_ref.current.getContext('2d')
     if (!ctx) return
 
-    canvas.width = 500
-    canvas.height = barcodes.length * 250 + 40
+    canvas.width = 300 * scale
+    canvas.height = (barcodes.length * 350 + 40) * scale
+
+    barcodes.forEach((barcode, i) => {
+      ctx.fillStyle = '#fff'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      renderBarcode(barcode, 0, 0 * i, scale)
+      if (i) pdf.addPage()
+      const imgData = canvas_ref.current?.toDataURL('image/jpeg', 1.0)
+      if (!imgData) return
+      pdf.addImage(imgData, 'JPEG', 0, 0, 0, 0)
+    })
 
     ctx.fillStyle = '#fff'
     ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-    barcodes.forEach((barcode, i) => renderBarcode(barcode, 30, 190 * i + 30))
+    barcodes.forEach((barcode, i) => {
+      renderBarcode(barcode, 0, 190 * i * scale, scale)
+    })
+    setPdf(pdf)
   }, [barcodes, renderBarcode])
 
   return (
@@ -67,11 +118,9 @@ const Barcodes: FC<Props> = ({ barcodes }) => {
           <Button
             type='primary'
             onClick={() => {
-              const imgData = canvas_ref.current?.toDataURL('image/jpeg', 1.0)
-              if (!imgData) return
-              var pdf = new jsPDF()
+              // const imgData = canvas_ref.current?.toDataURL('image/jpeg', 1.0)
+              // if (!imgData) return
 
-              pdf.addImage(imgData, 'JPEG', 0, 0, 0, 0)
               pdf.save('Labels.pdf')
             }}>
             Download as pdf

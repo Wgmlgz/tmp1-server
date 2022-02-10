@@ -25,3 +25,5 @@ export const getWildberriesSettings = () =>
 
 export const runUpdateWildberriesStocks = () =>
   axios.post(`${wildberries_url}/update`, {})
+export const checkWildberriesConnection = () =>
+  axios.get(`${wildberries_url}/check`, {})

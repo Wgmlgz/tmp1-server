@@ -33,7 +33,7 @@ const Orders = () => {
     orders: [],
     total: 0,
   })
-  const [status, setStatus] = useState(2)
+  const [status, setStatus] = useState(0)
   const [startDate, setStartDate] = useState(new Date())
 
   const defaultPagination = useMemo(
@@ -75,8 +75,17 @@ const Orders = () => {
   useEffect(() => {
     fetchProducts(pagination)
   }, [])
-
   const columns: ColumnsType<IOrder> = [
+    {
+      title: 'status',
+      dataIndex: 'status',
+      key: 'status',
+    },
+    {
+      title: 'userStatus',
+      dataIndex: 'userStatus',
+      key: 'userStatus',
+    },
     {
       title: '№ Заказа',
       dataIndex: 'orderId',
@@ -180,9 +189,10 @@ const Orders = () => {
   }, [status])
   return (
     <div style={{ width: '100%' }}>
+      {/* <pre>{JSON.stringify(orders.orders, null, 2)}</pre> */}
       <Card>
         <Tabs
-          defaultActiveKey='1'
+          defaultActiveKey='0'
           onChange={async e => {
             console.log(e)
 

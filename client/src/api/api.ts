@@ -100,6 +100,7 @@ const productToFormData = (product: IProduct) => {
     'article',
     'name',
     'description',
+    'color',
     'buy_price',
     'delivery_price',
     'height',

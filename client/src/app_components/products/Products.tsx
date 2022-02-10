@@ -49,7 +49,7 @@ interface IRemain {
 const Products = () => {
   const [products, setProducts] = useState<IProductFull[]>([])
   const [product_creation, setProductCreation] = useState<boolean>(false)
-  const [barcodes_creation, setBarcodesCreation] = useState<boolean>(false)
+  const [barcodes_creation, setBarcodesCreation] = useState('')
   const [categories, setCategories] = useState<string[]>([])
 
   const [active_products, setActiveProducts] = useState<IProductFull[]>([])
@@ -241,7 +241,7 @@ const Products = () => {
     try {
       setLoading(true)
       const res = await getProducts(
-        pagination.current ?? 0,
+        pagination.current ?? 1,
         pagination.pageSize ?? 10
       )
       const res_count = await getProductsCount()
@@ -255,19 +255,59 @@ const Products = () => {
       setLoading(false)
     } catch (err) {}
   }
+
+  const fetchAllProducts = async () => {
+    try {
+      setLoading(true)
+      const res = await getProducts(1, 10000000)
+      const res_count = await getProductsCount()
+
+      // setPagination({
+      //   pageSize: pagination.pageSize || 1,
+      //   current: pagination.current || 1,
+      //   total: res_count.data,
+      // })
+
+      setProducts(res.data)
+      setLoading(false)
+    } catch (err) {}
+  }
+
   return (
     <>
       {barcodes_creation && (
         <FullscreenCard
           onCancel={() => {
-            setBarcodesCreation(false)
+            setBarcodesCreation('')
           }}>
           <Barcodes
-            barcodes={selected_products.map(product => ({
-              barcode: product.barcode || '',
-              name: product.name || '',
-              article: product.article || '',
-            }))}
+            barcodes={
+              barcodes_creation === 'barcodes all'
+                ? products.map(product => ({
+                    barcode: product.barcode || '',
+                    name: product.name || '',
+                    article: product.article || '',
+                  }))
+                : barcodes_creation === 'barcodes wb'
+                ? selected_products
+                    .filter(
+                      product =>
+                        product.marketplace_data &&
+                        !!product.marketplace_data['Штрихкод Wildberries FBS']
+                    )
+                    .map((product: any) => ({
+                      barcode:
+                        product.marketplace_data['Штрихкод Wildberries FBS'],
+                      name: product.name || '',
+                      article: product.article || '',
+                      color: product.color || '',
+                    }))
+                : selected_products.map(product => ({
+                    barcode: product.barcode || '',
+                    name: product.name || '',
+                    article: product.article || '',
+                  }))
+            }
           />
         </FullscreenCard>
       )}
@@ -300,12 +340,23 @@ const Products = () => {
               cancelText='Нет'>
               <Button>Удалить продукты</Button>
             </Popconfirm>
-            <Button
-              onClick={() => {
-                setBarcodesCreation(true)
+            <Select
+              style={{ width: 300 }}
+              value={'Напечатать штрихкоды'}
+              onSelect={async (e: any) => {
+                if (e === 'barcodes all') {
+                  await fetchAllProducts()
+                }
+                setBarcodesCreation(e)
               }}>
-              Напечатать штрихкоды
-            </Button>
+              <Option value='barcodes'>Напечатать штрихкоды</Option>
+              <Option value='barcodes all'>
+                Напечатать штрихкоды всех товаров
+              </Option>
+              <Option value='barcodes wb'>
+                Напечатать штрихкоды Wildberries FB
+              </Option>
+            </Select>
             <Input.Search
               style={{ maxWidth: '500px' }}
               placeholder='поиск'

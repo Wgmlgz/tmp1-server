@@ -1,11 +1,7 @@
 import { Request, Response } from 'express'
 import Warehouse, { IWarehouse } from '../models/warehouse'
 import mongoose from 'mongoose'
-import {
-  WB_WAREHOUSE_ID,
-  WILDBERRIES_API_KEY,
-  WILDBERRIES_URL,
-} from '../config/env'
+import { WB_WAREHOUSE_ID, WILDBERRIES_URL } from '../config/env'
 import axios from 'axios'
 import ProductModel, { IProduct } from '../models/product'
 import RemainModel from '../models/remains'
@@ -21,6 +17,9 @@ interface IWilbberriesProduct {
 
 export const getWildberriesProducts = async (req: Request, res: Response) => {
   try {
+    const WILDBERRIES_API_KEY = JSON.parse(
+      fs.readFileSync('settings.json', 'utf8')
+    ).api_key
     const table = (
       await axios.get(`${WILDBERRIES_URL}/public/api/v1/info`, {
         headers: { Authorization: WILDBERRIES_API_KEY },
@@ -63,6 +62,9 @@ export const getWildberriesProducts = async (req: Request, res: Response) => {
 
 export const getWildberriesOrders = async (req: Request, res: Response) => {
   try {
+    const WILDBERRIES_API_KEY = JSON.parse(
+      fs.readFileSync('settings.json', 'utf8')
+    ).api_key
     const orders = (
       await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
         headers: { Authorization: WILDBERRIES_API_KEY },
@@ -135,6 +137,9 @@ export const getWildberriesSettings = async (req: Request, res: Response) => {
 }
 
 export const updateWildberriesStocks = async () => {
+  const WILDBERRIES_API_KEY = JSON.parse(
+    fs.readFileSync('settings.json', 'utf8')
+  ).api_key
   const warehouse = JSON.parse(
     fs.readFileSync('settings.json', 'utf8')
   ).sender_warehouse
@@ -175,5 +180,24 @@ export const runUpdateWildberriesStocks = async (
     console.log(err)
 
     res.status(200).json(err.message)
+  }
+}
+
+export const checkWildberriesConnection = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const WILDBERRIES_API_KEY = JSON.parse(
+      fs.readFileSync('settings.json', 'utf8')
+    ).api_key
+
+    await axios.get(`${WILDBERRIES_URL}/api/v2/warehouses`, {
+      headers: { Authorization: WILDBERRIES_API_KEY },
+    })
+
+    res.status(200).send('Соединено')
+  } catch (err: any) {
+    res.status(400).json(err.message)
   }
 }

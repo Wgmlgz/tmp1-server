@@ -7,6 +7,7 @@ export interface IProduct {
   article?: string
   name: string
   description?: string
+  color?: string
   tags?: string[]
   imgs?: string[]
   imgs_big?: string[]
@@ -62,6 +63,10 @@ const ProductSchema = new mongoose.Schema<IProduct>({
   description: {
     type: String,
     maxLength: 2000,
+  },
+  color: {
+    type: String,
+    maxLength: 50,
   },
   tags: {
     type: [String],

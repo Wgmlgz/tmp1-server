@@ -22,6 +22,7 @@ export const exportProducts = (selected_products: IProductFull[]) => {
     { header: 'article', key: 'article' },
     { header: 'name', key: 'name' },
     { header: 'description', key: 'description' },
+    { header: 'color', key: 'color' },
     { header: 'tags', key: 'tags' },
     { header: 'imgs', key: 'imgs' },
     { header: 'imgs_big', key: 'imgs_big' },

@@ -1,7 +1,9 @@
 import { Button, Card, Form, Input, message } from 'antd'
+import TextArea from 'antd/lib/input/TextArea'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import {
+  checkWildberriesConnection,
   getWildberriesSettings,
   runUpdateWildberriesStocks,
   updateWildberriesSettings,
@@ -50,34 +52,57 @@ export default function Settings() {
             name={'sender_warehouse'}
             required={false}
           />
-          <Form.Item name='send_cron'>
+          <Form.Item label='Интервал отправки (cron)' name='send_cron'>
             <Input placeholder='Интервал отправки (cron)' />
           </Form.Item>
-          <Form.Item>
-            <Button style={{ width: '100%' }} type='primary' htmlType='submit'>
-              Обновить настройки
-            </Button>
+          <Form.Item label='API ключ' name='api_key'>
+            <TextArea placeholder='API ключ' />
           </Form.Item>
-          <Form.Item>
-            <Button
-              style={{ width: '100%' }}
-              onClick={async () => {
-                try {
-                  const res = await runUpdateWildberriesStocks()
-                  console.log(res.data)
-                  setMsg(JSON.stringify(res.data, null, 2))
-                  message.success('Обновлено')
-                } catch (e) {
-                  console.log(e)
-                  if (axios.isAxiosError(e)) {
-                    message.error(e.response?.data)
+          <div style={{ display: 'flex', gap: '20px', width: '100%' }}>
+            <Form.Item style={{ flexGrow: 1 }}>
+              <Button type='primary' htmlType='submit'>
+                Обновить настройки
+              </Button>
+            </Form.Item>
+            <Form.Item style={{ flexGrow: 1 }}>
+              <Button
+                type='dashed'
+                onClick={async () => {
+                  try {
+                    await checkWildberriesConnection()
+                    message.success('OK')
+                  } catch (e) {
+                    console.log(e)
+                    message.error('Ошибка соединения')
+
+                    if (axios.isAxiosError(e)) {
+                      message.error(e.response?.data)
+                    }
                   }
-                }
-              }}
-              htmlType='submit'>
-              Вручную обновить отсатки
-            </Button>
-          </Form.Item>
+                }}>
+                Проверить соединение
+              </Button>
+            </Form.Item>
+            <Form.Item style={{ flexGrow: 1 }}>
+              <Button
+                onClick={async () => {
+                  try {
+                    const res = await runUpdateWildberriesStocks()
+                    console.log(res.data)
+                    setMsg(JSON.stringify(res.data, null, 2))
+                    message.success('Обновлено')
+                  } catch (e) {
+                    console.log(e)
+                    if (axios.isAxiosError(e)) {
+                      message.error(e.response?.data)
+                    }
+                  }
+                }}
+                htmlType='submit'>
+                Вручную обновить отсатки
+              </Button>
+            </Form.Item>
+          </div>
         </Form>
       )}
       {/* <pre>{msg}</pre> */}
