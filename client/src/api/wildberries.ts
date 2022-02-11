@@ -7,7 +7,7 @@ export const getWildBerriesProducts = () =>
   axios.get(`${wildberries_url}/products`, {})
 
 export const getWildberriesOrders = (
-  status: number,
+  status: string,
   date_start: string,
   take: number,
   skip: number

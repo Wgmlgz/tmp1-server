@@ -33,7 +33,7 @@ const Orders = () => {
     orders: [],
     total: 0,
   })
-  const [status, setStatus] = useState(0)
+  const [status, setStatus] = useState('new')
   const [startDate, setStartDate] = useState(new Date())
 
   const defaultPagination = useMemo(
@@ -163,7 +163,7 @@ const Orders = () => {
       dataIndex: 'wbWhId',
       key: 'wbWhId',
       render: (text, record, index) => {
-        if (status === 2) return ''
+        // if (status === 2) return ''
         moment.locale('ru')
         let secs = Math.floor(
           moment(record.dateCreated).add(2, 'days').diff(moment()) / 1000
@@ -189,7 +189,6 @@ const Orders = () => {
   }, [status])
   return (
     <div style={{ width: '100%' }}>
-      {/* <pre>{JSON.stringify(orders.orders, null, 2)}</pre> */}
       <Card>
         <Tabs
           defaultActiveKey='0'
@@ -197,36 +196,43 @@ const Orders = () => {
             console.log(e)
 
             setPagination(defaultPagination)
-            setStatus(parseInt(e))
+            setStatus(e)
           }}>
-          <TabPane tab='Новые заказы' key='0'>
+          <TabPane tab='Новые заказы' key='new'>
             <Table
               dataSource={orders.orders}
               columns={columns}
               loading={loading}
-              pagination={pagination}
-              onChange={pagination => {
-                fetchProducts(pagination)
-              }}
             />
           </TabPane>
-          <TabPane tab='На сборке' key='1'>
+          <TabPane tab='На сборке' key='on_assembly'>
             <Table
               dataSource={orders.orders}
               columns={columns}
               loading={loading}
               pagination={pagination}
-              onChange={pagination => {
-                fetchProducts(pagination)
-              }}
             />
           </TabPane>
-          <TabPane tab='Собранные' key='2'>
+          <TabPane tab='Активные заказы' key='active'>
             <Table
               dataSource={orders.orders}
               columns={columns}
               loading={loading}
-              pagination={pagination}
+            />
+          </TabPane>
+          <TabPane tab='Заказы в пути' key='on_delivery'>
+            <Table
+              dataSource={orders.orders}
+              columns={columns}
+              loading={loading}
+            />
+          </TabPane>
+          <TabPane tab='Все' key='all'>
+            <Table
+              dataSource={orders.orders}
+              columns={columns}
+              loading={loading}
+              pagination={{ ...pagination, pageSizeOptions: [100] }}
               onChange={pagination => {
                 fetchProducts(pagination)
               }}
@@ -234,6 +240,7 @@ const Orders = () => {
           </TabPane>
         </Tabs>
       </Card>
+      <pre>{JSON.stringify(orders, null, 2)}</pre>
     </div>
   )
 }

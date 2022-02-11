@@ -6,6 +6,7 @@ import axios from 'axios'
 import ProductModel, { IProduct } from '../models/product'
 import RemainModel from '../models/remains'
 import fs from 'fs'
+import moment from 'moment'
 
 interface IWilbberriesProduct {
   barcode: string
@@ -65,22 +66,139 @@ export const getWildberriesOrders = async (req: Request, res: Response) => {
     const WILDBERRIES_API_KEY = JSON.parse(
       fs.readFileSync('settings.json', 'utf8')
     ).api_key
-    const orders = (
-      await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
-        headers: { Authorization: WILDBERRIES_API_KEY },
-        params: {
-          status: req.query.status,
-          date_start: req.query.date_start,
-          take: Number(req.query.take),
-          skip: Number(req.query.skip),
-        },
-      })
-    ).data
+
+    const wb_header = { headers: { Authorization: WILDBERRIES_API_KEY } }
+    const status = req.query.status
+
+    let orders: any = { orders: [], total: 0 }
+
+    if (status === 'new') {
+      orders = (
+        await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
+          ...wb_header,
+          params: {
+            status: 0,
+            date_start: moment().subtract(96, 'hours').toISOString(),
+            take: Number(req.query.take),
+            skip: Number(req.query.skip),
+          },
+        })
+      ).data
+      orders.orders = orders.orders.filter(
+        (order: { userStatus: number }) => order.userStatus === 4
+      )
+    } else if (status === 'on_assembly') {
+      orders = (
+        await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
+          ...wb_header,
+          params: {
+            status: 1,
+            date_start: moment().subtract(96, 'hours').toISOString(),
+            take: Number(req.query.take),
+            skip: Number(req.query.skip),
+          },
+        })
+      ).data
+    } else if (status === 'active') {
+      orders = await Promise.all(
+        (
+          await Promise.all(
+            (
+              await axios.get(`${WILDBERRIES_URL}/api/v2/supplies`, {
+                ...wb_header,
+                params: {
+                  status: 'ACTIVE',
+                },
+              })
+            ).data.supplies
+              .map((supply: { supplyId: string }) => supply.supplyId)
+              .map(
+                async (supply: string) =>
+                  (
+                    await axios.get(
+                      `${WILDBERRIES_URL}/api/v2/supplies/${supply}/orders`,
+                      wb_header
+                    )
+                  ).data.orders
+              )
+          )
+        )
+          .flat()
+          .map(order => parseInt(order.orderId))
+          .map(
+            async orderId =>
+              (
+                await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
+                  ...wb_header,
+                  params: {
+                    id: orderId,
+                    skip: 0,
+                    take: 1,
+                    date_start: '2021-01-11T17:52:51+00:00',
+                  },
+                })
+              ).data.orders[0]
+          )
+      )
+      orders = { orders, total: orders.length }
+    } else if (status === 'on_delivery') {
+      orders = await Promise.all(
+        (
+          await Promise.all(
+            (
+              await axios.get(`${WILDBERRIES_URL}/api/v2/supplies`, {
+                ...wb_header,
+                params: {
+                  status: 'ON_DELIVERY',
+                },
+              })
+            ).data.supplies
+              .map((supply: { supplyId: string }) => supply.supplyId)
+              .map(
+                async (supply: string) =>
+                  (
+                    await axios.get(
+                      `${WILDBERRIES_URL}/api/v2/supplies/${supply}/orders`,
+                      wb_header
+                    )
+                  ).data.orders
+              )
+          )
+        )
+          .flat()
+          .map(order => parseInt(order.orderId))
+          .map(
+            async orderId =>
+              (
+                await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
+                  ...wb_header,
+                  params: {
+                    id: orderId,
+                    skip: 0,
+                    take: 1,
+                    date_start: '2021-01-11T17:52:51+00:00',
+                  },
+                })
+              ).data.orders[0]
+          )
+      )
+      orders = { orders, total: orders.length }
+    } else if (status === 'all') {
+      orders = (
+        await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
+          ...wb_header,
+          params: {
+            date_start: '2021-01-11T17:52:51+00:00',
+            take: Number(req.query.take),
+            skip: Number(req.query.skip),
+          },
+        })
+      ).data
+    }
+
     const warehouses = new Map<number, string>(
       (
-        await axios.get(`${WILDBERRIES_URL}/api/v2/warehouses`, {
-          headers: { Authorization: WILDBERRIES_API_KEY },
-        })
+        await axios.get(`${WILDBERRIES_URL}/api/v2/warehouses`, wb_header)
       ).data.map(({ id, name }: { id: number; name: string }) => [id, name])
     )
     const db_products = new Map<string, IProduct>(
@@ -108,6 +226,8 @@ export const getWildberriesOrders = async (req: Request, res: Response) => {
 
     res.status(200).send(orders)
   } catch (err: any) {
+    console.log(err)
+
     res.status(400).json(err.message)
   }
 }
@@ -140,6 +260,8 @@ export const updateWildberriesStocks = async () => {
   const WILDBERRIES_API_KEY = JSON.parse(
     fs.readFileSync('settings.json', 'utf8')
   ).api_key
+  const wb_header = { headers: { Authorization: WILDBERRIES_API_KEY } }
+  
   const warehouse = JSON.parse(
     fs.readFileSync('settings.json', 'utf8')
   ).sender_warehouse
@@ -163,9 +285,7 @@ export const updateWildberriesStocks = async () => {
   const res = await axios.post(
     `${WILDBERRIES_URL}/api/v2/stocks`,
     sended_stocs,
-    {
-      headers: { Authorization: WILDBERRIES_API_KEY },
-    }
+    wb_header
   )
   return Promise.resolve(res.data)
 }
