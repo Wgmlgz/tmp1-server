@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react'
 import {
   checkWildberriesConnection,
   getWildberriesSettings,
+  runRefreshOrders,
   runUpdateWildberriesStocks,
   updateWildberriesSettings,
 } from '../../../api/wildberries'
@@ -37,7 +38,11 @@ export default function Settings() {
           initialValues={settings}
           onFinish={async e => {
             try {
-              await updateWildberriesSettings(e.sender_warehouse, e.send_cron)
+              await updateWildberriesSettings(
+                e.sender_warehouse,
+                e.send_cron,
+                e.update_orders_cron
+              )
               message.success('Обновлено')
             } catch (e) {
               console.log(e)
@@ -54,6 +59,11 @@ export default function Settings() {
           />
           <Form.Item label='Интервал отправки (cron)' name='send_cron'>
             <Input placeholder='Интервал отправки (cron)' />
+          </Form.Item>
+          <Form.Item
+            label='Интервал обновления заказов (cron)'
+            name='update_orders_cron'>
+            <Input placeholder='Интервал обновления заказов (cron)' />
           </Form.Item>
           <Form.Item label='API ключ' name='api_key'>
             <TextArea placeholder='API ключ' />
@@ -81,6 +91,24 @@ export default function Settings() {
                   }
                 }}>
                 Проверить соединение
+              </Button>
+            </Form.Item>
+            <Form.Item style={{ flexGrow: 1 }}>
+              <Button
+                onClick={async () => {
+                  try {
+                    const res = await runRefreshOrders()
+                    console.log(res.data)
+                    setMsg(JSON.stringify(res.data, null, 2))
+                    message.success('Обновлено')
+                  } catch (e) {
+                    console.log(e)
+                    if (axios.isAxiosError(e)) {
+                      message.error(e.response?.data)
+                    }
+                  }
+                }}>
+                Вручную обновить заказы
               </Button>
             </Form.Item>
             <Form.Item style={{ flexGrow: 1 }}>

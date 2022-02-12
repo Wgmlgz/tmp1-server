@@ -18,12 +18,15 @@ export const getWildberriesOrders = (
 
 export const updateWildberriesSettings = (
   sender_warehouse: string,
-  send_cron: string
-) => axios.post(`${wildberries_url}/settings`, { sender_warehouse, send_cron })
+  send_cron: string,
+  update_orders_cron: string
+) => axios.post(`${wildberries_url}/settings`, { sender_warehouse, send_cron, update_orders_cron })
 export const getWildberriesSettings = () =>
   axios.get(`${wildberries_url}/settings`)
 
 export const runUpdateWildberriesStocks = () =>
-  axios.post(`${wildberries_url}/update`, {})
+  axios.get(`${wildberries_url}/update`)
+export const runRefreshOrders = () =>
+  axios.get(`${wildberries_url}/update_orders`)
 export const checkWildberriesConnection = () =>
   axios.get(`${wildberries_url}/check`, {})

@@ -7,6 +7,8 @@ import ProductModel, { IProduct } from '../models/product'
 import RemainModel from '../models/remains'
 import fs from 'fs'
 import moment from 'moment'
+import WBOrderModel from '../models/wb_orders'
+import { changeRemain, changeRemains } from './remains'
 
 interface IWilbberriesProduct {
   barcode: string
@@ -237,10 +239,11 @@ export const updateWildberriesSettings = async (
   res: Response
 ) => {
   try {
-    const { sender_warehouse, send_cron } = req.body
+    const { sender_warehouse, send_cron, update_orders_cron } = req.body
     const old = JSON.parse(fs.readFileSync('settings.json', 'utf8'))
     if (sender_warehouse) old.sender_warehouse = sender_warehouse
     if (send_cron) old.send_cron = send_cron
+    if (update_orders_cron) old.update_orders_cron = update_orders_cron
     fs.writeFileSync('settings.json', JSON.stringify(old, null, 2))
     res.status(200).send('settings updated')
   } catch (err: any) {
@@ -261,7 +264,7 @@ export const updateWildberriesStocks = async () => {
     fs.readFileSync('settings.json', 'utf8')
   ).api_key
   const wb_header = { headers: { Authorization: WILDBERRIES_API_KEY } }
-  
+
   const warehouse = JSON.parse(
     fs.readFileSync('settings.json', 'utf8')
   ).sender_warehouse
@@ -319,5 +322,123 @@ export const checkWildberriesConnection = async (
     res.status(200).send('Соединено')
   } catch (err: any) {
     res.status(400).json(err.message)
+  }
+}
+
+export const refreshOrders = async () => {
+  const setting = JSON.parse(fs.readFileSync('settings.json', 'utf8'))
+  const WILDBERRIES_API_KEY = setting.api_key
+  const wb_header = { headers: { Authorization: WILDBERRIES_API_KEY } }
+
+  const total = (
+    await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
+      ...wb_header,
+      params: {
+        date_start: '2021-01-11T17:52:51+00:00',
+        take: 1,
+        skip: 0,
+      },
+    })
+  ).data.total
+
+  const take = 1000
+  let orders: any[] = []
+  for (let i = 0; i < total; i += take) {
+    orders.push(
+      (
+        await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
+          ...wb_header,
+          params: {
+            date_start: '2021-01-11T17:52:51+00:00',
+            take: take,
+            skip: i,
+          },
+        })
+      ).data.orders
+    )
+  }
+  orders = orders.flat()
+
+  const old_orders = await WBOrderModel.find({})
+  const old_orders_ids = new Set<string>(
+    old_orders.map(order => order.wb_order_id)
+  )
+  let old_count = old_orders.length
+
+  orders = orders.filter(order => !old_orders_ids.has(order.orderId))
+
+  const orders2save = await Promise.all(
+    orders.map(async order => {
+      const barcodes = order.barcodes.reduce(
+        (acc: { [x: string]: number }, curr: string) => {
+          return acc[curr] ? ++acc[curr] : (acc[curr] = 1), acc
+        },
+        {}
+      )
+      const db_products = new Map<string, IProduct & { id: string }>(
+        (
+          await ProductModel.find({
+            'marketplace_data.Штрихкод Wildberries FBS': {
+              $in: order.barcodes,
+            },
+          })
+        ).map((product: any) => [
+          product.marketplace_data.get('Штрихкод Wildberries FBS'),
+          product,
+        ])
+      )
+
+      return {
+        order_id: ++old_count,
+        wb_order_id: order.orderId,
+        created: new Date(),
+        products: Object.entries(barcodes)
+          .map(([barcode, count]) => ({
+            id: db_products.get(barcode)?.id ?? '',
+            count: Number(count),
+          }))
+          .filter(x => x.id),
+        cost: Object.entries(barcodes)
+          .map(
+            ([barcode, count]: any) =>
+              parseInt(db_products.get(barcode)?.buy_price ?? '0') * count
+          )
+          .reduce((acc, cur) => acc * cur, 1),
+        status: 0,
+        warehouse_id: setting.sender_warehouse,
+        wb_order: order,
+      }
+    })
+  )
+  await Promise.allSettled(
+    orders2save.map(async order => {
+      try {
+        const new_order = new WBOrderModel(order)
+        await new_order.save()
+        await changeRemains(
+          order.products.map(({ id, count }) => ({
+            warehouse: order.warehouse_id,
+            product: id,
+            quantity_add: -count,
+          }))
+        )
+      } catch (err: any) {
+        console.log(err.message)
+      }
+    })
+  )
+
+  return Promise.resolve(orders2save)
+}
+
+export const runRefreshOrdeers = async (req: Request, res: Response) => {
+  try {
+    const ans = await refreshOrders()
+
+    res.status(200).json(ans)
+  } catch (err: any) {
+    console.log(err)
+
+    res.status(200).json(err.message)
   }
 }

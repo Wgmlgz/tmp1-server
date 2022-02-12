@@ -1,14 +1,5 @@
-import {
-  Button,
-  Card,
-  Input,
-  message,
-  Popconfirm,
-  Select,
-  Table,
-  Tabs,
-} from 'antd'
-import { Key, useEffect, useMemo, useState } from 'react'
+import { Card, message, Table, Tabs } from 'antd'
+import { useEffect, useMemo, useState } from 'react'
 
 import axios from 'axios'
 import { ColumnsType, TablePaginationConfig } from 'antd/lib/table'

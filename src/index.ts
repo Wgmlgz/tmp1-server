@@ -67,5 +67,14 @@ mongoose
         console.log('done', res)
       }
     )
+    cron.schedule(
+      JSON.parse(fs.readFileSync('settings.json', 'utf8')).update_orders_cron,
+      async () => {
+        console.log('updating orders')
+
+        const res = await updateWildberriesStocks()
+        console.log('done', res)
+      }
+    )
   })
   .catch(err => console.log(err.message))
