@@ -190,7 +190,7 @@ const Page: FC = () => {
               setDa(products)
               await createExcelProducts(products)
               await fetchImports()
-              message.success('Импорт продуктов начен')
+              message.success('Импорт товаров начен')
             } catch (err) {
               if (axios.isAxiosError(err)) {
                 message.error(err.response?.data)

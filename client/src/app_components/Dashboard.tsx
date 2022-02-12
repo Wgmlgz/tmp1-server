@@ -93,9 +93,9 @@ export default function Dashboard() {
                 <Link to='/dashboard/users'>Пользователи</Link>
               </Menu.Item>
             )}
-            <SubMenu key='sub1' icon={<AppstoreOutlined />} title='Продукты'>
+            <SubMenu key='sub1' icon={<AppstoreOutlined />} title='Товары'>
               <Menu.Item key='2' icon={<AppstoreOutlined />}>
-                <Link to='/dashboard/products'>Продукты</Link>
+                <Link to='/dashboard/products'>Товары</Link>
               </Menu.Item>
               <Menu.Item key='3' icon={<UnorderedListOutlined />}>
                 <Link to='/dashboard/categories'>Категории</Link>

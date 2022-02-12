@@ -512,7 +512,7 @@ const ProductsForm: FC<Props> = ({
                   <Popconfirm
                     onCancel={() => {}}
                     onConfirm={onRemove}
-                    title={`Вы точно хотите безвозвратно удалить продукт?`}
+                    title={`Вы точно хотите безвозвратно удалить товар?`}
                     okText='Да'
                     cancelText='Нет'>
                     <Button

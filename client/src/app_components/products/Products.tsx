@@ -225,7 +225,7 @@ const Products = () => {
                 }
               }
             }}
-            title={`Вы точно хотите безвозвратно удалить продукт?`}
+            title={`Вы точно хотите безвозвратно удалить товар?`}
             okText='Да'
             cancelText='Нет'>
             <Button>
@@ -319,7 +319,7 @@ const Products = () => {
               gap: '20px',
               flexWrap: 'wrap',
             }}>
-            <p style={{ fontWeight: 'bold', fontSize: '20px' }}>Все продукты</p>
+            <p style={{ fontWeight: 'bold', fontSize: '20px' }}>Все товары</p>
             <Popconfirm
               onCancel={() => {}}
               onConfirm={async () => {
@@ -328,17 +328,17 @@ const Products = () => {
                     selected_products.map(product => product._id)
                   )
                   await fetchProducts()
-                  message.success('Продукты удалены')
+                  message.success('Товары удалены')
                 } catch (e) {
                   if (axios.isAxiosError(e)) {
                     message.error(e.response?.data)
                   }
                 }
               }}
-              title={`Вы точно хотите безвозвратно удалить ${selected_products.length} продуктов?`}
+              title={`Вы точно хотите безвозвратно удалить ${selected_products.length} товаров?`}
               okText='Да'
               cancelText='Нет'>
-              <Button>Удалить продукты</Button>
+              <Button>Удалить товары</Button>
             </Popconfirm>
             <Select
               style={{ width: 300 }}
@@ -377,7 +377,7 @@ const Products = () => {
               onClick={() => {
                 setProductCreation(true)
               }}>
-              Создать новый продукт
+              Создать новый товар
             </Button>
             <Select
               placeholder='Фильтр по категориям'
@@ -426,7 +426,7 @@ const Products = () => {
       {product_creation && (
         <FullscreenCard onCancel={() => setProductCreation(false)}>
           <ProductsForm
-            header='Создать новый продукт'
+            header='Создать новый товар'
             button='Создать'
             onSubmit={async product => {
               try {
@@ -448,7 +448,7 @@ const Products = () => {
       {edited_product_id && (
         <FullscreenCard onCancel={() => setEditedProductId('')}>
           <ProductsForm
-            header='Изменить продукт'
+            header='Изменить товар'
             button='Изменить'
             product={edited_product}
             onSubmit={async product => {
