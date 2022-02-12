@@ -396,6 +396,12 @@ const Products = () => {
               }}>
               Экспорт excel
             </Button>
+            <Button
+              onClick={() => {
+                exportProducts(products)
+              }}>
+              Экспорт excel(все)
+            </Button>
           </div>
           <br />
 

@@ -231,7 +231,7 @@ const Orders = () => {
           </TabPane>
         </Tabs>
       </Card>
-      <pre>{JSON.stringify(orders, null, 2)}</pre>
+      {/* <pre>{JSON.stringify(orders, null, 2)}</pre> */}
     </div>
   )
 }
