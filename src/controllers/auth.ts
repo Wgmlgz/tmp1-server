@@ -38,7 +38,7 @@ export const authenticateAdmin = (
 ) => {
   const token = req.cookies['access-token']
 
-  if (!token) return res.status(401)
+  if (!token) return res.status(401).send('err')
   jwt.verify(token, ACCESS_TOKEN_SECRET as string, (err: any, user: any) => {
     if (err) {
       res.status(401).send('err')
@@ -58,7 +58,7 @@ export const authenticateSuperAdmin = (
 ) => {
   const token = req.cookies['access-token']
 
-  if (!token) return res.status(401)
+  if (!token) return res.status(401).send('err')
   jwt.verify(token, ACCESS_TOKEN_SECRET as string, (err: any, user: any) => {
     if (err) {
       res.status(401).send('err')
