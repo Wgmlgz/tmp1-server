@@ -3,8 +3,7 @@ import { ICategory } from '../app_components/categories/Categories'
 import { IProduct } from '../app_components/products/ProductsForm'
 import { IWarehouse } from '../app_components/warehouses/WarehouseForm'
 
-export const url =
-  process.env.REACT_APP_SERVER_URL || 'https://tmp1-server.herokuapp.com'
+export const url = process.env.REACT_APP_SERVER_URL
 export const auth_url = `${url}/api/auth`
 export const user_url = `${url}/api/user`
 export const super_admin_url = `${url}/api/super_admin`
@@ -26,12 +25,21 @@ const createAxiosResponseInterceptor = () => {
   const interceptor = axios.interceptors.response.use(
     response => response,
     async error => {
-      if (error.response.status !== 401) return Promise.reject(error)
+      const originalRequest = error.config
+      console.log(error.response.status, originalRequest._retry)
+      
+      if (error.response.status === 401 && !originalRequest._retry) {
+        console.log('trying');
+        
+        originalRequest._retry = true
+        await refreshToken()
+        console.log('done')
+        console.log(originalRequest)
+        
+        return axios(originalRequest)
+      }
       axios.interceptors.response.eject(interceptor)
-      return refreshToken()
-        .then(res => axios(error.response.config))
-        .catch(err => Promise.reject(err))
-        .finally(createAxiosResponseInterceptor)
+      return Promise.reject(error)
     }
   )
 }

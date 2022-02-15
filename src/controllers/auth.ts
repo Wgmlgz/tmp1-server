@@ -22,9 +22,11 @@ export const authenticateUser = (
     res.status(401).send('You are not logged in')
   } else {
     jwt.verify(token, ACCESS_TOKEN_SECRET as string, (err: any, user: any) => {
-      if (err) res.status(401)
-      else req.user = user
-      next()
+      if (err) res.status(401).send('err')
+      else {
+        req.user = user
+        next()
+      }
     })
   }
 }
@@ -39,7 +41,7 @@ export const authenticateAdmin = (
   if (!token) return res.status(401)
   jwt.verify(token, ACCESS_TOKEN_SECRET as string, (err: any, user: any) => {
     if (err) {
-      res.status(401)
+      res.status(401).send('err')
     } else if (!user.admin && !user.super_admin) {
       res.status(400).send('You are not super admin')
     } else {
@@ -59,7 +61,7 @@ export const authenticateSuperAdmin = (
   if (!token) return res.status(401)
   jwt.verify(token, ACCESS_TOKEN_SECRET as string, (err: any, user: any) => {
     if (err) {
-      res.status(401)
+      res.status(401).send('err')
     } else if (!user.super_admin) {
       res.status(400).send('You are not super admin')
     } else {
@@ -141,6 +143,7 @@ export const token = async (req: Request, res: Response) => {
       })
       res.cookie('access-token', access_token, { httpOnly: true })
       res.json()
+      console.log('refreshed')
     }
   )
 }
