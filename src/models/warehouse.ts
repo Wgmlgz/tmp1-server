@@ -2,7 +2,7 @@ import mongoose from 'mongoose'
 
 export interface IWarehouse {
   name: string
-  descriptrion?: string
+  description?: string
   undeletable?: boolean
 }
 
@@ -11,7 +11,7 @@ const WarehouseSchema = new mongoose.Schema<IWarehouse>({
     type: String,
     required: true,
   },
-  descriptrion: {
+  description: {
     type: String,
   },
   undeletable: {

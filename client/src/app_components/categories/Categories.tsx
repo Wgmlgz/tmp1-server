@@ -28,7 +28,7 @@ const { Option } = Select
 
 export interface ICategory {
   name: string
-  descriptrion?: string
+  description?: string
   img?: File
   tags?: string[]
   parent?: string
@@ -44,8 +44,8 @@ export default function Categories() {
 
   const input_tags_ref = useRef<Input>(null)
 
-  const onFinish = async ({ name, descriptrion, parent }: ICategory) => {
-    const category: ICategory = { name, descriptrion, img, tags, parent }
+  const onFinish = async ({ name, description, parent }: ICategory) => {
+    const category: ICategory = { name, description, img, tags, parent }
 
     try {
       const res = await createCategory(category)
@@ -72,8 +72,8 @@ export default function Categories() {
     },
     {
       title: 'Описание',
-      dataIndex: 'descriptrion',
-      key: 'descriptrion',
+      dataIndex: 'description',
+      key: 'description',
     },
     {
       title: 'Изображение',
@@ -154,7 +154,7 @@ export default function Categories() {
               ]}>
               <Input placeholder='Название' />
             </Form.Item>
-            <Form.Item name='descriptrion'>
+            <Form.Item name='description'>
               <Input placeholder='Описание' />
             </Form.Item>
             <Form.Item>

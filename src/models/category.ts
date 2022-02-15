@@ -2,7 +2,7 @@ import mongoose from 'mongoose'
 
 export interface ICategory {
   name: string
-  descriptrion?: string
+  description?: string
   img?: string
   tags?: string[]
   parent?: string
@@ -13,7 +13,7 @@ const CategorySchema = new mongoose.Schema<ICategory>({
     type: String,
     required: true,
   },
-  descriptrion: {
+  description: {
     type: String,
   },
   img: {

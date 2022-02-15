@@ -26,8 +26,8 @@ export default function Warehouses() {
     },
     {
       title: 'Описание',
-      dataIndex: 'descriptrion',
-      key: 'descriptrion',
+      dataIndex: 'description',
+      key: 'description',
     },
     {
       title: '',
@@ -35,6 +35,7 @@ export default function Warehouses() {
       render: (text, record, index) => (
         <div style={{ display: 'flex', gap: '10px' }}>
           <Popconfirm
+            disabled={record.undeletable}
             title='Вы точно хотите удалить склад?'
             onConfirm={async () => {
               try {

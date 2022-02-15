@@ -3,7 +3,7 @@ import { FC } from 'react'
 
 export interface IWarehouse {
   name: string
-  descriptrion?: string
+  description?: string
   undeletable?: boolean
 }
 export interface IWarehouseFull extends IWarehouse {
@@ -41,7 +41,7 @@ const WarehouseForm: FC<Props> = ({
         ]}>
         <Input placeholder='Имя' />
       </Form.Item>
-      <Form.Item name='descriptrion'>
+      <Form.Item name='description'>
         <Input.TextArea placeholder='Описание' />
       </Form.Item>
       <Form.Item>

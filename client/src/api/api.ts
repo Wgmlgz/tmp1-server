@@ -3,7 +3,7 @@ import { ICategory } from '../app_components/categories/Categories'
 import { IProduct } from '../app_components/products/ProductsForm'
 import { IWarehouse } from '../app_components/warehouses/WarehouseForm'
 
-export const url = process.env.REACT_APP_SERVER_URL
+export const url = process.env.REACT_APP_SERVER_URL || 'http://localhost:5000'
 export const auth_url = `${url}/api/auth`
 export const user_url = `${url}/api/user`
 export const super_admin_url = `${url}/api/super_admin`
@@ -38,7 +38,7 @@ const createAxiosResponseInterceptor = () => {
         
         return axios(originalRequest)
       }
-      axios.interceptors.response.eject(interceptor)
+      // axios.interceptors.response.eject(interceptor)
       return Promise.reject(error)
     }
   )
@@ -68,7 +68,7 @@ export const createCategory = (category: ICategory) => {
   let fd = new FormData()
   category.img && fd.append('file', category.img)
   category.name && fd.append('name', category.name)
-  category.descriptrion && fd.append('descriptrion', category.descriptrion)
+  category.description && fd.append('description', category.description)
   category.tags && fd.append('tags', JSON.stringify(category.tags))
   category.parent && fd.append('parent', category.parent)
   return axios.post(`${categories_url}`, fd, config)

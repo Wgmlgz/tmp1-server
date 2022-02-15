@@ -10,7 +10,7 @@ import { changeRemains } from './remains'
 
 export const createWarehouse = (req: Request, res: Response) => {
   try {
-    let { name, descriptrion } = req.body
+    let { name, description } = req.body
     if (!name) throw new Error('Expected name')
     Warehouse.findOne({ name }, async (err: Error, doc: IWarehouse) => {
       if (err) throw err
@@ -18,7 +18,7 @@ export const createWarehouse = (req: Request, res: Response) => {
         return res.status(400).send('Warehouse already Exists')
       }
 
-      const new_warehouse = new Warehouse({ name, descriptrion })
+      const new_warehouse = new Warehouse({ name, description })
       await new_warehouse.save()
       res.send('Warehouse created')
     })
@@ -77,7 +77,7 @@ export const updateWarehouse = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
     const { name, description } = req.body
-
+    
     if (!mongoose.Types.ObjectId.isValid(id))
       return res.status(404).send(`No warehouse with id: ${id}`)
     const old_warehouse = await Warehouse.findById(id)
@@ -96,7 +96,7 @@ export const getWarehouses = async (req: Request, res: Response) => {
     const res_warehouses = categories.map(category => ({
       _id: category._id,
       name: category.name,
-      descriptrion: category.descriptrion,
+      description: category.description,
       undeletable: category.undeletable,
     }))
     res.status(200).json(res_warehouses)

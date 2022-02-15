@@ -38,17 +38,18 @@ export const authenticateAdmin = (
 ) => {
   const token = req.cookies['access-token']
 
-  if (!token) return res.status(401).send('err')
-  jwt.verify(token, ACCESS_TOKEN_SECRET as string, (err: any, user: any) => {
-    if (err) {
-      res.status(401).send('err')
-    } else if (!user.admin && !user.super_admin) {
-      res.status(400).send('You are not super admin')
-    } else {
-      req.user = user
-      next()
-    }
-  })
+  if (!token) res.status(401).send('no token')
+  else
+    jwt.verify(token, ACCESS_TOKEN_SECRET as string, (err: any, user: any) => {
+      if (err) {
+        res.status(401).send('You are not logged in')
+      } else if (!user.admin && !user.super_admin) {
+        res.status(400).send('You are not super admin')
+      } else {
+        req.user = user
+        next()
+      }
+    })
 }
 
 export const authenticateSuperAdmin = (
@@ -58,17 +59,18 @@ export const authenticateSuperAdmin = (
 ) => {
   const token = req.cookies['access-token']
 
-  if (!token) return res.status(401).send('err')
-  jwt.verify(token, ACCESS_TOKEN_SECRET as string, (err: any, user: any) => {
-    if (err) {
-      res.status(401).send('err')
-    } else if (!user.super_admin) {
-      res.status(400).send('You are not super admin')
-    } else {
-      req.user = user
-      next()
-    }
-  })
+  if (!token) res.status(401).send('You are not logged in')
+  else
+    jwt.verify(token, ACCESS_TOKEN_SECRET as string, (err: any, user: any) => {
+      if (err) {
+        res.status(401).send('err')
+      } else if (!user.super_admin) {
+        res.status(400).send('You are not super admin')
+      } else {
+        req.user = user
+        next()
+      }
+    })
 }
 
 export const generateAccessToken = (user: IUser) => {

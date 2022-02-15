@@ -397,7 +397,8 @@ const Products = () => {
               Экспорт excel
             </Button>
             <Button
-              onClick={() => {
+              onClick={async () => {
+                  await fetchAllProducts()
                 exportProducts(products)
               }}>
               Экспорт excel(все)

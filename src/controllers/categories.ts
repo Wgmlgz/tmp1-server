@@ -38,7 +38,7 @@ export const upload = multer({ storage, fileFilter })
 
 export const createCategory = (req: Request, res: Response) => {
   try {
-    let { name, descriptrion, img, tags, parent } = req.body
+    let { name, description, img, tags, parent } = req.body
     tags = JSON.parse(tags)
     if (!name) throw new Error('Expected name')
     Category.findOne({ name }, async (err: Error, doc: ICategory) => {
@@ -52,7 +52,7 @@ export const createCategory = (req: Request, res: Response) => {
       }
       const new_category = new Category({
         name,
-        descriptrion,
+        description,
         img: req.file?.filename,
         tags,
         parent,
@@ -99,7 +99,7 @@ export const getCategories = async (req: Request, res: Response) => {
     const res_categories = categories.map(category => ({
       _id: category._id,
       name: category.name,
-      descriptrion: category.descriptrion,
+      description: category.description,
       img: category.img,
       tags: category.tags,
       parent: category.parent,
