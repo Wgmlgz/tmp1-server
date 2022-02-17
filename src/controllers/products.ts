@@ -259,6 +259,7 @@ const createProductExcel = async (
     product.imgs = []
     product.imgs_small = []
     product.imgs_big = []
+
     await Promise.allSettled(
       product.upload_imgs.map(async url => {
         try {
@@ -290,6 +291,11 @@ const createProductExcel = async (
     product.category = (await CategoryModel.findOne({ name: product.category }))
       ? product.category
       : ''
+    product.height = Number(product.height)
+    product.length = Number(product.length)
+    product.width = Number(product.width)
+    product.weight = Number(product.weight)
+    product.changed = new Date()
     product.created = new Date()
     product.user_creator_id = user.id
     const new_product = new Product(product)

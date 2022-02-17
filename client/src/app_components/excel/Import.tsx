@@ -1,11 +1,12 @@
-import { Button, message, Popover, Progress, Table } from 'antd'
+import { Button, Card, message, Popover, Progress, Table } from 'antd'
 import { ColumnsType } from 'antd/lib/table'
 import axios from 'axios'
-import ExcelJS from 'exceljs'
+import ExcelJS, { Csv } from 'exceljs'
+import { ReadableWebToNodeStream } from 'readable-web-to-node-stream'
 import moment from 'moment'
 import { FC, useEffect, useRef, useState } from 'react'
 import { createExcelProducts, getExcelImports } from '../../api/api'
-
+import CSVReader from 'react-csv-reader'
 interface IImport {
   date: Date
   import_errors: string[]
@@ -14,7 +15,11 @@ interface IImport {
   failed: number
 }
 
-export const importProducts = (e: any, onDone: (products: any) => any) => {
+export const importProducts = (
+  e: any,
+  onDone: (products: any) => any,
+  isCSV: boolean
+) => {
   const files = e.target.files
   if (!files) return
   const file = files[0]
@@ -23,13 +28,28 @@ export const importProducts = (e: any, onDone: (products: any) => any) => {
   const reader = new FileReader()
 
   reader.readAsArrayBuffer(file)
+
   reader.onload = async () => {
     try {
       const buffer = reader.result
-      const workbook = await wb.xlsx.load(buffer as any)
-      console.log(workbook, 'workbook instance')
-      workbook.eachSheet((sheet, id) => {
-        const products: any[] = []
+      console.log(isCSV)
+
+      console.log('ddd')
+
+      if (isCSV) {
+        const stream = new ReadableWebToNodeStream(
+          file.stream()
+        ) as unknown as Parameters<Csv['read']>[0]
+        console.log(stream)
+        await wb.csv.read(stream)
+      } else {
+        await wb.xlsx.load(buffer as any)
+      }
+      console.log('ddd')
+
+      const products: any[] = []
+
+      wb.eachSheet(sheet => {
         sheet.eachRow((row, id) => {
           try {
             if (id === 1) return
@@ -44,34 +64,26 @@ export const importProducts = (e: any, onDone: (products: any) => any) => {
 
               product[header] = value
             }
-            product.tags = product.tags
-              .split(';')
-              .map((str: string) => str.trim())
-              .filter((x: string) => !!x)
 
-            product.upload_imgs = product.imgs
-              .split(';')
-              .map((str: string) => str.trim())
-              .filter((x: string) => !!x)
-            delete product.imgs_big
-            delete product.imgs
-            delete product.imgs_small
             product.excel_row = id
             products.push(product)
           } catch (err) {
             message.error(err as any)
           }
         })
-        onDone(products)
       })
+      onDone(products)
+      // })
     } catch (err) {
-      message.error(err as any)
+      console.log(err)
+
+      // message.error(err as any)
     }
   }
 }
 
 const Page: FC = () => {
-  const hiddenFileInput = useRef(null)
+  const hiddenFileInputXLS = useRef<HTMLInputElement>(null)
 
   const [da, setDa] = useState<any>()
   const [imports, setImports] = useState<IImport[]>([])
@@ -175,42 +187,91 @@ const Page: FC = () => {
     }
   }
   useEffect(() => {
-    fetchImports()
     setInterval(() => fetchImports(), 1000)
   }, [])
+
+  const processProducts = async (products: any[]) => {
+    try {
+      products.forEach((product: any) => {
+        product.tags = product.tags
+          .split(';')
+          .map((str: string) => str.trim())
+          .filter((x: string) => !!x)
+
+        product.upload_imgs = product.imgs
+          .split(';')
+          .map((str: string) => str.trim())
+          .filter((x: string) => !!x)
+        delete product.imgs_big
+        delete product.imgs
+        delete product.imgs_small
+      })
+      setDa(products)
+      console.log(products)
+
+      await createExcelProducts(products)
+      await fetchImports()
+      message.success('Импорт товаров начен')
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        message.error(err.response?.data)
+      } else {
+        message.error(err as any)
+      }
+    }
+  }
   return (
     <div>
       <input
-        ref={hiddenFileInput}
+        ref={hiddenFileInputXLS}
         type='file'
-        name='file'
-        onInput={e =>
-          importProducts(e, async products => {
-            try {
-              setDa(products)
-              await createExcelProducts(products)
-              await fetchImports()
-              message.success('Импорт товаров начен')
-            } catch (err) {
-              if (axios.isAxiosError(err)) {
-                message.error(err.response?.data)
-              } else {
+        name='fileXLS'
+        value={''}
+        style={{ display: 'none' }}
+        onInput={e => importProducts(e, processProducts, false)}
+        // style={{ display: 'none' }}
+      />
+      <Card>
+        <Button
+          onClick={event => {
+            hiddenFileInputXLS.current?.click()
+          }}>
+          Импорт excel
+        </Button>
+        <br />
+        <br />
+        <CSVReader
+          label='Импорт csv   '
+          onFileLoaded={f => {
+            const products: any[] = []
+            f.forEach((row, id) => {
+              try {
+                if (id === 0) return
+                let product: any = {}
+                for (let j = 0; j < row.length; j++) {
+                  const header: any = f[0][j]
+                  const value = row[j]
+                  product[header] = value
+                }
+
+                product.excel_row = id
+                products.push(product)
+              } catch (err) {
                 message.error(err as any)
               }
-            }
-          })
-        }
-        style={{ display: 'none' }}
-      />
-      <Button
-        onClick={event => {
-          // @ts-ignore
-          hiddenFileInput.current.click()
-        }}>
-        Импорт excel
-      </Button>
+            })
+            processProducts(products)
+          }}
+          onError={e => {
+            message.error(e.message)
+          }}
+          inputId='ObiWan'
+          inputName='ObiWan'
+          inputStyle={{ color: 'red' }}
+        />
+      </Card>
       <Table dataSource={imports} columns={columns} />
-      <pre>{JSON.stringify(da, null, 2)}</pre>
+      {/* <pre>{JSON.stringify(da, null, 2)}</pre> */}
     </div>
   )
 }
