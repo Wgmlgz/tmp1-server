@@ -21,6 +21,14 @@ export const createProductIn = async (req: Request, res: Response) => {
     //     })
     //   )
     // )
+    const new_product_in = new ProductIn({
+      warehouse,
+      date,
+      user,
+      comment,
+      products,
+    })
+    await new_product_in.save()
     await changeRemains(
       products.map(
         (product: { product: string; name: string; quantity: number }) => ({
@@ -30,14 +38,7 @@ export const createProductIn = async (req: Request, res: Response) => {
         })
       )
     )
-    const new_product_in = new ProductIn({
-      warehouse,
-      date,
-      user,
-      comment,
-      products,
-    })
-    await new_product_in.save()
+
     res.send('ProductIn created')
   } catch (err: any) {
     res.status(400).send(err.message)

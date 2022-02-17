@@ -334,7 +334,7 @@ export const refreshOrders = async () => {
     await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
       ...wb_header,
       params: {
-        date_start: '2021-01-11T17:52:51+00:00',
+        date_start: '2000-01-11T17:52:51+00:00',
         take: 1,
         skip: 0,
       },
@@ -349,7 +349,7 @@ export const refreshOrders = async () => {
         await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
           ...wb_header,
           params: {
-            date_start: '2021-01-11T17:52:51+00:00',
+            date_start: '2000-01-11T17:52:51+00:00',
             take: take,
             skip: i,
           },

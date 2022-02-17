@@ -12,6 +12,24 @@ export const createProductMove = async (req: Request, res: Response) => {
     let { warehouse_to, warehouse_from, date, comment, products } = req.body
     const user = req_user.id
 
+    await checkRemains(
+      products.map(
+        (product: { product: string; name: string; quantity: number }) => ({
+          warehouse: warehouse_from,
+          product: product.product,
+          quantity_add: -product.quantity,
+        })
+      )
+    )
+    await checkRemains(
+      products.map(
+        (product: { product: string; name: string; quantity: number }) => ({
+          warehouse: warehouse_to,
+          product: product.product,
+          quantity_add: product.quantity,
+        })
+      )
+    )
     const new_product_move = new ProductMove({
       warehouse_to,
       warehouse_from,
@@ -20,43 +38,25 @@ export const createProductMove = async (req: Request, res: Response) => {
       comment,
       products,
     })
-    await checkRemains(
-      products.map(
-        (product: { product: string; name: string; quantity: number }) => ({
-          warehouse: warehouse_from,
-          product: product.product,
-          quantity_add: -product.quantity,
-        })
-      )
-    )
-    await checkRemains(
-      products.map(
-        (product: { product: string; name: string; quantity: number }) => ({
-          warehouse: warehouse_to,
-          product: product.product,
-          quantity_add: product.quantity,
-        })
-      )
-    )
-    await changeRemains(
-      products.map(
-        (product: { product: string; name: string; quantity: number }) => ({
-          warehouse: warehouse_from,
-          product: product.product,
-          quantity_add: -product.quantity,
-        })
-      )
-    )
-    await changeRemains(
-      products.map(
-        (product: { product: string; name: string; quantity: number }) => ({
-          warehouse: warehouse_to,
-          product: product.product,
-          quantity_add: product.quantity,
-        })
-      )
-    )
     await new_product_move.save()
+    await changeRemains(
+      products.map(
+        (product: { product: string; name: string; quantity: number }) => ({
+          warehouse: warehouse_from,
+          product: product.product,
+          quantity_add: -product.quantity,
+        })
+      )
+    )
+    await changeRemains(
+      products.map(
+        (product: { product: string; name: string; quantity: number }) => ({
+          warehouse: warehouse_to,
+          product: product.product,
+          quantity_add: product.quantity,
+        })
+      )
+    )
     res.send('ProductMove created')
   } catch (err: any) {
     res.status(400).send(err.message)

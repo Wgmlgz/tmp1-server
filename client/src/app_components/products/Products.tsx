@@ -1,4 +1,4 @@
-import { Button, Card, Input, message, Popconfirm, Select, Table } from 'antd'
+import { Button, Card, Input, message, Popconfirm, Select, Table, Typography } from 'antd'
 import { Key, useEffect, useState } from 'react'
 import {
   createProduct,
@@ -25,6 +25,8 @@ import { IWarehouseFull } from '../warehouses/WarehouseForm'
 import FullscreenCard from '../FullscreenCard'
 
 import { exportProducts } from './Excel'
+
+const { Title } = Typography
 
 export const highlightText = (str: string, search: string) => (
   <div>
@@ -316,10 +318,11 @@ const Products = () => {
           <div
             style={{
               display: 'flex',
+              placeItems: 'center',
               gap: '20px',
               flexWrap: 'wrap',
             }}>
-            <p style={{ fontWeight: 'bold', fontSize: '20px' }}>Все товары</p>
+            <Title level={2}>Все товары</Title>
             <Popconfirm
               onCancel={() => {}}
               onConfirm={async () => {
@@ -340,23 +343,25 @@ const Products = () => {
               cancelText='Нет'>
               <Button>Удалить товары</Button>
             </Popconfirm>
-            <Select
-              style={{ width: 300 }}
-              value={'Напечатать штрихкоды'}
-              onSelect={async (e: any) => {
-                if (e === 'barcodes all') {
-                  await fetchAllProducts()
-                }
-                setBarcodesCreation(e)
-              }}>
-              <Option value='barcodes'>Напечатать штрихкоды</Option>
-              <Option value='barcodes all'>
-                Напечатать штрихкоды всех товаров
-              </Option>
-              <Option value='barcodes wb'>
-                Напечатать штрихкоды Wildberries FB
-              </Option>
-            </Select>
+            <div style={{ display: 'grid' }}>
+              <Select
+                style={{ width: 300 }}
+                value={'Напечатать штрихкоды'}
+                onSelect={async (e: any) => {
+                  if (e === 'barcodes all') {
+                    await fetchAllProducts()
+                  }
+                  setBarcodesCreation(e)
+                }}>
+                <Option value='barcodes'>Напечатать штрихкоды</Option>
+                <Option value='barcodes all'>
+                  Напечатать штрихкоды всех товаров
+                </Option>
+                <Option value='barcodes wb'>
+                  Напечатать штрихкоды Wildberries FB
+                </Option>
+              </Select>
+            </div>
             <Input.Search
               style={{ maxWidth: '500px' }}
               placeholder='поиск'
@@ -398,7 +403,7 @@ const Products = () => {
             </Button>
             <Button
               onClick={async () => {
-                  await fetchAllProducts()
+                await fetchAllProducts()
                 exportProducts(products)
               }}>
               Экспорт excel(все)
@@ -419,6 +424,8 @@ const Products = () => {
             pagination={{
               ...pagination,
               pageSizeOptions: ['50', '100', '200'],
+              // pageSizeOptions: ['1', '2', '3'],
+              // pageSize: 1
             }}
             onChange={fetchProductsPagination}
           />
