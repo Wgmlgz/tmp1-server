@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 
 import axios from 'axios'
 import { ColumnsType, TablePaginationConfig } from 'antd/lib/table'
-import { getWildberriesOrders } from '../../../api/wildberries'
+import { getWildberriesOrders } from '../../../api/api'
 import moment from 'moment'
 import { products_url } from '../../../api/api'
 const { TabPane } = Tabs

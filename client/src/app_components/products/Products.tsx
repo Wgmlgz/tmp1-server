@@ -20,7 +20,7 @@ import moment from 'moment'
 import Barcodes from './Barcodes'
 
 import reactStringReplace from 'react-string-replace'
-import { getRemains } from '../../api/remains'
+import { getRemains } from '../../api/api'
 import { IWarehouseFull } from '../warehouses/WarehouseForm'
 import FullscreenCard from '../FullscreenCard'
 

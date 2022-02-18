@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 
 export interface IUser {
+  id: string
   email: string
   password: string
   admin: boolean

@@ -99,7 +99,7 @@ export const login = async (req: Request, res: Response) => {
       if (!isMatch) {
         res.status(400).send('password is invalid')
       } else {
-        const user = {
+        const user: IUser = {
           id: db_user.id,
           email,
           password,
@@ -138,6 +138,7 @@ export const token = async (req: Request, res: Response) => {
     (err: any, user: any) => {
       if (err) return res.sendStatus(403)
       const access_token = generateAccessToken({
+        id: String(user.id),
         email: String(user.email),
         password: String(user.password),
         admin: Boolean(user.admin),

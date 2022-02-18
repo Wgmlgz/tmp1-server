@@ -17,7 +17,7 @@ import {
   getProductsMove,
   removeProductMove,
   updateProductMove,
-} from '../../api/products_move'
+} from '../../api/api'
 import axios from 'axios'
 import { IWarehouseFull } from './WarehouseForm'
 import { getWarehouses } from '../../api/api'

@@ -8,7 +8,7 @@ import {
   runRefreshOrders,
   runUpdateWildberriesStocks,
   updateWildberriesSettings,
-} from '../../../api/wildberries'
+} from '../../../api/api'
 import WarehouseSelect from '../../warehouses/WarehouseSelect'
 
 export default function Settings() {

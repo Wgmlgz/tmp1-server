@@ -17,7 +17,7 @@ import {
   createProductOut,
   getProductsOut,
   updateProductOut,
-} from '../../api/products_out'
+} from '../../api/api'
 import axios from 'axios'
 import { IWarehouseFull } from './WarehouseForm'
 import { getWarehouses } from '../../api/api'

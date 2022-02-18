@@ -1,6 +1,9 @@
 import axios from 'axios'
 import { ICategory } from '../app_components/categories/Categories'
 import { IProduct } from '../app_components/products/ProductsForm'
+import { IProductMove } from '../app_components/warehouses/ProductsIn'
+import { IProductIn } from '../app_components/warehouses/ProductsInForm'
+import { IProductOut } from '../app_components/warehouses/ProductsOutForm'
 import { IWarehouse } from '../app_components/warehouses/WarehouseForm'
 
 export const url = process.env.REACT_APP_SERVER_URL || 'http://localhost:5000'
@@ -27,15 +30,15 @@ const createAxiosResponseInterceptor = () => {
     async error => {
       const originalRequest = error.config
       console.log(error.response.status, originalRequest._retry)
-      
+
       if (error.response.status === 401 && !originalRequest._retry) {
-        console.log('trying');
-        
+        console.log('trying')
+
         originalRequest._retry = true
         await refreshToken()
         console.log('done')
         console.log(originalRequest)
-        
+
         return axios(originalRequest)
       }
       // axios.interceptors.response.eject(interceptor)
@@ -158,3 +161,72 @@ export const updateWarehouse = (id: string, warehouse: IWarehouse) =>
   axios.patch(`${warehouses_url}/${id}`, warehouse)
 export const removeWarehouse = (id: string) =>
   axios.delete(`${warehouses_url}/${id}`)
+
+export const wildberries_url = `${url}/api/wildberries`
+
+export const getWildBerriesProducts = () =>
+  axios.get(`${wildberries_url}/products`, {})
+
+export const getWildberriesOrders = (
+  status: string,
+  date_start: string,
+  take: number,
+  skip: number
+) =>
+  axios.get(`${wildberries_url}/orders`, {
+    params: { status, date_start, take, skip },
+  })
+
+export const updateWildberriesSettings = (
+  sender_warehouse: string,
+  send_cron: string,
+  update_orders_cron: string
+) =>
+  axios.post(`${wildberries_url}/settings`, {
+    sender_warehouse,
+    send_cron,
+    update_orders_cron,
+  })
+export const getWildberriesSettings = () =>
+  axios.get(`${wildberries_url}/settings`)
+
+export const runUpdateWildberriesStocks = () =>
+  axios.get(`${wildberries_url}/update`)
+export const runRefreshOrders = () =>
+  axios.get(`${wildberries_url}/update_orders`)
+export const checkWildberriesConnection = () =>
+  axios.get(`${wildberries_url}/check`, {})
+
+export const remains_url = `${url}/api/remains`
+
+export const getRemains = () => axios.get(`${remains_url}`)
+
+export const products_out_url = `${url}/api/products_out`
+
+export const getProductsOut = () => axios.get(`${products_out_url}`)
+export const createProductOut = (product_out: IProductOut) =>
+  axios.post(`${products_out_url}`, product_out)
+export const updateProductOut = (id: string, product_out: IProductOut) =>
+  axios.patch(`${products_out_url}/${id}`, product_out)
+export const removeProductOut = (id: string) =>
+  axios.delete(`${products_out_url}/${id}`)
+
+export const products_move_url = `${url}/api/products_move`
+
+export const getProductsMove = () => axios.get(`${products_move_url}`)
+export const createProductMove = (product_out: IProductMove) =>
+  axios.post(`${products_move_url}`, product_out)
+export const updateProductMove = (id: string, product_out: IProductMove) =>
+  axios.patch(`${products_move_url}/${id}`, product_out)
+export const removeProductMove = (id: string) =>
+  axios.delete(`${products_move_url}/${id}`)
+
+export const products_in_url = `${url}/api/products_in`
+
+export const getProductsIn = () => axios.get(`${products_in_url}`)
+export const createProductIn = (product_in: IProductIn) =>
+  axios.post(`${products_in_url}`, product_in)
+export const updateProductIn = (id: string, product_in: IProductIn) =>
+  axios.patch(`${products_in_url}/${id}`, product_in)
+export const removeProductIn = (id: string) =>
+  axios.delete(`${products_in_url}/${id}`)

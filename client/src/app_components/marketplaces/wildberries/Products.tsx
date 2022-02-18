@@ -3,7 +3,7 @@ import { ColumnsType } from 'antd/lib/table'
 import axios, { AxiosResponse } from 'axios'
 import React, { useEffect, useState } from 'react'
 import { products_url } from '../../../api/api'
-import { getWildBerriesProducts } from '../../../api/wildberries'
+import { getWildBerriesProducts } from '../../../api/api'
 
 interface IWilbberriesProduct {
   barcode: string

@@ -4,11 +4,7 @@ import { useEffect, useState } from 'react'
 import { IProductIn, IProductInFull, ProductsInForm } from './ProductsInForm'
 
 import { PlusCircleOutlined } from '@ant-design/icons'
-import {
-  createProductIn,
-  getProductsIn,
-  updateProductIn,
-} from '../../api/products_in'
+import { createProductIn, getProductsIn, updateProductIn } from '../../api/api'
 import axios from 'axios'
 import { IWarehouseFull } from './WarehouseForm'
 import { getWarehouses } from '../../api/api'
