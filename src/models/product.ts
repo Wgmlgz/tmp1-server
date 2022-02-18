@@ -136,7 +136,6 @@ const ProductSchema = new mongoose.Schema<IProduct>({
     type: String,
   },
   barcode: {
-    unique: true,
     sparse: true,
     type: String,
   },
