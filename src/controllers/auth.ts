@@ -100,7 +100,7 @@ export const login = async (req: Request, res: Response) => {
         res.status(400).send('password is invalid')
       } else {
         const user = {
-          id: db_user._id,
+          id: db_user.id,
           email,
           password,
           admin: db_user.admin,

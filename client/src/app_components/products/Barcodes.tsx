@@ -37,7 +37,12 @@ const Barcodes: FC<Props> = ({ barcodes }) => {
         ctx.fillStyle = '#000'
         ctx.font = `${15 * scale}px serif`
         if (barcode.color) {
-          ctx.fillText(barcode.name, x + 10 * scale, y + 20 * scale, 200)
+          ctx.fillText(
+            barcode.name,
+            x + 10 * scale,
+            y + 20 * scale,
+            200 * scale
+          )
           ctx.fillText(
             `Артикул: ${barcode.article}`,
             x + 10 * scale,
