@@ -335,6 +335,7 @@ export const refreshOrders = async () => {
       ...wb_header,
       params: {
         date_start: '2000-01-11T17:52:51+00:00',
+        date_end: (new Date()).toISOString(),
         take: 1,
         skip: 0,
       },

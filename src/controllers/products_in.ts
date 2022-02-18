@@ -12,6 +12,8 @@ export const createProductIn = async (req: Request, res: Response) => {
     let { warehouse, date, comment, products } = req.body
     const user = req_user.id
 
+    console.log(req_user)
+    
     // await checkRemains(
     //   products.map(
     //     (product: { product: string; name: string; quantity: number }) => ({

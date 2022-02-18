@@ -18,7 +18,7 @@ import mongoose from 'mongoose'
 import cookieParser from 'cookie-parser'
 import { CORS_ORIGIN, MONGO_CONNECTION_URL, PORT, NODE_ENV } from './config/env'
 import fs from 'fs'
-import { updateWildberriesStocks } from './controllers/wildberries'
+import { refreshOrders, runUpdateWildberriesStocks, updateWildberriesStocks } from './controllers/wildberries'
 
 const app = express()
 app.use(cookieParser())
@@ -72,7 +72,7 @@ mongoose
       async () => {
         console.log('updating orders')
 
-        const res = await updateWildberriesStocks()
+        const res = await refreshOrders()
         console.log('done', res)
       }
     )
