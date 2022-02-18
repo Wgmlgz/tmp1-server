@@ -340,6 +340,7 @@ export const refreshOrders = async () => {
       },
     })
   ).data.total
+  console.log('total:', total);
 
   const take = 1000
   let orders: any[] = []
