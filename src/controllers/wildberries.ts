@@ -114,14 +114,13 @@ export const getWildberriesOrders = async (req: Request, res: Response) => {
               })
             ).data.supplies
               .map((supply: { supplyId: string }) => supply.supplyId)
-              .map(
-                async (supply: string) =>
-                  (
-                    await axios.get(
-                      `${WILDBERRIES_URL}/api/v2/supplies/${supply}/orders`,
-                      wb_header
-                    )
-                  ).data.orders
+              .map(async (supply: string) =>
+                (
+                  await axios.get(
+                    `${WILDBERRIES_URL}/api/v2/supplies/${supply}/orders`,
+                    wb_header
+                  )
+                ).data.orders.map((order: any) => ({...order, supply}))
               )
           )
         )
@@ -335,13 +334,13 @@ export const refreshOrders = async () => {
       ...wb_header,
       params: {
         date_start: '2000-01-11T17:52:51+00:00',
-        date_end: (new Date()).toISOString(),
+        date_end: new Date().toISOString(),
         take: 1,
         skip: 0,
       },
     })
   ).data.total
-  console.log('total:', total);
+  console.log('total:', total)
 
   const take = 1000
   let orders: any[] = []

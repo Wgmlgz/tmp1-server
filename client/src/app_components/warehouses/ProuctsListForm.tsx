@@ -172,9 +172,9 @@ const ProductsListForm: FC<Props> = ({
                   }}
                   value={new_product_name}
                   options={
-                    search_products.map(product => ({
+                    search_products.map((product, id) => ({
                       label: (
-                        <div>
+                        <div key={id}>
                           {highlightText(
                             `${product.name} ${product.article} ${product.barcode}`,
                             search_query

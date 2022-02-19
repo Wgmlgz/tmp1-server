@@ -60,8 +60,10 @@ const WarehouseSelect: FC<Props> = ({
           onChange={e => {
             onChange && onChange(e)
           }}>
-          {warehouses.map(warehouse => (
-            <Option value={warehouse._id}>{warehouse.name}</Option>
+          {warehouses.map((warehouse, id) => (
+            <Option key={id} value={warehouse._id}>
+              {warehouse.name}
+            </Option>
           ))}
         </Select>
       )}

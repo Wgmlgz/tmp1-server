@@ -9,23 +9,31 @@ import {
   Card,
   Select,
   Popconfirm,
+  Tree,
+  Typography,
+  Checkbox,
+  Collapse,
 } from 'antd'
 import {
   categories_url,
   createCategory,
   getCategories,
+  getUserColumnsSetting,
   removeCategory,
+  setUserColumnsSetting,
 } from '../../api/api'
 import axios from 'axios'
-import { ColumnsType } from 'antd/lib/table'
+import { ColumnsType, ColumnType } from 'antd/lib/table'
 import {
   PlusCircleOutlined,
   DeleteOutlined,
   EditOutlined,
 } from '@ant-design/icons'
+import useColumns from '../../hooks/useColumns'
 
 const { Option } = Select
-
+const { Panel } = Collapse
+const { Title } = Typography
 export interface ICategory {
   name: string
   description?: string
@@ -64,7 +72,7 @@ export default function Categories() {
     if (img) setImg(img)
   }
 
-  const columns: ColumnsType<ICategoryFull> = [
+  const columns = useColumns<ICategoryFull>('categories', [
     {
       title: 'Название',
       dataIndex: 'name',
@@ -89,7 +97,10 @@ export default function Categories() {
       dataIndex: 'tags',
       key: 'tags',
       render: (text, record, index) => (
-        <>{record.tags && record.tags.map(tag => <Tag>{tag}</Tag>)}</>
+        <>
+          {record.tags &&
+            record.tags.map((tag, id) => <Tag key={id}>{tag}</Tag>)}
+        </>
       ),
     },
     {
@@ -106,7 +117,7 @@ export default function Categories() {
           onConfirm={async () => {
             try {
               const res = await removeCategory(record._id)
-              message.success("Категория удалена")
+              message.success('Категория удалена')
               fetchCategories()
             } catch (err) {
               if (axios.isAxiosError(err)) {
@@ -122,7 +133,7 @@ export default function Categories() {
         </Popconfirm>
       ),
     },
-  ]
+  ])
 
   const fetchCategories = async () => {
     try {
@@ -139,6 +150,29 @@ export default function Categories() {
     fetchCategories()
   }, [])
 
+  function list_to_tree(list: any[]) {
+    var map: { [id: string]: any } = {},
+      node,
+      roots = [],
+      i
+
+    list.forEach((item, i) => {
+      map[list[i].name] = i
+      list[i].children = []
+      list[i].key = list[i]._id
+      list[i].expanded = true
+    })
+
+    for (i = 0; i < list.length; i += 1) {
+      node = list[i]
+      if (node.parent) {
+        list[map[node.parent]].children.push(node)
+      } else {
+        roots.push(node)
+      }
+    }
+    return roots
+  }
   return (
     <div style={{ display: 'flex', gap: '20px' }}>
       <div style={{ width: '300px' }}>
@@ -168,8 +202,8 @@ export default function Categories() {
             <Form.Item>
               <label style={{ fontWeight: 'bold' }}>Теги: </label>
 
-              {tags.map(tag => (
-                <Tag>{tag}</Tag>
+              {tags.map((tag, id) => (
+                <Tag key={id}>{tag}</Tag>
               ))}
             </Form.Item>
             <Form.Item name='tags'>
@@ -191,8 +225,10 @@ export default function Categories() {
             </Form.Item>
             <Form.Item name='parent'>
               <Select placeholder='Родительская категория'>
-                {categories.map(s => (
-                  <Option value={s.name}>{s.name}</Option>
+                {categories.map((s, id) => (
+                  <Option key={id} value={s.name}>
+                    {s.name}
+                  </Option>
                 ))}
               </Select>
             </Form.Item>
@@ -207,9 +243,18 @@ export default function Categories() {
           </Form>
         </Card>
       </div>
-      <div style={{ width: 'fit-content' }}>
+      <div style={{ flexGrow: 1 }}>
+        {/* <Tree defaultExpandAll treeData={list_to_tree(categories)} /> */}
         <Card title='Все категории'>
-          <Table dataSource={categories} columns={columns} />
+          {categories.length ? (
+            <Table
+              expandable={{ defaultExpandAllRows: true }}
+              dataSource={list_to_tree(categories)}
+              columns={columns}
+            />
+          ) : (
+            <Table key='loading-not-done' columns={columns} loading />
+          )}
         </Card>
       </div>
     </div>

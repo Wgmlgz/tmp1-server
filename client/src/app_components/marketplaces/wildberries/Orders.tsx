@@ -6,6 +6,7 @@ import { ColumnsType, TablePaginationConfig } from 'antd/lib/table'
 import { getWildberriesOrders } from '../../../api/api'
 import moment from 'moment'
 import { products_url } from '../../../api/api'
+import useColumns from '../../../hooks/useColumns'
 const { TabPane } = Tabs
 interface IOrder {
   product: string
@@ -17,6 +18,7 @@ interface IOrder {
   totalPrice: number
   barcodes: string[]
   barcode: string
+  supply?: string
 }
 
 const Orders = () => {
@@ -66,11 +68,17 @@ const Orders = () => {
   useEffect(() => {
     fetchProducts(pagination)
   }, [])
-  const columns: ColumnsType<IOrder> = [
+  const columns: ColumnsType<IOrder> = useColumns('wb_orders', [
     {
       title: 'status',
       dataIndex: 'status',
       key: 'status',
+    },
+    {
+      title: 'Номер поставки',
+      dataIndex: 'supply',
+      key: 'supply',
+      sorter: (a, b) => Number(a.supply) - Number(b.supply),
     },
     {
       title: 'userStatus',
@@ -173,11 +181,12 @@ const Orders = () => {
         }${hours}:${mins}:${secs}`
       },
     },
-  ]
+  ])
 
   useEffect(() => {
     fetchProducts(pagination)
   }, [status])
+
   return (
     <div style={{ width: '100%' }}>
       <Card>

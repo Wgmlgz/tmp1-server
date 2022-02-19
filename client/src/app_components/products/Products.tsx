@@ -389,8 +389,10 @@ const Products = () => {
                 setActiveCategory(e)
               }}>
               <Option value=''>Все</Option>
-              {categories.map(s => (
-                <Option value={s}>{s}</Option>
+              {categories.map((s, id) => (
+                <Option key={id} value={s}>
+                  {s}
+                </Option>
               ))}
             </Select>
             <Button

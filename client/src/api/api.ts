@@ -50,6 +50,17 @@ createAxiosResponseInterceptor()
 
 /** Auth */
 export const getUser = () => axios.get(`${user_url}/user`)
+export const getUserColumnsSetting = (setting: string) =>
+  axios.get(`${user_url}/columns_settings`, { params: setting })
+export const setUserColumnsSetting = (
+  setting: string,
+  val: { [id: string]: boolean }
+) =>
+  axios.post(
+    `${user_url}/columns_settings`,
+    { new_val: val },
+    { params: setting }
+  )
 
 export const superAdminGetUsers = () => axios.get(`${super_admin_url}/users`)
 export const superAdminUpdateUser = (id: string, admin: boolean) =>

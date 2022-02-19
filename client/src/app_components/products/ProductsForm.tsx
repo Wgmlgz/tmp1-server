@@ -229,8 +229,10 @@ const ProductsForm: FC<Props> = ({
                     <Select
                       defaultValue={product?.category}
                       placeholder='Категория'>
-                      {categories.map(s => (
-                        <Option value={s}>{s}</Option>
+                      {categories.map((s, id) => (
+                        <Option key={id} value={s}>
+                          {s}
+                        </Option>
                       ))}
                     </Select>
                   </Form.Item>
@@ -328,8 +330,8 @@ const ProductsForm: FC<Props> = ({
                     />
                   </Form.Item>
                   <Form.Item label='Теги'>
-                    {tags.map(tag => (
-                      <Tag>{tag}</Tag>
+                    {tags.map((tag, id) => (
+                      <Tag key={id}>{tag}</Tag>
                     ))}
                   </Form.Item>
                   <Form.Item name='tags'>
