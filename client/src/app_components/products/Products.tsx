@@ -1,4 +1,13 @@
-import { Button, Card, Input, message, Popconfirm, Select, Table, Typography } from 'antd'
+import {
+  Button,
+  Card,
+  Input,
+  message,
+  Popconfirm,
+  Select,
+  Table,
+  Typography,
+} from 'antd'
 import { Key, useEffect, useState } from 'react'
 import {
   createProduct,
@@ -25,6 +34,7 @@ import { IWarehouseFull } from '../warehouses/WarehouseForm'
 import FullscreenCard from '../FullscreenCard'
 
 import { exportProducts } from './Excel'
+import { promises } from 'stream'
 
 const { Title } = Typography
 
@@ -259,20 +269,8 @@ const Products = () => {
   }
 
   const fetchAllProducts = async () => {
-    try {
-      setLoading(true)
-      const res = await getProducts(1, 10000000)
-      const res_count = await getProductsCount()
-
-      // setPagination({
-      //   pageSize: pagination.pageSize || 1,
-      //   current: pagination.current || 1,
-      //   total: res_count.data,
-      // })
-
-      setProducts(res.data)
-      setLoading(false)
-    } catch (err) {}
+    const res = await getProducts(1, 10000000)
+    return res.data
   }
 
   return (
@@ -403,7 +401,7 @@ const Products = () => {
             </Button>
             <Button
               onClick={async () => {
-                await fetchAllProducts()
+                const products = await fetchAllProducts()
                 exportProducts(products)
               }}>
               Экспорт excel(все)
