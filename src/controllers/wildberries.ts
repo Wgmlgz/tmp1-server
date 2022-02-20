@@ -120,26 +120,26 @@ export const getWildberriesOrders = async (req: Request, res: Response) => {
                     `${WILDBERRIES_URL}/api/v2/supplies/${supply}/orders`,
                     wb_header
                   )
-                ).data.orders.map((order: any) => ({...order, supply}))
+                ).data.orders.map((order: any) => ({ ...order, supply }))
               )
           )
         )
           .flat()
-          .map(order => parseInt(order.orderId))
-          .map(
-            async orderId =>
-              (
-                await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
-                  ...wb_header,
-                  params: {
-                    id: orderId,
-                    skip: 0,
-                    take: 1,
-                    date_start: '2021-01-11T17:52:51+00:00',
-                  },
-                })
-              ).data.orders[0]
-          )
+          .map(order => [parseInt(order.orderId), order.supply])
+          .map(async ([orderId, supply]) => ({
+            ...(
+              await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
+                ...wb_header,
+                params: {
+                  id: orderId,
+                  skip: 0,
+                  take: 1,
+                  date_start: '2021-01-11T17:52:51+00:00',
+                },
+              })
+            ).data.orders[0],
+            supply,
+          }))
       )
       orders = { orders, total: orders.length }
     } else if (status === 'on_delivery') {
@@ -155,33 +155,32 @@ export const getWildberriesOrders = async (req: Request, res: Response) => {
               })
             ).data.supplies
               .map((supply: { supplyId: string }) => supply.supplyId)
-              .map(
-                async (supply: string) =>
-                  (
-                    await axios.get(
-                      `${WILDBERRIES_URL}/api/v2/supplies/${supply}/orders`,
-                      wb_header
-                    )
-                  ).data.orders
+              .map(async (supply: string) =>
+                (
+                  await axios.get(
+                    `${WILDBERRIES_URL}/api/v2/supplies/${supply}/orders`,
+                    wb_header
+                  )
+                ).data.orders.map((order: any) => ({ ...order, supply }))
               )
           )
         )
           .flat()
-          .map(order => parseInt(order.orderId))
-          .map(
-            async orderId =>
-              (
-                await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
-                  ...wb_header,
-                  params: {
-                    id: orderId,
-                    skip: 0,
-                    take: 1,
-                    date_start: '2021-01-11T17:52:51+00:00',
-                  },
-                })
-              ).data.orders[0]
-          )
+          .map(order => [parseInt(order.orderId), order.supply])
+          .map(async ([orderId, supply]) => ({
+            ...(
+              await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
+                ...wb_header,
+                params: {
+                  id: orderId,
+                  skip: 0,
+                  take: 1,
+                  date_start: '2021-01-11T17:52:51+00:00',
+                },
+              })
+            ).data.orders[0],
+            supply,
+          }))
       )
       orders = { orders, total: orders.length }
     } else if (status === 'all') {
