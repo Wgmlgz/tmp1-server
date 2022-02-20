@@ -2,6 +2,7 @@ import sharp from 'sharp'
 
 import fs from 'fs'
 import Axios from 'axios'
+import { Request, Response } from 'express'
 
 export const resizeImg100 = async (in_path: string) => {
   const buffer = await sharp(in_path).resize(100, 100).toBuffer()

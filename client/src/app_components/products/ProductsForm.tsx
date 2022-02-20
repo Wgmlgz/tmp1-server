@@ -5,17 +5,20 @@ import {
   Input,
   InputNumber,
   message,
+  Modal,
   Popconfirm,
   Select,
   Table,
   Tag,
+  Upload,
 } from 'antd'
 import { FC, useEffect, useRef, useState } from 'react'
 import { Collapse } from 'antd'
-import { getCategories } from '../../api/api'
+import { getCategories, products_url } from '../../api/api'
 import axios from 'axios'
 import { ICategory } from '../categories/Categories'
 import WarehouseSelect from '../warehouses/WarehouseSelect'
+import { PlusOutlined } from '@ant-design/icons'
 
 const { Panel } = Collapse
 const { Option } = Select
@@ -77,7 +80,12 @@ const ProductsForm: FC<Props> = ({
   product,
 }) => {
   const [tags, setTags] = useState<string[]>([])
-  const [imgs, setImgs] = useState<FileList>()
+  const [fileState, setFileState] = useState<any>({
+    previewVisible: false,
+    previewImage: '',
+    previewTitle: '',
+    fileList: [],
+  })
   const [categories, setCategories] = useState<string[]>([])
   const [marketplace_data, setMarketplaceData] = useState<[string, string][]>(
     []
@@ -162,7 +170,7 @@ const ProductsForm: FC<Props> = ({
         description,
         color,
         tags,
-        imgs,
+        imgs: fileState.fileList.map((file: any) => file.originFileObj),
         videos,
         buy_price,
         delivery_price,
@@ -189,6 +197,34 @@ const ProductsForm: FC<Props> = ({
     }
   }
 
+  useEffect(() => {
+    const setup = async () => {
+      const files = await Promise.all(
+        product?.imgs_big?.map(async (img, id) => ({
+          uid: `-${id}`,
+          name: 'image.png',
+          status: 'done',
+          url: `${products_url}/img/${img}`,
+          originFileObj: new File(
+            [
+              (
+                await axios.get(`${products_url}/img/${img}`, {
+                  responseType: 'blob',
+                })
+              ).data,
+            ],
+            'name.jpg'
+          ),
+        })) ?? []
+      )
+      console.log(files)
+      setFileState((x: any) => ({
+        ...x,
+        fileList: [...x.fileList, ...files],
+      }))
+    }
+    setup()
+  }, [])
   return (
     <div>
       <Card title={header}>
@@ -354,15 +390,78 @@ const ProductsForm: FC<Props> = ({
                 </Panel>
                 <Panel header='Медиа' key='3'>
                   <Form.Item label='Изображения' name='imgs'>
-                    <Input
-                      type='file'
-                      accept='.png, .jpg, .jpeg'
-                      name='imgs'
-                      multiple
-                      ref={input_imgs_ref}
-                      onChange={e => e.target.files && setImgs(e.target.files)}
-                    />
+                    <Upload
+                      listType='picture-card'
+                      fileList={fileState.fileList}
+                      onRemove={file => {
+                        setFileState((state: any) => {
+                          const index = state.fileList.indexOf(file)
+                          const newFileList = state.fileList.slice()
+                          newFileList.splice(index, 1)
+                          return {
+                            ...state,
+                            fileList: newFileList,
+                          }
+                        })
+                      }}
+                      beforeUpload={file => {
+                        setFileState((state: any) => ({
+                          ...state,
+                          fileList: [...state.fileList, file],
+                        }))
+                        console.log(fileState.fileList)
+
+                        return false
+                      }}
+                      onPreview={async (file: any) => {
+                        const getBase64 = (file: any) =>
+                          new Promise((resolve, reject) => {
+                            const reader = new FileReader()
+                            reader.readAsDataURL(file)
+                            reader.onload = () => resolve(reader.result)
+                            reader.onerror = error => reject(error)
+                          })
+
+                        if (!file.url && !file.preview) {
+                          file.preview = await getBase64(file.originFileObj)
+                        }
+
+                        setFileState((x: any) => ({
+                          ...x,
+                          previewImage: file.url || file.preview,
+                          previewVisible: true,
+                          previewTitle:
+                            file.name ||
+                            file.url.substring(file.url.lastIndexOf('/') + 1),
+                        }))
+                      }}
+                      onChange={({ fileList }) =>
+                        setFileState((x: any) => ({ ...x, fileList }))
+                      }>
+                      {fileState.fileList.length >= 8 ? null : (
+                        <div>
+                          <PlusOutlined />
+                          <div style={{ marginTop: 8 }}>Upload</div>
+                        </div>
+                      )}
+                    </Upload>
                   </Form.Item>
+                  <Modal
+                    visible={fileState.previewVisible}
+                    title={fileState.previewTitle}
+                    footer={null}
+                    onCancel={() =>
+                      setFileState((x: any) => ({
+                        ...x,
+                        previewVisible: false,
+                      }))
+                    }>
+                    <img
+                      alt='example'
+                      style={{ width: '100%' }}
+                      src={fileState.previewImage}
+                    />
+                  </Modal>
                   <Form.Item label='Видео на Youtube 1' name='yt1'>
                     <Input
                       defaultValue={product?.videos?.at(0)}

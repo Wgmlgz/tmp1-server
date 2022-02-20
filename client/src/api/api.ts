@@ -113,8 +113,12 @@ export const removeProduct = (id: string) =>
 const productToFormData = (product: IProduct) => {
   let fd = new FormData()
 
+  console.log(product.imgs)
+
   if (product.imgs) {
-    Array.from(product.imgs).forEach(file => fd.append('imgs', file))
+    Array.from(product.imgs).forEach(file =>
+      fd.append('imgs', file)
+    )
   }
   ;[
     'type',
