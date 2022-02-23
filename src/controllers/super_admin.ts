@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import mongoose from 'mongoose'
 import User from '../models/user'
+import logger from '../util/logger'
 
 export const superAdminUpdateUser = async (req: Request, res: Response) => {
   try {
@@ -15,6 +16,7 @@ export const superAdminUpdateUser = async (req: Request, res: Response) => {
     await User.findByIdAndUpdate(id, updatedUser, { new: true })
     res.status(200).json(updatedUser)
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }
@@ -30,7 +32,7 @@ export const superAdminGetUsers = async (req: any, res: Response) => {
       }))
     )
   } catch (err: any) {
-    console.log(err);
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }

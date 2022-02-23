@@ -1,5 +1,6 @@
 import { Response } from 'express'
 import UserModel, { IUser } from '../models/user'
+import logger from '../util/logger'
 
 export const getUser = (req: any, res: Response) => {
   res.json(req.user)
@@ -14,6 +15,7 @@ export const getSetting = async (req: any, res: Response) => {
     const user = await UserModel.findById(req_user.id)
     res.status(200).json(user?.columns_settings?.get(setting) ?? new Map())
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }
@@ -29,6 +31,7 @@ export const setSetting = async (req: any, res: Response) => {
       [`columns_settings.${setting}`]: new_val,
     })
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }

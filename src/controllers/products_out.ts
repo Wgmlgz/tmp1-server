@@ -4,6 +4,7 @@ import mongoose from 'mongoose'
 import { IUser } from '../models/user'
 import { changeRemains, checkRemains } from './remains'
 import Product from '../models/product'
+import logger from '../util/logger'
 
 export const createProductOut = async (req: Request, res: Response) => {
   try {
@@ -41,6 +42,7 @@ export const createProductOut = async (req: Request, res: Response) => {
 
     res.send('ProductOut created')
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }
@@ -62,6 +64,7 @@ export const removeProductOut = async (req: Request, res: Response) => {
     )
     res.status(200).send('Deleted')
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }
@@ -121,6 +124,7 @@ export const updateProductOut = async (req: Request, res: Response) => {
     )
     res.send('ProductOut updated')
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }
@@ -146,6 +150,7 @@ export const getProductsOut = async (req: Request, res: Response) => {
     )
     res.status(200).json(res_products_out)
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }

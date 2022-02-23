@@ -18,7 +18,12 @@ import mongoose from 'mongoose'
 import cookieParser from 'cookie-parser'
 import { CORS_ORIGIN, MONGO_CONNECTION_URL, PORT, NODE_ENV } from './config/env'
 import fs from 'fs'
-import { refreshOrders, runUpdateWildberriesStocks, updateWildberriesStocks } from './controllers/wildberries'
+import {
+  refreshOrders,
+  runUpdateWildberriesStocks,
+  updateWildberriesStocks,
+} from './controllers/wildberries'
+import logger from './util/logger'
 
 const app = express()
 app.use(cookieParser())
@@ -53,28 +58,39 @@ app.use('/api/wildberries', wildberries_routes)
 //     res.sendFile(path.join(__dirname, '../client/build', 'index.html'))
 //   })
 // }
-
 mongoose
   .connect(MONGO_CONNECTION_URL)
   .then(() => {
-    app.listen(PORT, () => console.log(`server goes brrrrrr at ${PORT}`))
+    app.listen(PORT, () => {
+      logger.info(`Mongo connection - OK`)
+      logger.info(`server goes brrrrrr at ${PORT}`)
+      console.log(`server goes brrrrrr at ${PORT}`)
+    })
     cron.schedule(
       JSON.parse(fs.readFileSync('settings.json', 'utf8')).send_cron,
       async () => {
-        console.log('updating stocks')
-
-        const res = await updateWildberriesStocks()
-        console.log('done', res)
+        try {
+          logger.info(`updating stocks`)
+          const res = await updateWildberriesStocks()
+          logger.info(`updating stocks done:`, res)
+        } catch (err) {
+          logger.error(`updating stocks error:`, err)
+        }
       }
     )
     cron.schedule(
       JSON.parse(fs.readFileSync('settings.json', 'utf8')).update_orders_cron,
       async () => {
-        console.log('updating orders')
-
-        const res = await refreshOrders()
-        console.log('done', res)
+        try {
+          const res = await refreshOrders()
+          logger.info(`updating orders done:`, res)
+        } catch (err) {
+          logger.error(`updating orders error:`, err)
+        }
       }
     )
   })
-  .catch(err => console.log(err.message))
+  .catch(err => {
+    logger.error(`Mongo connection - problem`, err.message)
+    console.log(err.message)
+  })

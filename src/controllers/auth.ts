@@ -10,6 +10,7 @@ import {
   REFRESH_TOKEN_EXPIRES,
   REFRESH_TOKEN_SECRET,
 } from '../config/env'
+import logger from '../util/logger'
 
 export const authenticateUser = (
   req: any,
@@ -120,6 +121,7 @@ export const login = async (req: Request, res: Response) => {
       }
     })
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }
@@ -191,6 +193,7 @@ export const register = (req: Request, res: Response) => {
       res.send('User Created')
     })
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }

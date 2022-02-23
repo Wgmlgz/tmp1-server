@@ -7,6 +7,7 @@ import multer from 'multer'
 import { v4 as uuidv4 } from 'uuid'
 import { resizeImg100 } from '../util/imgs'
 import Product from '../models/product'
+import logger from '../util/logger'
 
 sharp.cache(false)
 
@@ -61,6 +62,7 @@ export const createCategory = (req: Request, res: Response) => {
       res.send('Category Created')
     })
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }
@@ -89,6 +91,7 @@ export const removeCategory = async (req: Request, res: Response) => {
     await Category.findByIdAndRemove(id)
     res.status(200).send('Deleted')
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }
@@ -106,6 +109,7 @@ export const getCategories = async (req: Request, res: Response) => {
     }))
     res.status(200).json(res_categories)
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }

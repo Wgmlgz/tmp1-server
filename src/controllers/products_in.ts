@@ -4,6 +4,7 @@ import mongoose from 'mongoose'
 import { IUser } from '../models/user'
 import { changeRemains, checkRemains } from './remains'
 import Product from '../models/product'
+import logger from '../util/logger'
 
 export const createProductIn = async (req: Request, res: Response) => {
   try {
@@ -13,7 +14,7 @@ export const createProductIn = async (req: Request, res: Response) => {
     const user = req_user.id
 
     console.log(req_user)
-    
+
     // await checkRemains(
     //   products.map(
     //     (product: { product: string; name: string; quantity: number }) => ({
@@ -43,6 +44,7 @@ export const createProductIn = async (req: Request, res: Response) => {
 
     res.send('ProductIn created')
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }
@@ -71,6 +73,7 @@ export const removeProductIn = async (req: Request, res: Response) => {
     await ProductIn.findByIdAndRemove(id)
     res.status(200).send('Deleted')
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }
@@ -131,6 +134,7 @@ export const updateProductIn = async (req: Request, res: Response) => {
 
     res.send('ProductIn updated')
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }
@@ -156,6 +160,7 @@ export const getProductsIn = async (req: Request, res: Response) => {
     )
     res.status(200).json(res_products_in)
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }

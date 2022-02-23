@@ -1,7 +1,6 @@
 import { Request, Response } from 'express'
 import Remain from '../models/remains'
-import mongoose from 'mongoose'
-import { IUser } from '../models/user'
+import logger from '../util/logger'
 
 export const checkRemain = async (
   warehouse: string,
@@ -74,6 +73,7 @@ export const getRemains = async (req: Request, res: Response) => {
     }))
     res.status(200).json(res_remains)
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }

@@ -7,6 +7,7 @@ import ProductMoveModel, { IProductMove } from '../models/products_move'
 import { MAIN_WAREHOUSE_ID } from '../config/env'
 import { IUser } from '../models/user'
 import { changeRemains } from './remains'
+import logger from '../util/logger'
 
 export const createWarehouse = (req: Request, res: Response) => {
   try {
@@ -23,6 +24,7 @@ export const createWarehouse = (req: Request, res: Response) => {
       res.send('Warehouse created')
     })
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }
@@ -69,6 +71,7 @@ export const removeWarehouse = async (req: Request, res: Response) => {
     await Warehouse.findByIdAndRemove(id)
     res.status(200).send('Deleted')
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }
@@ -86,6 +89,7 @@ export const updateWarehouse = async (req: Request, res: Response) => {
     await Warehouse.findByIdAndUpdate(id, { name, description }, { new: true })
     res.send('Warehouse updated')
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }
@@ -101,6 +105,7 @@ export const getWarehouses = async (req: Request, res: Response) => {
     }))
     res.status(200).json(res_warehouses)
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }

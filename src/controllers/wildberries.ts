@@ -9,6 +9,7 @@ import fs from 'fs'
 import moment from 'moment'
 import WBOrderModel from '../models/wb_orders'
 import { changeRemain, changeRemains } from './remains'
+import logger from '../util/logger'
 
 interface IWilbberriesProduct {
   barcode: string
@@ -59,6 +60,7 @@ export const getWildberriesProducts = async (req: Request, res: Response) => {
 
     res.status(200).json(table)
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).json(err.message)
   }
 }
@@ -226,8 +228,7 @@ export const getWildberriesOrders = async (req: Request, res: Response) => {
 
     res.status(200).send(orders)
   } catch (err: any) {
-    console.log(err)
-
+    logger.error(err.message)
     res.status(400).json(err.message)
   }
 }
@@ -245,6 +246,7 @@ export const updateWildberriesSettings = async (
     fs.writeFileSync('settings.json', JSON.stringify(old, null, 2))
     res.status(200).send('settings updated')
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).json(err.message)
   }
 }
@@ -253,6 +255,7 @@ export const getWildberriesSettings = async (req: Request, res: Response) => {
     const old = JSON.parse(fs.readFileSync('settings.json', 'utf8'))
     res.status(200).json(old)
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).json(err.message)
   }
 }
@@ -298,8 +301,7 @@ export const runUpdateWildberriesStocks = async (
     const ans = await updateWildberriesStocks()
     res.status(200).json(ans)
   } catch (err: any) {
-    console.log(err)
-
+    logger.error(err.message)
     res.status(200).json(err.message)
   }
 }
@@ -319,6 +321,7 @@ export const checkWildberriesConnection = async (
 
     res.status(200).send('Соединено')
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).json(err.message)
   }
 }
@@ -423,6 +426,7 @@ export const refreshOrders = async () => {
           }))
         )
       } catch (err: any) {
+        logger.error(err.message)
         console.log(err.message)
       }
     })
@@ -437,8 +441,7 @@ export const runRefreshOrdeers = async (req: Request, res: Response) => {
 
     res.status(200).json(ans)
   } catch (err: any) {
-    console.log(err)
-
+    logger.error(err.message)
     res.status(200).json(err.message)
   }
 }

@@ -9,6 +9,7 @@ import mongoose from 'mongoose'
 import RemainModel from '../models/remains'
 import ExcelImport from '../models/excel_import'
 import CategoryModel from '../models/category'
+import logger from '../util/logger'
 
 const UPLOAD_FILES_DIR = './upload/products'
 
@@ -58,7 +59,6 @@ const parseReqToProduct = (req: Request) => {
 
   // @ts-ignore
   req.files?.forEach(i => {
-
     const orig_path = i.filename,
       small_path = genSmallPath(),
       big_path = genBigPath()
@@ -134,6 +134,7 @@ export const createProduct = async (req: Request, res: Response) => {
 
     res.send('Product created')
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }
@@ -161,6 +162,7 @@ export const updateProduct = async (req: Request, res: Response) => {
     })
     res.send('Product updated')
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }
@@ -172,6 +174,7 @@ export const getProduct = async (req: Request, res: Response) => {
     const product = await Product.findById(id)
     res.status(200).json(product)
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }
@@ -188,6 +191,7 @@ export const removeProducts = async (req: Request, res: Response) => {
     )
     res.status(200).json('Products deleated')
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }
@@ -204,6 +208,7 @@ export const getProducts = async (req: Request, res: Response) => {
       .limit(nPerPage)
     res.status(200).json(products)
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }
@@ -212,6 +217,7 @@ export const getCount = async (req: Request, res: Response) => {
     const products = await Product.count()
     res.status(200).json(products)
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }
@@ -241,6 +247,7 @@ export const searchProducts = async (req: Request, res: Response) => {
       res.status(200).json([])
     }
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }
@@ -279,7 +286,8 @@ const createProductExcel = async (
           product.imgs?.push(orig_path)
           product.imgs_small?.push(small_path)
           product.imgs_big?.push(big_path)
-        } catch (err) {
+        } catch (err: any) {
+          logger.error(err.message)
           await ExcelImport.findByIdAndUpdate(import_id, {
             $push: {
               import_errors: `Ошибка в строке ${product.excel_row} : Загрузка изображения ${url} не удалась`,
@@ -303,7 +311,8 @@ const createProductExcel = async (
     await ExcelImport.findByIdAndUpdate(import_id, {
       $push: { done: new_product.id },
     })
-  } catch (err) {
+  } catch (err: any) {
+    logger.error(err.message)
     try {
       let msg = `Ошибка в строке ${product.excel_row} : `
       if (err instanceof mongoose.Error) {
@@ -316,8 +325,8 @@ const createProductExcel = async (
         $inc: { failed: 1 },
       })
       import_id
-    } catch (err) {
-      console.log(err)
+    } catch (err: any) {
+      logger.error(err.message)
     }
   }
 }
@@ -345,6 +354,7 @@ export const createExcelProducts = async (req: Request, res: Response) => {
     )
     res.status(200).json('Import started')
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }
@@ -355,6 +365,7 @@ export const getExcelImports = async (req: Request, res: Response) => {
 
     res.status(200).json(excel_imports)
   } catch (err: any) {
+    logger.error(err.message)
     res.status(400).send(err.message)
   }
 }
