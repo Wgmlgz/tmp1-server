@@ -32,20 +32,15 @@ export const importProducts = (
   reader.onload = async () => {
     try {
       const buffer = reader.result
-      console.log(isCSV)
-
-      console.log('ddd')
 
       if (isCSV) {
         const stream = new ReadableWebToNodeStream(
           file.stream()
         ) as unknown as Parameters<Csv['read']>[0]
-        console.log(stream)
         await wb.csv.read(stream)
       } else {
         await wb.xlsx.load(buffer as any)
       }
-      console.log('ddd')
 
       const products: any[] = []
 
@@ -151,7 +146,9 @@ const Page: FC = () => {
                   key: 'err',
                 },
               ]}
-              dataSource={record.import_errors.map(str => ({ err: str }))}
+              dataSource={record.import_errors
+                .map(str => ({ err: str }))
+                ?.map((x, i) => ({ ...x, key: i }))}
             />
           }>
           <Button type='primary' style={{ backgroundColor: '#ff5555' }}>
@@ -207,7 +204,6 @@ const Page: FC = () => {
         delete product.imgs_small
       })
       setDa(products)
-      console.log(products)
 
       await createExcelProducts(products)
       await fetchImports()
@@ -270,7 +266,10 @@ const Page: FC = () => {
           inputStyle={{ color: 'red' }}
         />
       </Card>
-      <Table dataSource={imports} columns={columns} />
+      <Table
+        dataSource={imports?.map((x, i) => ({ ...x, key: i }))}
+        columns={columns}
+      />
       {/* <pre>{JSON.stringify(da, null, 2)}</pre> */}
     </div>
   )

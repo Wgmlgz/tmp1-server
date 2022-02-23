@@ -60,7 +60,7 @@ import useColumns from '../../hooks/useColumns'
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 export const highlightText = (str: string, search: string) => (
-  <div>
+  <span>
     {search
       ? reactStringReplace(str, new RegExp(`(${search})+`, 'g'), (match, i) => (
           <span key={i} style={{ fontWeight: 'bold' }}>
@@ -68,7 +68,7 @@ export const highlightText = (str: string, search: string) => (
           </span>
         ))
       : str}
-  </div>
+  </span>
 )
 
 const { Option } = Select
@@ -164,7 +164,6 @@ const Products = () => {
       if (axios.isAxiosError(err)) {
         message.error(err.response?.data)
       }
-      console.log(err)
     }
   }
   useEffect(() => {
@@ -240,17 +239,17 @@ const Products = () => {
       dataIndex: 'count',
       key: 'count',
       render: (text, record, index) => (
-        <div style={{ whiteSpace: 'pre-wrap' }}>
+        <p style={{ whiteSpace: 'pre-wrap' }}>
           {remains_map.get(record._id)}
-        </div>
+        </p>
       ),
     },
     {
       title: 'Изменить/Удалить',
       dataIndex: 'name',
-      key: 'name',
+      key: 'edit',
       render: (text, record, index) => (
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <span style={{ display: 'flex', gap: '10px' }}>
           <Button
             onClick={() => {
               setEditedProductId(record._id)
@@ -285,7 +284,7 @@ const Products = () => {
             }}>
             <BarChartOutlined />
           </Button>
-        </div>
+        </span>
       ),
     },
   ])
@@ -339,7 +338,6 @@ const Products = () => {
           ],
         }
         setStatsData(new_stats)
-        console.log(new_stats)
       } catch (e) {
         if (axios.isAxiosError(e)) {
           message.error(e.response?.data)

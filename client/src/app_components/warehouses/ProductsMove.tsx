@@ -218,7 +218,10 @@ export default function ProductsMove() {
             <PlusCircleOutlined /> перемещение
           </Button>
         }>
-        <Table dataSource={products_move} columns={columns} />
+        <Table
+          dataSource={products_move?.map((x, i) => ({ ...x, key: i }))}
+          columns={columns}
+        />
       </Card>
     </>
   )

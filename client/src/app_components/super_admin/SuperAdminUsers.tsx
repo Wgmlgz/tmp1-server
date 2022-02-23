@@ -76,7 +76,10 @@ const SuperAdminUsers: FC = () => {
   return (
     <div style={{ display: 'grid', width: 'fit-content', gap: '20px' }}>
       <Card title='Список пользователей'>
-        <Table dataSource={users} columns={columns} />
+        <Table
+          dataSource={users?.map((x, i) => ({ ...x, key: i }))}
+          columns={columns}
+        />
       </Card>
     </div>
   )

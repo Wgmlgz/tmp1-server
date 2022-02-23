@@ -211,7 +211,10 @@ export default function ProductsIn() {
             <PlusCircleOutlined /> оприходование
           </Button>
         }>
-        <Table dataSource={products_in} columns={columns} />
+        <Table
+          dataSource={products_in?.map((x, i) => ({ ...x, key: i }))}
+          columns={columns}
+        />
       </Card>
     </>
   )

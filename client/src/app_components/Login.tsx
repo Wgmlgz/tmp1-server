@@ -15,7 +15,6 @@ const LoginForm: FC = () => {
     email: string
     password: string
   }) => {
-    console.log(email, password)
     try {
       const res = await login(email, password)
       setErrMsg('')
@@ -28,7 +27,6 @@ const LoginForm: FC = () => {
       }
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        console.log(err)
         setErrMsg(err.response?.data)
       }
     }

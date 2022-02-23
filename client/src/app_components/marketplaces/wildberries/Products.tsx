@@ -159,7 +159,10 @@ export default function WildberriesProducts() {
       />
       <br />
       <br />
-      <Table dataSource={searched_products as any} columns={columns} />
+      <Table
+        dataSource={searched_products?.map((x, i) => ({ ...x, key: i }))}
+        columns={columns}
+      />
       {/* <pre> {JSON.stringify(products, null, 2)}</pre> */}
     </Card>
   )

@@ -161,7 +161,7 @@ const ProductsListForm: FC<Props> = ({
     <ConfigProvider renderEmpty={() => ''}>
       <Table
         columns={columns}
-        dataSource={products}
+        dataSource={products?.map((x, i) => ({ ...x, key: i }))}
         footer={
           locked
             ? undefined

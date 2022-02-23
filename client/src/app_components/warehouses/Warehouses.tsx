@@ -103,7 +103,10 @@ export default function Warehouses() {
         </div>
         <div style={{ flexGrow: '1' }}>
           <Card title='Все склады'>
-            <Table dataSource={warehouses} columns={columns} />
+            <Table
+              dataSource={warehouses?.map((x, i) => ({ ...x, key: i }))}
+              columns={columns}
+            />
           </Card>
         </div>
       </div>

@@ -41,12 +41,9 @@ const Orders = () => {
   const [loading, setLoading] = useState(false)
 
   const fetchProducts = async (pagination: TablePaginationConfig) => {
-    console.log(pagination)
     setOrders({ orders: [], total: 0 })
     setLoading(true)
     try {
-      console.log(status)
-
       const res = await getWildberriesOrders(
         status,
         '2021-09-30T17:14:52+03:00',
@@ -59,10 +56,8 @@ const Orders = () => {
       if (axios.isAxiosError(err)) {
         message.error(err.response?.data)
       }
-      console.log(err)
     }
     setLoading(false)
-    console.log(pagination)
   }
 
   useEffect(() => {
@@ -200,14 +195,14 @@ const Orders = () => {
           }}>
           <TabPane tab='Новые заказы' key='new'>
             <Table
-              dataSource={orders.orders}
+              dataSource={orders.orders?.map((x, i) => ({ ...x, key: i }))}
               columns={columns}
               loading={loading}
             />
           </TabPane>
           <TabPane tab='На сборке' key='on_assembly'>
             <Table
-              dataSource={orders.orders}
+              dataSource={orders.orders?.map((x, i) => ({ ...x, key: i }))}
               columns={columns}
               loading={loading}
               pagination={pagination}
@@ -215,21 +210,21 @@ const Orders = () => {
           </TabPane>
           <TabPane tab='Активные заказы' key='active'>
             <Table
-              dataSource={orders.orders}
+              dataSource={orders.orders?.map((x, i) => ({ ...x, key: i }))}
               columns={columns}
               loading={loading}
             />
           </TabPane>
           <TabPane tab='Заказы в пути' key='on_delivery'>
             <Table
-              dataSource={orders.orders}
+              dataSource={orders.orders?.map((x, i) => ({ ...x, key: i }))}
               columns={columns}
               loading={loading}
             />
           </TabPane>
           <TabPane tab='Все' key='all'>
             <Table
-              dataSource={orders.orders}
+              dataSource={orders.orders?.map((x, i) => ({ ...x, key: i }))}
               columns={columns}
               loading={loading}
               pagination={{ ...pagination, pageSizeOptions: [100] }}

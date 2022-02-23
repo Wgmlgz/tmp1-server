@@ -29,16 +29,9 @@ const createAxiosResponseInterceptor = () => {
     response => response,
     async error => {
       const originalRequest = error.config
-      console.log(error.response.status, originalRequest._retry)
-
       if (error.response.status === 401 && !originalRequest._retry) {
-        console.log('trying')
-
         originalRequest._retry = true
         await refreshToken()
-        console.log('done')
-        console.log(originalRequest)
-
         return axios(originalRequest)
       }
       // axios.interceptors.response.eject(interceptor)
@@ -112,8 +105,6 @@ export const removeProduct = (id: string) =>
 
 const productToFormData = (product: IProduct) => {
   let fd = new FormData()
-
-  console.log(product.imgs)
 
   if (product.imgs) {
     Array.from(product.imgs).forEach(file => fd.append('imgs', file))

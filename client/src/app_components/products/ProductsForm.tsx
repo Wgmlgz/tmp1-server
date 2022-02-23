@@ -217,7 +217,6 @@ const ProductsForm: FC<Props> = ({
           ),
         })) ?? []
       )
-      console.log(files)
       setFileState((x: any) => ({
         ...x,
         fileList: [...x.fileList, ...files],
@@ -335,7 +334,10 @@ const ProductsForm: FC<Props> = ({
                       },
                     ]}
                     pagination={{ defaultPageSize: 10000 }}
-                    dataSource={marketplace_data}
+                    dataSource={marketplace_data?.map((x, i) => ({
+                      ...x,
+                      key: i,
+                    }))}
                   />
                 </Panel>
                 <Panel header='Описание' key='2'>
@@ -409,8 +411,6 @@ const ProductsForm: FC<Props> = ({
                           ...state,
                           fileList: [...state.fileList, file],
                         }))
-                        console.log(fileState.fileList)
-
                         return false
                       }}
                       onPreview={async (file: any) => {

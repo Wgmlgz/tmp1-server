@@ -45,12 +45,10 @@ export default function Settings() {
               )
               message.success('Обновлено')
             } catch (e) {
-              console.log(e)
               if (axios.isAxiosError(e)) {
                 message.error(e.response?.data)
               }
             }
-            console.log(e)
           }}>
           <WarehouseSelect
             label={'Склад отправки'}
@@ -98,11 +96,9 @@ export default function Settings() {
                 onClick={async () => {
                   try {
                     const res = await runRefreshOrders()
-                    console.log(res.data)
                     setMsg(JSON.stringify(res.data, null, 2))
                     message.success('Обновлено')
                   } catch (e) {
-                    console.log(e)
                     if (axios.isAxiosError(e)) {
                       message.error(e.response?.data)
                     }

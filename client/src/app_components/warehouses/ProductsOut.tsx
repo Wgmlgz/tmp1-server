@@ -204,7 +204,10 @@ export default function ProductsOut() {
             <PlusCircleOutlined /> списание
           </Button>
         }>
-        <Table dataSource={products_out} columns={columns} />
+        <Table
+          dataSource={products_out?.map((x, i) => ({ ...x, key: i }))}
+          columns={columns}
+        />
       </Card>
     </>
   )
