@@ -116,9 +116,7 @@ const productToFormData = (product: IProduct) => {
   console.log(product.imgs)
 
   if (product.imgs) {
-    Array.from(product.imgs).forEach(file =>
-      fd.append('imgs', file)
-    )
+    Array.from(product.imgs).forEach(file => fd.append('imgs', file))
   }
   ;[
     'type',
@@ -245,3 +243,8 @@ export const updateProductIn = (id: string, product_in: IProductIn) =>
   axios.patch(`${products_in_url}/${id}`, product_in)
 export const removeProductIn = (id: string) =>
   axios.delete(`${products_in_url}/${id}`)
+
+export const stats_url = `${url}/api/stats`
+
+export const getStats = (start: Date, end: Date, product: string) =>
+  axios.post(`${stats_url}`, { start, end, product })

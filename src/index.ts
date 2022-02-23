@@ -13,6 +13,7 @@ import products_in_routes from './routes/products_in'
 import products_out_routes from './routes/products_out'
 import products_move_routes from './routes/products_move'
 import wildberries_routes from './routes/wildberries'
+import stats_routes from './routes/stats'
 import cron from 'node-cron'
 import mongoose from 'mongoose'
 import cookieParser from 'cookie-parser'
@@ -47,6 +48,7 @@ app.use('/api/products_in', products_in_routes)
 app.use('/api/products_out', products_out_routes)
 app.use('/api/products_move', products_move_routes)
 app.use('/api/wildberries', wildberries_routes)
+app.use('/api/stats', stats_routes)
 
 // if (NODE_ENV === 'production') {
 //   app.use(express.static(path.join(__dirname, '../client/build')))
@@ -60,7 +62,7 @@ app.use('/api/wildberries', wildberries_routes)
 // }
 mongoose
   .connect(MONGO_CONNECTION_URL)
-  .then(() => {
+  .then(async () => {
     app.listen(PORT, () => {
       logger.info(`Mongo connection - OK`)
       logger.info(`server goes brrrrrr at ${PORT}`)
@@ -78,6 +80,9 @@ mongoose
         }
       }
     )
+
+          const res = await refreshOrders()
+
     cron.schedule(
       JSON.parse(fs.readFileSync('settings.json', 'utf8')).update_orders_cron,
       async () => {

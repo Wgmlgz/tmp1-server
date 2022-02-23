@@ -1,8 +1,11 @@
 import {
   Button,
   Card,
+  ConfigProvider,
+  DatePicker,
   Input,
   message,
+  Modal,
   Popconfirm,
   Select,
   Table,
@@ -14,13 +17,18 @@ import {
   getCategories,
   getProducts,
   getProductsCount,
+  getStats,
   getWarehouses,
   products_url,
   removeProducts,
   searchProducts,
   updateProduct,
 } from '../../api/api'
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
+import {
+  DeleteOutlined,
+  EditOutlined,
+  BarChartOutlined,
+} from '@ant-design/icons'
 import axios from 'axios'
 import { ColumnsType, TablePaginationConfig } from 'antd/lib/table'
 import { ICategory } from '../categories/Categories'
@@ -32,11 +40,24 @@ import reactStringReplace from 'react-string-replace'
 import { getRemains } from '../../api/api'
 import { IWarehouseFull } from '../warehouses/WarehouseForm'
 import FullscreenCard from '../FullscreenCard'
+import ru_RU from 'antd/lib/locale/ru_RU'
 
 import { exportProducts } from './Excel'
 import { promises } from 'stream'
 
-const { Title } = Typography
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js'
+import { Bar } from 'react-chartjs-2'
+import useColumns from '../../hooks/useColumns'
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 export const highlightText = (str: string, search: string) => (
   <div>
@@ -51,6 +72,7 @@ export const highlightText = (str: string, search: string) => (
 )
 
 const { Option } = Select
+const { RangePicker } = DatePicker
 
 interface IRemain {
   product: string
@@ -60,6 +82,7 @@ interface IRemain {
 
 const Products = () => {
   const [products, setProducts] = useState<IProductFull[]>([])
+
   const [product_creation, setProductCreation] = useState<boolean>(false)
   const [barcodes_creation, setBarcodesCreation] = useState('')
   const [categories, setCategories] = useState<string[]>([])
@@ -80,6 +103,19 @@ const Products = () => {
   const [pagination, setPagination] = useState<TablePaginationConfig>({})
   // fetch
   const [loading, setLoading] = useState(false)
+
+  const [stats, setStats] = useState<IProductFull>()
+  const [statsStart, setStatsStart] = useState(new Date())
+  const [statsEnd, setStatsEnd] = useState(new Date())
+
+  const [statsData, setStatsData] = useState<{
+    labels: string[]
+    datasets: {
+      label: string
+      data: number[]
+      backgroundColor: string
+    }[]
+  }>({ labels: [], datasets: [] })
 
   useEffect(() => {
     const set = new Set(selected_row_keys)
@@ -139,7 +175,7 @@ const Products = () => {
     fetchProducts()
   }, [])
 
-  const columns: ColumnsType<IProductFull> = [
+  const columns = useColumns<IProductFull>('main_products', [
     {
       title: 'Изображение',
       dataIndex: 'img',
@@ -177,7 +213,6 @@ const Products = () => {
         <p>{highlightText(record.name || '', search_query)}</p>
       ),
     },
-
     {
       title: 'Закупочная цена',
       dataIndex: 'buy_price',
@@ -244,10 +279,16 @@ const Products = () => {
               <DeleteOutlined />
             </Button>
           </Popconfirm>
+          <Button
+            onClick={() => {
+              setStats(record)
+            }}>
+            <BarChartOutlined />
+          </Button>
         </div>
       ),
     },
-  ]
+  ])
 
   const fetchProductsPagination = async (pagination: TablePaginationConfig) => {
     try {
@@ -272,6 +313,40 @@ const Products = () => {
     const res = await getProducts(1, 10000000)
     return res.data
   }
+
+  useEffect(() => {
+    ;(async () => {
+      if (!stats) return
+
+      try {
+        const res = await getStats(statsStart, statsEnd, stats?._id)
+        const data = res.data
+        const map = new Map<string, number>()
+        data.forEach(
+          ({ platform, amount }: { platform: string; amount: number }) => {
+            map.set(platform, (map.get(platform) ?? 0) + amount)
+          }
+        )
+        console.log(data)
+        const new_stats = {
+          labels: [...map.entries()].map(x => x[0]),
+          datasets: [
+            {
+              backgroundColor: '#ff5555',
+              data: [...map.entries()].map(x => x[1]),
+              label: stats.name,
+            },
+          ],
+        }
+        setStatsData(new_stats)
+        console.log(new_stats)
+      } catch (e) {
+        if (axios.isAxiosError(e)) {
+          message.error(e.response?.data)
+        }
+      }
+    })()
+  }, [stats, statsEnd, statsStart])
 
   return (
     <>
@@ -320,7 +395,7 @@ const Products = () => {
               gap: '20px',
               flexWrap: 'wrap',
             }}>
-            <Title level={2}>Все товары</Title>
+            <h2>Все товары</h2>
             <Popconfirm
               onCancel={() => {}}
               onConfirm={async () => {
@@ -487,6 +562,39 @@ const Products = () => {
           />
         </FullscreenCard>
       )}
+      <Modal
+        title='Статискика'
+        visible={!!stats}
+        onCancel={() => setStats(undefined)}
+        footer={null}>
+        <ConfigProvider locale={ru_RU}>
+          <RangePicker
+            onChange={e => {
+              if (!e) return
+              if (!e[0]) return
+              if (!e[1]) return
+              setStatsStart(e[0].toDate())
+              setStatsEnd(e[1].toDate())
+            }}
+          />
+        </ConfigProvider>
+
+        <Bar
+          options={{
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'top' as const,
+              },
+              title: {
+                display: true,
+                text: `Статиска по товару: '${stats?.name}'`,
+              },
+            },
+          }}
+          data={statsData}
+        />
+      </Modal>
     </>
   )
 }

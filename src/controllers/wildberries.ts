@@ -10,6 +10,7 @@ import moment from 'moment'
 import WBOrderModel from '../models/wb_orders'
 import { changeRemain, changeRemains } from './remains'
 import logger from '../util/logger'
+import StatsModel from '../models/stats'
 
 interface IWilbberriesProduct {
   barcode: string
@@ -413,6 +414,8 @@ export const refreshOrders = async () => {
       }
     })
   )
+  console.log(orders2save)
+  
   await Promise.allSettled(
     orders2save.map(async order => {
       try {
@@ -424,6 +427,20 @@ export const refreshOrders = async () => {
             product: id,
             quantity_add: -count,
           }))
+        )
+
+        await Promise.allSettled(
+          order.products.map(async ({ count, id }) => {
+            const new_stats = new StatsModel({
+              amount: count,
+              date: new Date(),
+              platform: 'wildberries',
+              product: id,
+            })
+            console.log(new_stats)
+
+            await new_stats.save()
+          })
         )
       } catch (err: any) {
         logger.error(err.message)
