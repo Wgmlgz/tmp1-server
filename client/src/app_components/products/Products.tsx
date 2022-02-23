@@ -9,7 +9,6 @@ import {
   Popconfirm,
   Select,
   Table,
-  Typography,
 } from 'antd'
 import { Key, useEffect, useState } from 'react'
 import {
@@ -30,7 +29,7 @@ import {
   BarChartOutlined,
 } from '@ant-design/icons'
 import axios from 'axios'
-import { ColumnsType, TablePaginationConfig } from 'antd/lib/table'
+import { TablePaginationConfig } from 'antd/lib/table'
 import { ICategory } from '../categories/Categories'
 import ProductsForm, { IProductFull } from './ProductsForm'
 import moment from 'moment'
@@ -239,9 +238,7 @@ const Products = () => {
       dataIndex: 'count',
       key: 'count',
       render: (text, record, index) => (
-        <p style={{ whiteSpace: 'pre-wrap' }}>
-          {remains_map.get(record._id)}
-        </p>
+        <p style={{ whiteSpace: 'pre-wrap' }}>{remains_map.get(record._id)}</p>
       ),
     },
     {

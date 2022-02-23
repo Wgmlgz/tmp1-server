@@ -200,6 +200,11 @@ export const runRefreshOrders = () =>
   axios.get(`${wildberries_url}/update_orders`)
 export const checkWildberriesConnection = () =>
   axios.get(`${wildberries_url}/check`, {})
+export const wbUpdateDiscount = (nmId: string, val: number) =>
+  axios.post(`${wildberries_url}/update_discount`, {
+    nmId,
+    val,
+  })
 
 export const remains_url = `${url}/api/remains`
 

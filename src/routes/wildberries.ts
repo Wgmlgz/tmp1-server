@@ -6,7 +6,8 @@ import {
   runUpdateWildberriesStocks,
   getWildberriesSettings,
   checkWildberriesConnection,
-  runRefreshOrdeers
+  runRefreshOrdeers,
+  updateDiscount
 } from '../controllers/wildberries'
 import { authenticateAdmin, authenticateSuperAdmin } from '../controllers/auth'
 
@@ -18,6 +19,7 @@ router.post('/settings', authenticateAdmin, updateWildberriesSettings)
 router.get('/settings', authenticateAdmin, getWildberriesSettings)
 router.get('/update', authenticateAdmin, runUpdateWildberriesStocks)
 router.get('/update_orders', authenticateAdmin, runRefreshOrdeers)
+router.post('/update_discount', authenticateAdmin, updateDiscount)
 router.get('/check', authenticateAdmin, checkWildberriesConnection)
 
 export default router

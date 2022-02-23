@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import e, { Request, Response } from 'express'
 import Warehouse, { IWarehouse } from '../models/warehouse'
 import mongoose from 'mongoose'
 import { WB_WAREHOUSE_ID, WILDBERRIES_URL } from '../config/env'
@@ -303,7 +303,7 @@ export const runUpdateWildberriesStocks = async (
     res.status(200).json(ans)
   } catch (err: any) {
     logger.error(err.message)
-    res.status(200).json(err.message)
+    res.status(400).json(err.message)
   }
 }
 
@@ -415,7 +415,7 @@ export const refreshOrders = async () => {
     })
   )
   console.log(orders2save)
-  
+
   await Promise.allSettled(
     orders2save.map(async order => {
       try {
@@ -459,6 +459,49 @@ export const runRefreshOrdeers = async (req: Request, res: Response) => {
     res.status(200).json(ans)
   } catch (err: any) {
     logger.error(err.message)
-    res.status(200).json(err.message)
+    res.status(400).json(err.message)
+  }
+}
+
+export const updateDiscount = async (req: Request, res: Response) => {
+  try {
+    const setting = JSON.parse(fs.readFileSync('settings.json', 'utf8'))
+    const WILDBERRIES_API_KEY = setting.api_key
+    const wb_header = { headers: { Authorization: WILDBERRIES_API_KEY } }
+
+    const { nmId, val } = req.body
+    if (val) {
+      console.log([
+        {
+          discount: Number(val),
+          nm: Number(nmId),
+        },
+      ])
+      
+      const ans = await axios.post(
+        `${WILDBERRIES_URL}/public/api/v1/updateDiscounts`,
+        [
+          {
+            discount: Number(val),
+            nm: Number(nmId),
+          },
+        ],
+        wb_header
+      )
+      console.log(ans.data)
+
+      res.status(200).json(ans.data)
+    } else {
+      const ans = await axios.post(
+        `${WILDBERRIES_URL}/public/api/v1/revokeDiscounts`,
+        [Number(nmId)],
+        wb_header
+      )
+      console.log(ans.data)
+      res.status(200).json(ans.data)
+    }
+  } catch (err: any) {
+    logger.error(err.message)
+    res.status(400).json(err.message)
   }
 }

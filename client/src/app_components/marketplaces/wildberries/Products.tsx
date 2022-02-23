@@ -1,12 +1,22 @@
-import { AutoComplete, Card, message, Table } from 'antd'
+import {
+  AutoComplete,
+  Button,
+  Card,
+  Input,
+  message,
+  Popover,
+  Table,
+} from 'antd'
 import { ColumnsType } from 'antd/lib/table'
 import axios, { AxiosResponse } from 'axios'
-import React, { useEffect, useState } from 'react'
-import { products_url } from '../../../api/api'
+import React, { Key, useEffect, useState } from 'react'
+import { products_url, wbUpdateDiscount } from '../../../api/api'
 import { getWildBerriesProducts } from '../../../api/api'
 import useColumns from '../../../hooks/useColumns'
 import { highlightText } from '../../products/Products'
-
+import { EditOutlined } from '@ant-design/icons'
+import Barcodes from '../../products/Barcodes'
+import FullscreenCard from '../../FullscreenCard'
 interface IWilbberriesProduct {
   barcode: string
   article: string
@@ -26,9 +36,16 @@ interface IWilbberriesProduct {
 // }
 
 export default function WildberriesProducts() {
-  const [products, setProducts] = useState<IWilbberriesProduct[]>()
-  const [searched_products, setSearchedProducts] =
-    useState<IWilbberriesProduct[]>()
+  const [selected_products, setSelectedProducts] = useState<
+    IWilbberriesProduct[]
+  >([])
+  const [selected_row_keys, setSelectedRowKeys] = useState<Key[]>([])
+  const [barcodes_creation, setBarcodesCreation] = useState('')
+
+  const [products, setProducts] = useState<IWilbberriesProduct[]>([])
+  const [searched_products, setSearchedProducts] = useState<
+    IWilbberriesProduct[]
+  >([])
   const [searched_product, setSearchedProduct] = useState('')
   const setup = async () => {
     try {
@@ -45,6 +62,13 @@ export default function WildberriesProducts() {
   useEffect(() => {
     setup()
   }, [])
+
+  useEffect(() => {
+    const set = new Set(selected_row_keys)
+    setSelectedProducts(
+      searched_products.filter(product => set.has(product.nmId))
+    )
+  }, [products, selected_row_keys])
 
   const columns = useColumns<IWilbberriesProduct>(
     'wb_products',
@@ -110,7 +134,50 @@ export default function WildberriesProducts() {
         dataIndex: 'discount',
         key: 'discount',
         sorter: (a, b) => Number(a.discount) - Number(b.discount),
-        render: (text, record, index) => <p>{record.discount}%</p>,
+        render: (text, record, index) => (
+          <span>
+            <Popover
+              placement='left'
+              content={
+                <form
+                  onSubmit={async (e: any) => {
+                    e.preventDefault()
+                    const val: number = Number(e.target.val.value)
+                    console.log(val)
+                    try {
+                      const res = await wbUpdateDiscount(record.nmId, val)
+                      console.log(res.data)
+                      message.success('Скидка обновлена')
+                      setup()
+                    } catch (err) {
+                      if (axios.isAxiosError(err)) {
+                        message.error(err.response?.data)
+                      }
+                    }
+                  }}>
+                  <Input.Group compact>
+                    <Input
+                      type='number'
+                      defaultValue={record.discount}
+                      min={0}
+                      max={100}
+                      name='val'
+                      style={{ width: 'calc(100% - 100px)' }}
+                      addonAfter='%'
+                    />
+                    <Button htmlType='submit' type='primary'>
+                      Сохранить
+                    </Button>
+                  </Input.Group>
+                </form>
+              }>
+              {record.discount}%{' '}
+              <Button>
+                <EditOutlined />
+              </Button>
+            </Popover>
+          </span>
+        ),
       },
       {
         title: 'Цена со скидкой на wb',
@@ -146,24 +213,57 @@ export default function WildberriesProducts() {
   }, [searched_product])
 
   return (
-    <Card>
-      <AutoComplete
-        style={{
-          width: 600,
-        }}
-        onSearch={e => {
-          setSearchedProduct(e)
-          console.log(e)
-        }}
-        placeholder='поиск'
-      />
-      <br />
-      <br />
-      <Table
-        dataSource={searched_products?.map((x, i) => ({ ...x, key: i }))}
-        columns={columns}
-      />
-      {/* <pre> {JSON.stringify(products, null, 2)}</pre> */}
-    </Card>
+    <>
+      {barcodes_creation && (
+        <FullscreenCard
+          onCancel={() => {
+            setBarcodesCreation('')
+          }}>
+          <Barcodes
+            barcodes={selected_products.map(product => ({
+              article: product.article,
+              barcode: product.barcode,
+              name: product.name,
+            }))}
+          />
+        </FullscreenCard>
+      )}
+      <Card>
+        <div style={{ display: 'flex', gap: '20px' }}>
+          <AutoComplete
+            style={{
+              width: 600,
+            }}
+            onSearch={e => {
+              setSearchedProduct(e)
+              console.log(e)
+            }}
+            placeholder='поиск'
+          />
+          <Button
+            type='primary'
+            onClick={() => {
+              setBarcodesCreation('barcodes')
+            }}>
+            Напечатать штрихкоды
+          </Button>
+        </div>
+        <br />
+        <Table
+          rowSelection={{
+            selectedRowKeys: selected_row_keys,
+            onChange: selectedRowKeys => {
+              setSelectedRowKeys(selectedRowKeys)
+            },
+          }}
+          dataSource={searched_products?.map((x, i) => ({
+            ...x,
+            key: x.nmId,
+          }))}
+          columns={columns}
+        />
+        {/* <pre> {JSON.stringify(products, null, 2)}</pre> */}
+      </Card>
+    </>
   )
 }
