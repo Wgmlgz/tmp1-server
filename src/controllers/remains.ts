@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import NotificationModel from '../models/notification'
 import Remain from '../models/remains'
 import logger from '../util/logger'
 
@@ -39,6 +40,14 @@ export const changeRemain = async (
   if (!remain) {
     Remain.create({ warehouse, product, quantity: quantity_add })
     return
+  }
+  if (remain.quantity + quantity_add <= 999999999) {
+    const notification = new NotificationModel({
+      date: new Date(),
+      product,
+      warehouse,
+    })
+    await notification.save()
   }
   await Remain.findByIdAndUpdate(
     remain.id,

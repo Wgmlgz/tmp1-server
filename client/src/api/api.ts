@@ -244,3 +244,9 @@ export const stats_url = `${url}/api/stats`
 
 export const getStats = (start: Date, end: Date, product: string) =>
   axios.post(`${stats_url}`, { start, end, product })
+
+export const notifications_url = `${url}/api/notifications`
+
+export const getNotifications = () => axios.get(`${notifications_url}`)
+export const removeNotification = (id: string) =>
+  axios.delete(`${products_url}/remove/${id}`)

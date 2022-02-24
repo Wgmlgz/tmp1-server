@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import 'antd/dist/antd.css'
-import { Button, Layout, Menu, message } from 'antd'
+import { Badge, Button, Layout, Menu, message } from 'antd'
 import {
   UnorderedListOutlined,
   UserOutlined,
@@ -22,6 +22,8 @@ import Import from './excel/Import'
 import WildberriesProducts from './marketplaces/wildberries/Products'
 import Settings from './marketplaces/wildberries/Settings'
 import Orders from './marketplaces/wildberries/Orders'
+import Notifications from './notifications/Notifications'
+import { NotificationFilled } from '@ant-design/icons'
 
 const { Header, Content, Sider } = Layout
 const { SubMenu } = Menu
@@ -60,15 +62,33 @@ export default function Dashboard() {
             placeItems: 'center',
             gap: '20px',
           }}>
-          <div style={{ fontWeight: 'bold', color: 'white', fontSize: '2em' }}>
+          <div
+            style={{
+              fontWeight: 'bold',
+              color: 'white',
+              fontSize: '2em',
+              flexGrow: 1,
+            }}>
             MIRACLUS
           </div>
+          <Link
+            to='/dashboard/notifications'
+            style={{
+              backgroundColor: '#ffffff',
+              paddingLeft: '15px',
+              paddingRight: '15px',
+            }}>
+            <Badge count={6}>
+              <div style={{ margin: '10px' }}>
+                <NotificationFilled />
+              </div>
+            </Badge>
+          </Link>
           <div
             style={{
               fontWeight: 'bold',
               color: 'white',
               fontSize: '1.2em',
-              marginLeft: 'auto',
             }}>
             {user.email}
           </div>
@@ -148,6 +168,7 @@ export default function Dashboard() {
         <Content style={{ margin: '20px' }}>
           <div>
             <Routes>
+              <Route path='/notifications' element={<Notifications />} />
               <Route path='/categories' element={<Categories />} />
               <Route path='/users' element={<SuperAdminUsers />} />
               <Route path='/products' element={<Products />} />
