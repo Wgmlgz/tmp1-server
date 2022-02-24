@@ -41,7 +41,7 @@ export const changeRemain = async (
     Remain.create({ warehouse, product, quantity: quantity_add })
     return
   }
-  if (remain.quantity + quantity_add <= 999999999) {
+  if (remain.quantity + quantity_add <= 0) {
     const notification = new NotificationModel({
       date: new Date(),
       product,
