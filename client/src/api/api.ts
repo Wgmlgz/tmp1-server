@@ -249,4 +249,4 @@ export const notifications_url = `${url}/api/notifications`
 
 export const getNotifications = () => axios.get(`${notifications_url}`)
 export const removeNotification = (id: string) =>
-  axios.delete(`${products_url}/remove/${id}`)
+  axios.delete(`${notifications_url}/${id}`)

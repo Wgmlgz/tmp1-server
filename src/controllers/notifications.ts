@@ -6,11 +6,16 @@ import ProductModel from '../models/product'
 
 export const getNotifications = async (req: Request, res: Response) => {
   try {
-    const notifications = await Promise.all((await NotificationModel.find({})).map(async notification => ({
-      product: await ProductModel.findById(notification.product),
-      warehouse: await ProductModel.findById(notification.warehouse),
-      date: notification.date
-    })))
+    const notifications = await Promise.all(
+      (
+        await NotificationModel.find({})
+      ).map(async notification => ({
+        product: await ProductModel.findById(notification.product),
+        warehouse: await ProductModel.findById(notification.warehouse),
+        date: notification.date,
+        id: notification.id,
+      }))
+    )
     res.status(200).json(notifications)
   } catch (err: any) {
     logger.error(err.message)

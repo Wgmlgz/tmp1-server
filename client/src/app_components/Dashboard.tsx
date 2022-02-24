@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import 'antd/dist/antd.css'
-import { Badge, Button, Layout, Menu, message } from 'antd'
+import { Badge, Button, Layout, Menu, message, notification } from 'antd'
 import {
   UnorderedListOutlined,
   UserOutlined,
   AppstoreOutlined,
   ImportOutlined,
 } from '@ant-design/icons'
-import { getUser, logout } from '../api/api'
+import { getNotifications, getUser, logout } from '../api/api'
 import SuperAdminUsers from './super_admin/SuperAdminUsers'
 import { Route, Link, Routes } from 'react-router-dom'
 import Categories from './categories/Categories'
@@ -24,6 +24,7 @@ import Settings from './marketplaces/wildberries/Settings'
 import Orders from './marketplaces/wildberries/Orders'
 import Notifications from './notifications/Notifications'
 import { NotificationFilled } from '@ant-design/icons'
+import axios from 'axios'
 
 const { Header, Content, Sider } = Layout
 const { SubMenu } = Menu
@@ -31,6 +32,21 @@ const { SubMenu } = Menu
 export default function Dashboard() {
   const [collapsed, setCollapsed] = useState(false)
   const [user, setUser] = useState<any>('loading...')
+  const [notifications, setNotifications] = useState<Notification[]>([])
+
+  const fetchNotifications = async () => {
+    try {
+      const res = await getNotifications()
+      setNotifications(res.data)
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        message.error(err.response?.data)
+      }
+    }
+  }
+  useEffect(() => {
+    fetchNotifications()
+  }, [])
 
   const setup = useCallback(async () => {
     try {
@@ -78,7 +94,7 @@ export default function Dashboard() {
               paddingLeft: '15px',
               paddingRight: '15px',
             }}>
-            <Badge count={6}>
+            <Badge count={notifications.length}>
               <div style={{ margin: '10px' }}>
                 <NotificationFilled />
               </div>

@@ -1,26 +1,31 @@
-import { Card, message, Table } from 'antd'
+import { Button, Card, message, Table } from 'antd'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
-import { getNotifications, products_url } from '../../api/api'
+import {
+  getNotifications,
+  products_url,
+  removeNotification,
+} from '../../api/api'
 import useColumns from '../../hooks/useColumns'
 import { IProduct, IProductFull } from '../products/ProductsForm'
 import { IWarehouseFull } from '../warehouses/WarehouseForm'
+import { WarningOutlined, DeleteOutlined } from '@ant-design/icons'
+import moment from 'moment'
 
 interface INotification {
   product: IProductFull
   warehouse: IWarehouseFull
   date: string
+  id: string
 }
+
 const Notifications = () => {
   const [notifications, setNotifications] = useState<INotification[]>([])
-  const [loading, setLoading] = useState(false)
 
   const fetchNotifications = async () => {
     try {
-      setLoading(true)
       const res = await getNotifications()
       setNotifications(res.data)
-      setLoading(false)
     } catch (err) {
       if (axios.isAxiosError(err)) {
         message.error(err.response?.data)
@@ -32,7 +37,7 @@ const Notifications = () => {
     {
       title: 'Изображение',
       dataIndex: 'img',
-      key: 'type',
+      key: 'img',
       render: (text, record, index) =>
         record.product.imgs_small &&
         record.product.imgs_small[0] && (
@@ -60,6 +65,34 @@ const Notifications = () => {
       key: 'name',
       sorter: (a, b) => a.product.name.localeCompare(b.product.name),
     },
+    {
+      title: 'Время',
+      dataIndex: 'date',
+      key: 'name',
+      sorter: (a, b) => moment(a.date).unix() - moment(b.date).unix(),
+      render: (a, b, c) => <p>{moment(b.date).format('MM-D HH:mm')}</p>,
+    },
+    {
+      title: 'Удалить',
+      dataIndex: 'remove',
+      key: 'remove',
+      render: (a, b, c) => (
+        <Button
+          onClick={async () => {
+            try {
+              await removeNotification(b.id)
+              await fetchNotifications()
+              message.success('Удалено')
+            } catch (err) {
+              if (axios.isAxiosError(err)) {
+                message.error(err.response?.data)
+              }
+            }
+          }}>
+          <DeleteOutlined />
+        </Button>
+      ),
+    },
   ])
 
   useEffect(() => {
@@ -68,14 +101,18 @@ const Notifications = () => {
 
   return (
     <div style={{ width: '100%' }}>
-      <Card>
+      <Card
+        title={
+          <p style={{ color: 'orange', fontSize: '30px' }}>
+            <WarningOutlined /> Недостаточно товаров
+          </p>
+        }>
         <Table
           dataSource={notifications.map((t, id) => ({ ...t, key: id }))}
           columns={columns}
-          loading={loading}
         />
       </Card>
-      <pre>{JSON.stringify(notifications, null, 2)}</pre>
+      {/* <pre>{JSON.stringify(notifications, null, 2)}</pre> */}
     </div>
   )
 }
