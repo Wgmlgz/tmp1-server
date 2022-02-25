@@ -3,6 +3,7 @@ import NotificationModel from '../models/notification'
 import logger from '../util/logger'
 import mongoose from 'mongoose'
 import ProductModel from '../models/product'
+import WarehouseModel from '../models/warehouse'
 
 export const getNotifications = async (req: Request, res: Response) => {
   try {
@@ -11,7 +12,7 @@ export const getNotifications = async (req: Request, res: Response) => {
         await NotificationModel.find({})
       ).map(async notification => ({
         product: await ProductModel.findById(notification.product),
-        warehouse: await ProductModel.findById(notification.warehouse),
+        warehouse: await WarehouseModel.findById(notification.warehouse),
         date: notification.date,
         id: notification.id,
       }))

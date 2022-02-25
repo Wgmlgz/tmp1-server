@@ -7,7 +7,7 @@ import {
   removeNotification,
 } from '../../api/api'
 import useColumns from '../../hooks/useColumns'
-import { IProduct, IProductFull } from '../products/ProductsForm'
+import { IProductFull } from '../products/ProductsForm'
 import { IWarehouseFull } from '../warehouses/WarehouseForm'
 import { WarningOutlined, DeleteOutlined } from '@ant-design/icons'
 import moment from 'moment'
@@ -73,6 +73,11 @@ const Notifications = () => {
       render: (a, b, c) => <p>{moment(b.date).format('MM-D HH:mm')}</p>,
     },
     {
+      title: 'Склад',
+      dataIndex: ['warehouse', 'name'],
+      key: 'warehouse',
+    },
+    {
       title: 'Удалить',
       dataIndex: 'remove',
       key: 'remove',
@@ -112,7 +117,7 @@ const Notifications = () => {
           columns={columns}
         />
       </Card>
-      {/* <pre>{JSON.stringify(notifications, null, 2)}</pre> */}
+      <pre>{JSON.stringify(notifications, null, 2)}</pre>
     </div>
   )
 }

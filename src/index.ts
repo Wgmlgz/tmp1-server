@@ -62,6 +62,7 @@ app.use('/api/notifications', notifications_routes)
 //     res.sendFile(path.join(__dirname, '../client/build', 'index.html'))
 //   })
 // }
+
 mongoose
   .connect(MONGO_CONNECTION_URL)
   .then(async () => {
@@ -82,9 +83,6 @@ mongoose
         }
       }
     )
-
-    const res = await refreshOrders()
-
     cron.schedule(
       JSON.parse(fs.readFileSync('settings.json', 'utf8')).update_orders_cron,
       async () => {

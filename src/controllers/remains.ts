@@ -48,6 +48,8 @@ export const changeRemain = async (
       warehouse,
     })
     await notification.save()
+  } else {
+    await NotificationModel.deleteMany({ product, warehouse })
   }
   await Remain.findByIdAndUpdate(
     remain.id,

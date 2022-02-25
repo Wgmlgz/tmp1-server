@@ -111,7 +111,7 @@ export default function ProductsIn() {
           content={
             <ProductsInForm
               onCancel={() => setProductInCreation(false)}
-              header='Списание'
+              header='Оприходование'
               button='Создать новое списание'
               product_in={record}
             />

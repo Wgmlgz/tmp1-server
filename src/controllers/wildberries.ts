@@ -57,6 +57,7 @@ export const getWildberriesProducts = async (req: Request, res: Response) => {
       item.buy_price = db_product.buy_price
       item.delivery_price = db_product.delivery_price
       item.article = db_product.article
+      item.color = db_product.color
     })
 
     res.status(200).json(table)
@@ -221,10 +222,11 @@ export const getWildberriesOrders = async (req: Request, res: Response) => {
       const db_product = db_products.get(item.barcode)
       if (!db_product) return
 
-      item.name = db_product.name
       db_product.imgs_small && (item.img = db_product.imgs_small[0])
+      item.name = db_product.name
       item.brand = db_product.brand
       item.article = db_product.article
+      item.color = db_product.color
     })
 
     res.status(200).send(orders)

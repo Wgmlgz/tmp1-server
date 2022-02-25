@@ -5,9 +5,9 @@ import {
   Input,
   message,
   Popover,
+  Select,
   Table,
 } from 'antd'
-import { ColumnsType } from 'antd/lib/table'
 import axios, { AxiosResponse } from 'axios'
 import React, { Key, useEffect, useState } from 'react'
 import { products_url, wbUpdateDiscount } from '../../../api/api'
@@ -20,6 +20,7 @@ import FullscreenCard from '../../FullscreenCard'
 interface IWilbberriesProduct {
   barcode: string
   article: string
+  color: string
   sell_price: string
   price: number
   discount: number
@@ -34,6 +35,7 @@ interface IWilbberriesProduct {
 //   stocks: IWilbberriesProduct[]
 //   total: number
 // }
+const { Option } = Select
 
 export default function WildberriesProducts() {
   const [selected_products, setSelectedProducts] = useState<
@@ -68,6 +70,7 @@ export default function WildberriesProducts() {
     setSelectedProducts(
       searched_products.filter(product => set.has(product.nmId))
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [products, selected_row_keys])
 
   const columns = useColumns<IWilbberriesProduct>(
@@ -103,13 +106,14 @@ export default function WildberriesProducts() {
         title: 'Цена доставки',
         dataIndex: 'delivery_price',
         key: 'delivery_price',
-        sorter: (a, b) => Number(a.delivery_price) - Number(b.delivery_price),
+        sorter: (a, b) =>
+          Number(a.delivery_price || 0) - Number(b.delivery_price || 0),
       },
       {
         title: 'Закупочная цена',
         dataIndex: 'buy_price',
         key: 'buy_price',
-        sorter: (a, b) => Number(a.buy_price) - Number(b.buy_price),
+        sorter: (a, b) => Number(a.buy_price || 0) - Number(b.buy_price || 0),
       },
       {
         title: 'Штрихкод на wb',
@@ -210,6 +214,7 @@ export default function WildberriesProducts() {
           r.test(String(product.nmId))
       )
     )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searched_product])
 
   return (
@@ -220,11 +225,19 @@ export default function WildberriesProducts() {
             setBarcodesCreation('')
           }}>
           <Barcodes
-            barcodes={selected_products.map(product => ({
-              article: product.article,
-              barcode: product.barcode,
-              name: product.name,
-            }))}
+            barcodes={
+              barcodes_creation === 'barcodes wb'
+                ? selected_products.map(product => ({
+                    article: product.article,
+                    barcode: product.barcode,
+                    name: product.name,
+                  }))
+                : selected_products.map(product => ({
+                    article: product.article,
+                    barcode: product.barcode,
+                    name: product.name,
+                  }))
+            }
           />
         </FullscreenCard>
       )}
@@ -247,6 +260,23 @@ export default function WildberriesProducts() {
             }}>
             Напечатать штрихкоды
           </Button>
+          <Select
+            style={{ width: 300 }}
+            value={'Напечатать штрихкоды'}
+            onSelect={async (e: any) => {
+              if (e === 'barcodes all') {
+                // await fetchAllProducts()
+              }
+              setBarcodesCreation(e)
+            }}>
+            <Option value='barcodes'>Напечатать штрихкоды</Option>
+            <Option value='barcodes all'>
+              Напечатать штрихкоды всех товаров
+            </Option>
+            <Option value='barcodes wb'>
+              Напечатать штрихкоды Wildberries FB
+            </Option>
+          </Select>
         </div>
         <br />
         <Table

@@ -1,6 +1,7 @@
 import ExcelJS from 'exceljs'
 import { IProductFull } from './ProductsForm'
 import { saveAs } from 'file-saver'
+import { products_url } from '../../api/api'
 
 async function saveFile(fileName: string, workbook: ExcelJS.Workbook) {
   const xls64 = await workbook.xlsx.writeBuffer({ base64: true } as any)
@@ -54,8 +55,12 @@ export const exportProducts = (selected_products: IProductFull[]) => {
       videos: product.videos?.join('; '),
       tags: product.tags?.join('; '),
       imgs: product.imgs?.join('; '),
-      imgs_big: product.imgs_big?.join('; '),
-      imgs_small: product.imgs_small?.join('; '),
+      imgs_big: product.imgs_big
+        .map((x: string) => `${products_url}/img/${x}`)
+        ?.join('; '),
+      imgs_small: product.imgs_small
+        .map((x: string) => `${products_url}/img/${x}`)
+        ?.join('; '),
     })
   })
   saveFile('exported_products.xls', workbook)

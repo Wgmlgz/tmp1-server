@@ -1,6 +1,5 @@
 import axios from 'axios'
 import { login, register } from '../api/api'
-import 'antd/dist/antd.css'
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
 
 import { Form, Input, Button, Alert } from 'antd'

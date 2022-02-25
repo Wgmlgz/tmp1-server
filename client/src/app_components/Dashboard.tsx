@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react'
-import 'antd/dist/antd.css'
 import { Badge, Button, Layout, Menu, message, notification } from 'antd'
 import {
   UnorderedListOutlined,

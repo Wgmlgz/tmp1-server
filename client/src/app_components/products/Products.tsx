@@ -136,10 +136,6 @@ const Products = () => {
         pagination.current ?? 0,
         pagination.pageSize ?? 10
       )
-      setPagination({ ...pagination, total: (await getProductsCount()).data })
-      setSearchQuery('')
-      setProducts(res.data)
-
       const res_warehouses = await getWarehouses()
       const warehouses_map = new Map<string, string>(
         res_warehouses.data.map((warehouse: IWarehouseFull) => [
@@ -159,6 +155,12 @@ const Products = () => {
         map.set(remain.product, old ? `${old}\n${str}` : str)
       })
       setRemainsMap(map)
+      setPagination({
+        ...pagination,
+        total: (await getProductsCount()).data,
+      })
+      setSearchQuery('')
+      setProducts(res.data)
     } catch (err) {
       if (axios.isAxiosError(err)) {
         message.error(err.response?.data)
@@ -237,9 +239,6 @@ const Products = () => {
       title: 'Количество',
       dataIndex: 'count',
       key: 'count',
-      render: (text, record, index) => (
-        <p style={{ whiteSpace: 'pre-wrap' }}>{remains_map.get(record._id)}</p>
-      ),
     },
     {
       title: 'Изменить/Удалить',
@@ -287,8 +286,8 @@ const Products = () => {
   ])
 
   const fetchProductsPagination = async (pagination: TablePaginationConfig) => {
+    setLoading(true)
     try {
-      setLoading(true)
       const res = await getProducts(
         pagination.current ?? 1,
         pagination.pageSize ?? 10
@@ -301,8 +300,12 @@ const Products = () => {
       })
 
       setProducts(res.data)
-      setLoading(false)
-    } catch (err) {}
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        message.error(err.response?.data)
+      }
+    }
+    setLoading(false)
   }
 
   const fetchAllProducts = async () => {
@@ -488,7 +491,16 @@ const Products = () => {
                 setSelectedRowKeys(selectedRowKeys)
               },
             }}
-            dataSource={active_products.map(t => ({ ...t, key: t._id }))}
+            // dataSource={active_products.map(t => ({ ...t, key: t._id }))}
+            dataSource={active_products.map(t => ({
+              ...t,
+              key: t._id,
+              count: (
+                <p style={{ whiteSpace: 'pre-wrap' }}>
+                  {remains_map.get(t._id)}
+                </p>
+              ),
+            }))}
             columns={columns}
             loading={loading}
             pagination={{

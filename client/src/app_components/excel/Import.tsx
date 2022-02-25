@@ -1,8 +1,7 @@
 import { Button, Card, message, Popover, Progress, Table } from 'antd'
 import { ColumnsType } from 'antd/lib/table'
 import axios from 'axios'
-import ExcelJS, { Csv } from 'exceljs'
-import { ReadableWebToNodeStream } from 'readable-web-to-node-stream'
+import ExcelJS from 'exceljs'
 import moment from 'moment'
 import { FC, useEffect, useRef, useState } from 'react'
 import { createExcelProducts, getExcelImports } from '../../api/api'
@@ -15,11 +14,7 @@ interface IImport {
   failed: number
 }
 
-export const importProducts = (
-  e: any,
-  onDone: (products: any) => any,
-  isCSV: boolean
-) => {
+export const importProducts = (e: any, onDone: (products: any) => any) => {
   const files = e.target.files
   if (!files) return
   const file = files[0]
@@ -33,14 +28,7 @@ export const importProducts = (
     try {
       const buffer = reader.result
 
-      if (isCSV) {
-        const stream = new ReadableWebToNodeStream(
-          file.stream()
-        ) as unknown as Parameters<Csv['read']>[0]
-        await wb.csv.read(stream)
-      } else {
-        await wb.xlsx.load(buffer as any)
-      }
+      await wb.xlsx.load(buffer as any)
 
       const products: any[] = []
 
@@ -80,7 +68,6 @@ export const importProducts = (
 const Page: FC = () => {
   const hiddenFileInputXLS = useRef<HTMLInputElement>(null)
 
-  const [da, setDa] = useState<any>()
   const [imports, setImports] = useState<IImport[]>([])
 
   const columns: ColumnsType<IImport> = [
@@ -203,7 +190,6 @@ const Page: FC = () => {
         delete product.imgs
         delete product.imgs_small
       })
-      setDa(products)
 
       await createExcelProducts(products)
       await fetchImports()
@@ -224,7 +210,7 @@ const Page: FC = () => {
         name='fileXLS'
         value={''}
         style={{ display: 'none' }}
-        onInput={e => importProducts(e, processProducts, false)}
+        onInput={e => importProducts(e, processProducts)}
         // style={{ display: 'none' }}
       />
       <Card>

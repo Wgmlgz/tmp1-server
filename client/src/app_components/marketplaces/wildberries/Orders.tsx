@@ -27,7 +27,6 @@ const Orders = () => {
     total: 0,
   })
   const [status, setStatus] = useState('new')
-  const [startDate, setStartDate] = useState(new Date())
 
   const defaultPagination = useMemo(
     () => ({
@@ -38,11 +37,9 @@ const Orders = () => {
   )
   const [pagination, setPagination] =
     useState<TablePaginationConfig>(defaultPagination)
-  const [loading, setLoading] = useState(false)
 
   const fetchProducts = async (pagination: TablePaginationConfig) => {
     setOrders({ orders: [], total: 0 })
-    setLoading(true)
     try {
       const res = await getWildberriesOrders(
         status,
@@ -57,11 +54,11 @@ const Orders = () => {
         message.error(err.response?.data)
       }
     }
-    setLoading(false)
   }
 
   useEffect(() => {
     fetchProducts(pagination)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const columns: ColumnsType<IOrder> = useColumns('wb_orders', [
     {
@@ -180,6 +177,7 @@ const Orders = () => {
 
   useEffect(() => {
     fetchProducts(pagination)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status])
 
   return (
@@ -197,36 +195,46 @@ const Orders = () => {
             <Table
               dataSource={orders.orders?.map((x, i) => ({ ...x, key: i }))}
               columns={columns}
-              loading={loading}
+              pagination={{ ...pagination, pageSizeOptions: [100] }}
+              onChange={pagination => {
+                fetchProducts(pagination)
+              }}
             />
           </TabPane>
           <TabPane tab='На сборке' key='on_assembly'>
             <Table
               dataSource={orders.orders?.map((x, i) => ({ ...x, key: i }))}
               columns={columns}
-              loading={loading}
-              pagination={pagination}
+              pagination={{ ...pagination, pageSizeOptions: [100] }}
+              onChange={pagination => {
+                fetchProducts(pagination)
+              }}
             />
           </TabPane>
           <TabPane tab='Активные заказы' key='active'>
             <Table
               dataSource={orders.orders?.map((x, i) => ({ ...x, key: i }))}
               columns={columns}
-              loading={loading}
+              pagination={{ ...pagination, pageSizeOptions: [100] }}
+              onChange={pagination => {
+                fetchProducts(pagination)
+              }}
             />
           </TabPane>
           <TabPane tab='Заказы в пути' key='on_delivery'>
             <Table
               dataSource={orders.orders?.map((x, i) => ({ ...x, key: i }))}
               columns={columns}
-              loading={loading}
+              pagination={{ ...pagination, pageSizeOptions: [100] }}
+              onChange={pagination => {
+                fetchProducts(pagination)
+              }}
             />
           </TabPane>
           <TabPane tab='Все' key='all'>
             <Table
               dataSource={orders.orders?.map((x, i) => ({ ...x, key: i }))}
               columns={columns}
-              loading={loading}
               pagination={{ ...pagination, pageSizeOptions: [100] }}
               onChange={pagination => {
                 fetchProducts(pagination)
