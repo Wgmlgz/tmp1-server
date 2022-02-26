@@ -42,7 +42,6 @@ import FullscreenCard from '../FullscreenCard'
 import ru_RU from 'antd/lib/locale/ru_RU'
 
 import { exportProducts } from './Excel'
-import { promises } from 'stream'
 
 import {
   Chart as ChartJS,
@@ -101,7 +100,7 @@ const Products = () => {
 
   const [pagination, setPagination] = useState<TablePaginationConfig>({})
   // fetch
-  const [loading, setLoading] = useState(false)
+  // const [loading, setLoading] = useState(false)
 
   const [stats, setStats] = useState<IProductFull>()
   const [statsStart, setStatsStart] = useState(new Date())
@@ -133,8 +132,10 @@ const Products = () => {
       )
 
       const res = await getProducts(
-        pagination.current ?? 0,
-        pagination.pageSize ?? 10
+        0,
+        1000000000000
+        // pagination.current ?? 0,
+        // pagination.pageSize ?? 10
       )
       const res_warehouses = await getWarehouses()
       const warehouses_map = new Map<string, string>(
@@ -173,6 +174,7 @@ const Products = () => {
 
   useEffect(() => {
     fetchProducts()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const columns = useColumns<IProductFull>('main_products', [
@@ -285,28 +287,30 @@ const Products = () => {
     },
   ])
 
-  const fetchProductsPagination = async (pagination: TablePaginationConfig) => {
-    setLoading(true)
-    try {
-      const res = await getProducts(
-        pagination.current ?? 1,
-        pagination.pageSize ?? 10
-      )
-      const res_count = await getProductsCount()
-      setPagination({
-        pageSize: pagination.pageSize || 1,
-        current: pagination.current || 1,
-        total: res_count.data,
-      })
+  // const fetchProductsPagination = async (pagination: TablePaginationConfig) => {
+  //   setLoading(true)
+  //   try {
+  //     const res = await getProducts(
+  //       0,
+  //       99999999999
+  //       // pagination.current ?? 1,
+  //       // pagination.pageSize ?? 10
+  //     )
+  //     const res_count = await getProductsCount()
+  //     setPagination({
+  //       pageSize: pagination.pageSize || 1,
+  //       current: pagination.current || 1,
+  //       total: res_count.data,
+  //     })
 
-      setProducts(res.data)
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        message.error(err.response?.data)
-      }
-    }
-    setLoading(false)
-  }
+  //     setProducts(res.data)
+  //   } catch (err) {
+  //     if (axios.isAxiosError(err)) {
+  //       message.error(err.response?.data)
+  //     }
+  //   }
+  //   setLoading(false)
+  // }
 
   const fetchAllProducts = async () => {
     const res = await getProducts(1, 10000000)
@@ -502,14 +506,14 @@ const Products = () => {
               ),
             }))}
             columns={columns}
-            loading={loading}
-            pagination={{
-              ...pagination,
-              pageSizeOptions: ['50', '100', '200'],
-              // pageSizeOptions: ['1', '2', '3'],
-              // pageSize: 1
-            }}
-            onChange={fetchProductsPagination}
+            // loading={loading}
+            // pagination={{
+            //   ...pagination,
+            //   pageSizeOptions: ['50', '100', '200'],
+            //   // pageSizeOptions: ['1', '2', '3'],
+            //   // pageSize: 1
+            // }}
+            // onChange={fetchProductsPagination}
           />
         </Card>
       </div>
