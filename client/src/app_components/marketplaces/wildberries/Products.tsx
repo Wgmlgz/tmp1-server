@@ -231,6 +231,7 @@ export default function WildberriesProducts() {
                     article: product.article,
                     barcode: product.barcode,
                     name: product.name,
+                    color: product.color
                   }))
                 : selected_products.map(product => ({
                     article: product.article,
@@ -270,9 +271,6 @@ export default function WildberriesProducts() {
               setBarcodesCreation(e)
             }}>
             <Option value='barcodes'>Напечатать штрихкоды</Option>
-            <Option value='barcodes all'>
-              Напечатать штрихкоды всех товаров
-            </Option>
             <Option value='barcodes wb'>
               Напечатать штрихкоды Wildberries FB
             </Option>

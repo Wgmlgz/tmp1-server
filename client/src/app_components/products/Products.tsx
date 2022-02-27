@@ -174,7 +174,7 @@ const Products = () => {
 
   useEffect(() => {
     fetchProducts()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const columns = useColumns<IProductFull>('main_products', [
