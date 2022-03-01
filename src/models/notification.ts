@@ -4,6 +4,7 @@ export interface INotification {
   product: string
   warehouse: string
   date: Date
+  count: Number
 }
 
 const NotificationSchema = new mongoose.Schema<INotification>({
@@ -17,6 +18,10 @@ const NotificationSchema = new mongoose.Schema<INotification>({
   },
   date: {
     type: Date,
+    required: true,
+  },
+  count: {
+    type: Number,
     required: true,
   },
 })

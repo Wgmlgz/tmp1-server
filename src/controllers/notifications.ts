@@ -15,6 +15,7 @@ export const getNotifications = async (req: Request, res: Response) => {
         warehouse: await WarehouseModel.findById(notification.warehouse),
         date: notification.date,
         id: notification.id,
+        count: notification.count,
       }))
     )
     res.status(200).json(notifications)

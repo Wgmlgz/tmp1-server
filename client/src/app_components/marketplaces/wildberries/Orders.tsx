@@ -44,8 +44,10 @@ const Orders = () => {
       const res = await getWildberriesOrders(
         status,
         '2021-09-30T17:14:52+03:00',
-        pagination.pageSize ?? 10,
-        (pagination.pageSize ?? 10) * ((pagination.current ?? 1) - 1)
+        1000,
+        0
+        // pagination.pageSize ?? 10,
+        // (pagination.pageSize ?? 10) * ((pagination.current ?? 1) - 1)
       )
       setPagination({ ...pagination, total: res.data.total })
       setOrders(res.data)
@@ -86,6 +88,8 @@ const Orders = () => {
       title: 'Создано',
       dataIndex: 'dateCreated',
       key: 'dateCreated',
+      sorter: (a, b) =>
+        moment(a.dateCreated).unix() - moment(b.dateCreated).unix(),
       render: (text, record, index) =>
         moment(record.dateCreated).format('DD MM YYYY HH:MM'),
     },
@@ -104,11 +108,12 @@ const Orders = () => {
       title: 'Название',
       dataIndex: 'name',
       key: 'name',
+      sorter: (a, b) => String(a.name).localeCompare(String(b.name)),
     },
     {
-      title: 'Название',
-      dataIndex: 'name',
-      key: 'name',
+      title: 'Фото',
+      dataIndex: 'img',
+      key: 'img',
       render: (text, record, index) =>
         record.img && (
           <img

@@ -16,7 +16,20 @@ interface INotification {
   product: IProductFull
   warehouse: IWarehouseFull
   date: string
+  count: number
   id: string
+}
+
+const hightlight = {
+  render: (text: any, record: any) => (
+    <p
+      style={{
+        color: Number(record.count) === 0 ? '#ff5555' : '#FFA500',
+        fontWeight: 'bold',
+      }}>
+      {text}
+    </p>
+  ),
 }
 
 const Notifications = () => {
@@ -51,19 +64,46 @@ const Notifications = () => {
     {
       title: 'Артикул',
       dataIndex: ['product', 'article'],
-
       key: 'article',
+      ...hightlight,
+    },
+    {
+      title: 'Осталось',
+      dataIndex: 'count',
+      key: 'count',
+      filters: [
+        {
+          text: '0',
+          value: 0,
+        },
+        {
+          text: '1',
+          value: 1,
+        },
+        {
+          text: '2',
+          value: 2,
+        },
+        {
+          text: '3',
+          value: 3,
+        },
+      ],
+      onFilter: (value, record) => record.count === value,
+      ...hightlight,
     },
     {
       title: 'Штрихкод',
       dataIndex: ['product', 'barcode'],
       key: 'barcode',
+      ...hightlight,
     },
     {
       title: 'Имя',
       dataIndex: ['product', 'name'],
       key: 'name',
       sorter: (a, b) => a.product.name.localeCompare(b.product.name),
+      ...hightlight,
     },
     {
       title: 'Время',
@@ -117,7 +157,7 @@ const Notifications = () => {
           columns={columns}
         />
       </Card>
-      <pre>{JSON.stringify(notifications, null, 2)}</pre>
+      {/* <pre>{JSON.stringify(notifications, null, 2)}</pre> */}
     </div>
   )
 }

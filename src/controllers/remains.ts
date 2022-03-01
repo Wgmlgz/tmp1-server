@@ -41,15 +41,15 @@ export const changeRemain = async (
     Remain.create({ warehouse, product, quantity: quantity_add })
     return
   }
-  if (remain.quantity + quantity_add <= 0) {
+  await NotificationModel.deleteMany({ product, warehouse })
+  if (remain.quantity + quantity_add <= 3) {
     const notification = new NotificationModel({
       date: new Date(),
       product,
       warehouse,
+      count: remain.quantity + quantity_add,
     })
     await notification.save()
-  } else {
-    await NotificationModel.deleteMany({ product, warehouse })
   }
   await Remain.findByIdAndUpdate(
     remain.id,
