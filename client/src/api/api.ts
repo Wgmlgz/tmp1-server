@@ -205,6 +205,11 @@ export const wbUpdateDiscount = (nmId: string, val: number) =>
     nmId,
     val,
   })
+export const wbUpdatePrice = (nmId: string, val: number) =>
+  axios.post(`${wildberries_url}/update_price`, {
+    nmId,
+    val,
+  })
 
 export const remains_url = `${url}/api/remains`
 

@@ -26,6 +26,7 @@ import {
   updateWildberriesStocks,
 } from './controllers/wildberries'
 import logger from './util/logger'
+import { readSettings } from './controllers/settings'
 
 const app = express()
 app.use(cookieParser())
@@ -71,29 +72,23 @@ mongoose
       logger.info(`server goes brrrrrr at ${PORT}`)
       console.log(`server goes brrrrrr at ${PORT}`)
     })
-    cron.schedule(
-      JSON.parse(fs.readFileSync('settings.json', 'utf8')).send_cron,
-      async () => {
-        try {
-          logger.info(`updating stocks`)
-          const res = await updateWildberriesStocks()
-          logger.info(`updating stocks done:`, res)
-        } catch (err) {
-          logger.error(`updating stocks error:`, err)
-        }
+    cron.schedule((await readSettings()).send_cron, async () => {
+      try {
+        logger.info(`updating stocks`)
+        const res = await updateWildberriesStocks()
+        logger.info(`updating stocks done:`, res)
+      } catch (err) {
+        logger.error(`updating stocks error:`, err)
       }
-    )
-    cron.schedule(
-      JSON.parse(fs.readFileSync('settings.json', 'utf8')).update_orders_cron,
-      async () => {
-        try {
-          const res = await refreshOrders()
-          logger.info(`updating orders done:`, res)
-        } catch (err) {
-          logger.error(`updating orders error:`, err)
-        }
+    })
+    cron.schedule((await readSettings()).update_orders_cron, async () => {
+      try {
+        const res = await refreshOrders()
+        logger.info(`updating orders done:`, res)
+      } catch (err) {
+        logger.error(`updating orders error:`, err)
       }
-    )
+    })
   })
   .catch(err => {
     logger.error(`Mongo connection - problem`, err.message)

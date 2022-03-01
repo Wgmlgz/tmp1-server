@@ -10,7 +10,7 @@ import {
 } from 'antd'
 import axios, { AxiosResponse } from 'axios'
 import React, { Key, useEffect, useState } from 'react'
-import { products_url, wbUpdateDiscount } from '../../../api/api'
+import { products_url, wbUpdateDiscount, wbUpdatePrice } from '../../../api/api'
 import { getWildBerriesProducts } from '../../../api/api'
 import useColumns from '../../../hooks/useColumns'
 import { highlightText } from '../../products/Products'
@@ -132,6 +132,48 @@ export default function WildberriesProducts() {
         dataIndex: 'price',
         key: 'price',
         sorter: (a, b) => Number(a.price) - Number(b.price),
+        render: (text, record, index) => (
+          <span>
+            <Popover
+              placement='left'
+              content={
+                <form
+                  onSubmit={async (e: any) => {
+                    e.preventDefault()
+                    const val: number = Number(e.target.val.value)
+                    console.log(val)
+                    try {
+                      const res = await wbUpdatePrice(record.nmId, val)
+                      console.log(res.data)
+                      message.success('Цена обновлена')
+                      setup()
+                    } catch (err) {
+                      if (axios.isAxiosError(err)) {
+                        message.error(err.response?.data)
+                      }
+                    }
+                  }}>
+                  <Input.Group compact>
+                    <Input
+                      type='number'
+                      defaultValue={record.price}
+                      min={0}
+                      name='val'
+                      style={{ width: 'calc(100% - 100px)' }}
+                    />
+                    <Button htmlType='submit' type='primary'>
+                      Сохранить
+                    </Button>
+                  </Input.Group>
+                </form>
+              }>
+              {record.price}
+              <Button>
+                <EditOutlined />
+              </Button>
+            </Popover>
+          </span>
+        ),
       },
       {
         title: 'Размер скидки',

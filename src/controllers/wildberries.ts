@@ -11,6 +11,7 @@ import WBOrderModel from '../models/wb_orders'
 import { changeRemain, changeRemains } from './remains'
 import logger from '../util/logger'
 import StatsModel from '../models/stats'
+import { readSettings, writeSettings } from './settings'
 
 interface IWilbberriesProduct {
   barcode: string
@@ -22,9 +23,7 @@ interface IWilbberriesProduct {
 
 export const getWildberriesProducts = async (req: Request, res: Response) => {
   try {
-    const WILDBERRIES_API_KEY = JSON.parse(
-      fs.readFileSync('settings.json', 'utf8')
-    ).api_key
+    const WILDBERRIES_API_KEY = (await readSettings()).api_key
     const table = (
       await axios.get(`${WILDBERRIES_URL}/public/api/v1/info`, {
         headers: { Authorization: WILDBERRIES_API_KEY },
@@ -69,9 +68,7 @@ export const getWildberriesProducts = async (req: Request, res: Response) => {
 
 export const getWildberriesOrders = async (req: Request, res: Response) => {
   try {
-    const WILDBERRIES_API_KEY = JSON.parse(
-      fs.readFileSync('settings.json', 'utf8')
-    ).api_key
+    const WILDBERRIES_API_KEY = (await readSettings()).api_key
 
     const wb_header = { headers: { Authorization: WILDBERRIES_API_KEY } }
     const status = req.query.status
@@ -242,11 +239,11 @@ export const updateWildberriesSettings = async (
 ) => {
   try {
     const { sender_warehouse, send_cron, update_orders_cron } = req.body
-    const old = JSON.parse(fs.readFileSync('settings.json', 'utf8'))
+    const old = await readSettings()
     if (sender_warehouse) old.sender_warehouse = sender_warehouse
     if (send_cron) old.send_cron = send_cron
     if (update_orders_cron) old.update_orders_cron = update_orders_cron
-    fs.writeFileSync('settings.json', JSON.stringify(old, null, 2))
+    await writeSettings(old)
     res.status(200).send('settings updated')
   } catch (err: any) {
     logger.error(err.message)
@@ -255,7 +252,7 @@ export const updateWildberriesSettings = async (
 }
 export const getWildberriesSettings = async (req: Request, res: Response) => {
   try {
-    const old = JSON.parse(fs.readFileSync('settings.json', 'utf8'))
+    const old = await readSettings()
     res.status(200).json(old)
   } catch (err: any) {
     logger.error(err.message)
@@ -264,14 +261,10 @@ export const getWildberriesSettings = async (req: Request, res: Response) => {
 }
 
 export const updateWildberriesStocks = async () => {
-  const WILDBERRIES_API_KEY = JSON.parse(
-    fs.readFileSync('settings.json', 'utf8')
-  ).api_key
+  const WILDBERRIES_API_KEY = (await readSettings()).api_key
   const wb_header = { headers: { Authorization: WILDBERRIES_API_KEY } }
 
-  const warehouse = JSON.parse(
-    fs.readFileSync('settings.json', 'utf8')
-  ).sender_warehouse
+  const warehouse = (await readSettings()).sender_warehouse
   const wb_warehouse = WB_WAREHOUSE_ID
   const remains = await RemainModel.find({ warehouse })
 
@@ -314,9 +307,7 @@ export const checkWildberriesConnection = async (
   res: Response
 ) => {
   try {
-    const WILDBERRIES_API_KEY = JSON.parse(
-      fs.readFileSync('settings.json', 'utf8')
-    ).api_key
+    const WILDBERRIES_API_KEY = (await readSettings()).api_key
 
     await axios.get(`${WILDBERRIES_URL}/api/v2/warehouses`, {
       headers: { Authorization: WILDBERRIES_API_KEY },
@@ -330,7 +321,7 @@ export const checkWildberriesConnection = async (
 }
 
 export const refreshOrders = async () => {
-  const setting = JSON.parse(fs.readFileSync('settings.json', 'utf8'))
+  const setting = await readSettings()
   const WILDBERRIES_API_KEY = setting.api_key
   const wb_header = { headers: { Authorization: WILDBERRIES_API_KEY } }
 
@@ -467,19 +458,12 @@ export const runRefreshOrdeers = async (req: Request, res: Response) => {
 
 export const updateDiscount = async (req: Request, res: Response) => {
   try {
-    const setting = JSON.parse(fs.readFileSync('settings.json', 'utf8'))
+    const setting = await readSettings()
     const WILDBERRIES_API_KEY = setting.api_key
     const wb_header = { headers: { Authorization: WILDBERRIES_API_KEY } }
 
     const { nmId, val } = req.body
     if (val) {
-      console.log([
-        {
-          discount: Number(val),
-          nm: Number(nmId),
-        },
-      ])
-      
       const ans = await axios.post(
         `${WILDBERRIES_URL}/public/api/v1/updateDiscounts`,
         [
@@ -502,6 +486,33 @@ export const updateDiscount = async (req: Request, res: Response) => {
       console.log(ans.data)
       res.status(200).json(ans.data)
     }
+  } catch (err: any) {
+    logger.error(err.message)
+    res.status(400).json(err.message)
+  }
+}
+
+export const updatePrice = async (req: Request, res: Response) => {
+  try {
+    const setting = await readSettings()
+    const WILDBERRIES_API_KEY = setting.api_key
+    const wb_header = { headers: { Authorization: WILDBERRIES_API_KEY } }
+
+    const { nmId, val } = req.body
+
+    const ans = await axios.post(
+      `${WILDBERRIES_URL}/public/api/v1/prices`,
+      [
+        {
+          price: Number(val),
+          nmId: Number(nmId),
+        },
+      ],
+      wb_header
+    )
+    console.log(ans.data)
+
+    res.status(200).json(ans.data)
   } catch (err: any) {
     logger.error(err.message)
     res.status(400).json(err.message)
