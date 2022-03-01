@@ -40,6 +40,7 @@ import { getRemains } from '../../api/api'
 import { IWarehouseFull } from '../warehouses/WarehouseForm'
 import FullscreenCard from '../FullscreenCard'
 import ru_RU from 'antd/lib/locale/ru_RU'
+import { Image } from 'antd'
 
 import { exportProducts } from './Excel'
 
@@ -183,12 +184,11 @@ const Products = () => {
       dataIndex: 'img',
       key: 'type',
       render: (text, record, index) =>
-        record.imgs_small &&
-        record.imgs_small[0] && (
-          <img
-            style={{ borderRadius: '20px', width: '100px' }}
-            src={`${products_url}/img/${record.imgs_small[0]}`}
-            alt='img'
+        record.imgs_big &&
+        record.imgs_big[0] && (
+          <Image
+            width={100}
+            src={`${products_url}/img/${record.imgs_big[0]}`}
           />
         ),
     },
