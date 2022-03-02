@@ -80,6 +80,17 @@ export const createCategory = (category: ICategory) => {
   category.parent && fd.append('parent', category.parent)
   return axios.post(`${categories_url}`, fd, config)
 }
+export const editCategory = (id: string, category: ICategory) => {
+  const config = { headers: { 'Content-Type': 'multipart/form-data' } }
+  let fd = new FormData()
+  category.img && fd.append('file', category.img)
+  category.description && fd.append('description', category.description)
+  category.name && fd.append('name', category.name)
+  category.name && fd.append('id', id)
+  category.tags && fd.append('tags', JSON.stringify(category.tags))
+  category.parent && fd.append('parent', category.parent)
+  return axios.post(`${categories_url}/edit`, fd, config)
+}
 
 /** Products */
 export const getProducts = (pageNumber: number, nPerPage: number) =>

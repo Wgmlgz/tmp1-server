@@ -67,6 +67,41 @@ export const createCategory = (req: Request, res: Response) => {
   }
 }
 
+export const editCategory = (req: Request, res: Response) => {
+  try {
+    let { id, name, description, img, tags, parent } = req.body
+    tags = JSON.parse(tags)
+    if (!name) throw new Error('Expected name')
+    Category.findOne(
+      { name },
+      async (err: Error, doc: ICategory & { id: string }) => {
+        if (err) throw err
+        if (doc) {
+          if (doc.id !== id)
+            return res.status(400).send('Category Already Exists')
+        }
+        await Category.findByIdAndDelete(id)
+
+        if (req.file) {
+          resizeImg100(req.file.path)
+        }
+        const new_category = new Category({
+          name,
+          description,
+          img: req.file?.filename,
+          tags,
+          parent,
+        })
+        await new_category.save()
+        res.send('Category Created')
+      }
+    )
+  } catch (err: any) {
+    logger.error(err.message)
+    res.status(400).send(err.message)
+  }
+}
+
 export const removeCategory = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
