@@ -6,7 +6,7 @@ import { IProductIn } from '../app_components/warehouses/ProductsInForm'
 import { IProductOut } from '../app_components/warehouses/ProductsOutForm'
 import { IWarehouse } from '../app_components/warehouses/WarehouseForm'
 
-export const url = process.env.REACT_APP_SERVER_URL || 'http://localhost:5000'
+export const url = process.env.REACT_APP_SERVER_URL
 export const auth_url = `${url}/api/auth`
 export const user_url = `${url}/api/user`
 export const super_admin_url = `${url}/api/super_admin`
@@ -161,6 +161,8 @@ export const createProduct = (product: IProduct) =>
   })
 export const createExcelProducts = (products: IProduct[]) =>
   axios.post(`${products_url}/excel`, { products })
+export const createWbProduct = (url: string) =>
+  axios.post(`${products_url}/wb_url`, { url })
 export const getExcelImports = () => axios.get(`${products_url}/excel`)
 
 export const updateProduct = (product: IProduct, id: string) =>
@@ -192,16 +194,8 @@ export const getWildberriesOrders = (
     params: { status, date_start, take, skip },
   })
 
-export const updateWildberriesSettings = (
-  sender_warehouse: string,
-  send_cron: string,
-  update_orders_cron: string
-) =>
-  axios.post(`${wildberries_url}/settings`, {
-    sender_warehouse,
-    send_cron,
-    update_orders_cron,
-  })
+export const updateWildberriesSettings = (e: any) =>
+  axios.post(`${wildberries_url}/settings`, e)
 export const getWildberriesSettings = () =>
   axios.get(`${wildberries_url}/settings`)
 

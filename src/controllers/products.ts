@@ -10,6 +10,7 @@ import RemainModel from '../models/remains'
 import ExcelImport from '../models/excel_import'
 import CategoryModel from '../models/category'
 import logger from '../util/logger'
+import parseWbPage from '../util/wb_page_parser'
 
 const UPLOAD_FILES_DIR = './upload/products'
 
@@ -364,6 +365,65 @@ export const getExcelImports = async (req: Request, res: Response) => {
     const excel_imports = await ExcelImport.find({})
 
     res.status(200).json(excel_imports)
+  } catch (err: any) {
+    logger.error(err.message)
+    res.status(400).send(err.message)
+  }
+}
+
+export const createWbUrlProduct = async (req: Request, res: Response) => {
+  try {
+    const { url } = req.body
+
+    const data = await parseWbPage(url)
+    console.log(data)
+
+    const raw_product = {
+      width: data.width,
+      height: data.height,
+      length: data.length,
+      weight: data.weight,
+      name: data.name,
+      country: data.country,
+      description: data.description,
+      marketplace_data: {
+        'Номенклатура Wildberries FBS': data.article,
+      },
+      imgs: [] as string[],
+      imgs_big: [] as string[],
+      imgs_small: [] as string[],
+      buy_price: '1',
+      delivery_price: '1',
+    }
+
+    await Promise.allSettled(
+      data.imgUrl.map(async url => {
+        try {
+          const orig_path = genOrigPath(),
+            small_path = genSmallPath(),
+            big_path = genBigPath()
+
+          await downloadImage(url, `${UPLOAD_FILES_DIR}/${orig_path}`)
+          await resizeImg1024(
+            `${UPLOAD_FILES_DIR}/${orig_path}`,
+            `${UPLOAD_FILES_DIR}/${big_path}`
+          )
+          await resizeImg150(
+            `${UPLOAD_FILES_DIR}/${orig_path}`,
+            `${UPLOAD_FILES_DIR}/${small_path}`
+          )
+          raw_product.imgs.push(orig_path)
+          raw_product.imgs_small.push(small_path)
+          raw_product.imgs_big.push(big_path)
+        } catch (err: any) {
+          logger.error(err.message)
+        }
+      })
+    )
+
+    const product = new Product(raw_product)
+    await product.save()
+    res.status(200).json('Import started')
   } catch (err: any) {
     logger.error(err.message)
     res.status(400).send(err.message)

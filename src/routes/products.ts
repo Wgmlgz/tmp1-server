@@ -12,11 +12,13 @@ import {
   getProduct,
   removeProducts,
   getExcelImports,
+  createWbUrlProduct,
 } from '../controllers/products'
 
 const router = express.Router()
 
 router.post('/', [authenticateAdmin, upload.array('imgs', 12)], createProduct)
+router.post('/wb_url', authenticateAdmin, createWbUrlProduct)
 router.post('/excel', authenticateAdmin, createExcelProducts)
 router.get('/excel', authenticateAdmin, getExcelImports)
 router.post('/search/:pageNumber/:nPerPage', authenticateAdmin, searchProducts)

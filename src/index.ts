@@ -28,6 +28,11 @@ import {
 import logger from './util/logger'
 import { readSettings } from './controllers/settings'
 
+let dir = './upload/categories'
+if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
+dir = './upload/products'
+if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
+
 const app = express()
 app.use(cookieParser())
 app.use(bodyParser.json())
@@ -73,20 +78,24 @@ mongoose
       console.log(`server goes brrrrrr at ${PORT}`)
     })
     cron.schedule((await readSettings()).send_cron, async () => {
-      try {
-        logger.info(`updating stocks`)
-        const res = await updateWildberriesStocks()
-        logger.info(`updating stocks done:`, res)
-      } catch (err) {
-        logger.error(`updating stocks error:`, err)
+      if ((await readSettings()).send_cron_enabled) {
+        try {
+          logger.info(`updating stocks`)
+          const res = await updateWildberriesStocks()
+          logger.info(`updating stocks done:`, res)
+        } catch (err) {
+          logger.error(`updating stocks error:`, err)
+        }
       }
     })
     cron.schedule((await readSettings()).update_orders_cron, async () => {
-      try {
-        const res = await refreshOrders()
-        logger.info(`updating orders done:`, res)
-      } catch (err) {
-        logger.error(`updating orders error:`, err)
+      if ((await readSettings()).update_orders_cron_enabled) {
+        try {
+          const res = await refreshOrders()
+          logger.info(`updating orders done:`, res)
+        } catch (err) {
+          logger.error(`updating orders error:`, err)
+        }
       }
     })
   })

@@ -1,4 +1,4 @@
-import { Button, Card, Form, Input, message } from 'antd'
+import { Button, Card, Checkbox, Form, Input, message } from 'antd'
 import TextArea from 'antd/lib/input/TextArea'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
@@ -26,9 +26,11 @@ export default function Settings() {
       }
     }
   }
+
   useEffect(() => {
     setup()
   }, [])
+
   return (
     <Card title='Настройки wb'>
       {settings && (
@@ -38,11 +40,9 @@ export default function Settings() {
           initialValues={settings}
           onFinish={async e => {
             try {
-              await updateWildberriesSettings(
-                e.sender_warehouse,
-                e.send_cron,
-                e.update_orders_cron
-              )
+              console.log(e)
+
+              await updateWildberriesSettings(e)
               message.success('Обновлено')
             } catch (e) {
               if (axios.isAxiosError(e)) {
@@ -55,8 +55,14 @@ export default function Settings() {
             name={'sender_warehouse'}
             required={false}
           />
+          <Form.Item name='send_cron_enabled' valuePropName="checked">
+            <Checkbox name='send_cron_enabled' defaultChecked={settings.send_cron_enabled}/>
+          </Form.Item>
           <Form.Item label='Интервал отправки (cron)' name='send_cron'>
             <Input placeholder='Интервал отправки (cron)' />
+          </Form.Item>
+          <Form.Item name='update_orders_cron_enabled' valuePropName="checked">
+            <Checkbox name='send_cron_enabled' defaultChecked={settings.update_orders_cron_enabled} />
           </Form.Item>
           <Form.Item
             label='Интервал обновления заказов (cron)'

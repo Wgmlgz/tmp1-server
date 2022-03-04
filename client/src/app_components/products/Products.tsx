@@ -3,16 +3,19 @@ import {
   Card,
   ConfigProvider,
   DatePicker,
+  Form,
   Input,
   message,
   Modal,
   Popconfirm,
+  Popover,
   Select,
   Table,
 } from 'antd'
 import { Key, useEffect, useState } from 'react'
 import {
   createProduct,
+  createWbProduct,
   getCategories,
   getProducts,
   getProductsCount,
@@ -62,10 +65,10 @@ export const highlightText = (str: string, search: string) => (
   <span>
     {search
       ? reactStringReplace(str, new RegExp(`(${search})+`, 'g'), (match, i) => (
-          <span key={i} style={{ fontWeight: 'bold' }}>
-            {match}
-          </span>
-        ))
+        <span key={i} style={{ fontWeight: 'bold' }}>
+          {match}
+        </span>
+      ))
       : str}
   </span>
 )
@@ -150,9 +153,8 @@ const Products = () => {
 
       const map = new Map<string, string>()
       remains_res.data.forEach((remain: IRemain) => {
-        const str = `${warehouses_map.get(remain.warehouse)} - ${
-          remain.quantity
-        }`
+        const str = `${warehouses_map.get(remain.warehouse)} - ${remain.quantity
+          }`
         const old = map.get(remain.product)
         map.set(remain.product, old ? `${old}\n${str}` : str)
       })
@@ -256,7 +258,7 @@ const Products = () => {
             <EditOutlined />
           </Button>
           <Popconfirm
-            onCancel={() => {}}
+            onCancel={() => { }}
             onConfirm={async () => {
               try {
                 await removeProducts([record?._id ?? ''])
@@ -318,7 +320,7 @@ const Products = () => {
   }
 
   useEffect(() => {
-    ;(async () => {
+    ; (async () => {
       if (!stats) return
 
       try {
@@ -361,12 +363,12 @@ const Products = () => {
             barcodes={
               barcodes_creation === 'barcodes all'
                 ? products.map(product => ({
-                    barcode: product.barcode || '',
-                    name: product.name || '',
-                    article: product.article || '',
-                  }))
+                  barcode: product.barcode || '',
+                  name: product.name || '',
+                  article: product.article || '',
+                }))
                 : barcodes_creation === 'barcodes wb'
-                ? selected_products
+                  ? selected_products
                     .filter(
                       product =>
                         product.marketplace_data &&
@@ -379,7 +381,7 @@ const Products = () => {
                       article: product.article || '',
                       color: product.color || '',
                     }))
-                : selected_products.map(product => ({
+                  : selected_products.map(product => ({
                     barcode: product.barcode || '',
                     name: product.name || '',
                     article: product.article || '',
@@ -399,7 +401,7 @@ const Products = () => {
             }}>
             <h2>Все товары</h2>
             <Popconfirm
-              onCancel={() => {}}
+              onCancel={() => { }}
               onConfirm={async () => {
                 try {
                   await removeProducts(
@@ -418,6 +420,27 @@ const Products = () => {
               cancelText='Нет'>
               <Button>Удалить товары</Button>
             </Popconfirm>
+            <Popover content={
+              <form onSubmit={async (e: any) => {
+                e.preventDefault()
+                
+                try {
+                  await createWbProduct(e.target.url.value)
+                  await fetchProducts()
+                  message.success('Товар добавлен')
+                } catch (e) {
+                  if (axios.isAxiosError(e)) {
+                    message.error(e.response?.data)
+                  }
+                }
+              }}>
+                <Input name='url' placeholder='ссылка...' />
+                <Button htmlType='submit'>Добавить</Button>
+              </form>
+            }>
+
+              <Button>Добавить с WB</Button>
+            </Popover>
             <div style={{ display: 'grid' }}>
               <Select
                 style={{ width: 300 }}
@@ -506,14 +529,14 @@ const Products = () => {
               ),
             }))}
             columns={columns}
-            // loading={loading}
-            // pagination={{
-            //   ...pagination,
-            //   pageSizeOptions: ['50', '100', '200'],
-            //   // pageSizeOptions: ['1', '2', '3'],
-            //   // pageSize: 1
-            // }}
-            // onChange={fetchProductsPagination}
+          // loading={loading}
+          // pagination={{
+          //   ...pagination,
+          //   pageSizeOptions: ['50', '100', '200'],
+          //   // pageSizeOptions: ['1', '2', '3'],
+          //   // pageSize: 1
+          // }}
+          // onChange={fetchProductsPagination}
           />
         </Card>
       </div>

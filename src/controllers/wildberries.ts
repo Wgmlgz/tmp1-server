@@ -237,11 +237,21 @@ export const updateWildberriesSettings = async (
   res: Response
 ) => {
   try {
-    const { sender_warehouse, send_cron, update_orders_cron } = req.body
+    const {
+      sender_warehouse,
+      send_cron,
+      send_cron_enabled,
+      update_orders_cron,
+      update_orders_cron_enabled,
+    } = req.body
     const old = await readSettings()
     if (sender_warehouse) old.sender_warehouse = sender_warehouse
     if (send_cron) old.send_cron = send_cron
+    if (send_cron_enabled !== undefined)
+      old.send_cron_enabled = send_cron_enabled
     if (update_orders_cron) old.update_orders_cron = update_orders_cron
+    if (update_orders_cron_enabled !== undefined)
+      old.update_orders_cron_enabled = update_orders_cron_enabled
     await writeSettings(old)
     res.status(200).send('settings updated')
   } catch (err: any) {
