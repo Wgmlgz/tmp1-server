@@ -73,13 +73,6 @@ app.use('/api/notifications', notifications_routes)
 mongoose
   .connect(MONGO_CONNECTION_URL)
   .then(async () => {
-    try {
-      const res = await updatePrices()
-      logger.info(`updating prices done:`, res)
-    } catch (err) {
-      logger.error(`updating prices error:`, err)
-    }
-    
     app.listen(PORT, () => {
       logger.info(`Mongo connection - OK`)
       logger.info(`server goes brrrrrr at ${PORT}`)
