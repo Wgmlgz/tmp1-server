@@ -1,6 +1,7 @@
 import {
   Button,
   Card,
+  Checkbox,
   Form,
   Input,
   InputNumber,
@@ -37,6 +38,7 @@ export interface IProduct {
   videos?: string[]
   buy_price: string
   delivery_price: string
+  update_price: boolean
   height: number
   length: number
   width: number
@@ -138,28 +140,34 @@ const ProductsForm: FC<Props> = ({
     ])
   }, [product])
 
-  const onFinish = async ({
-    article,
-    brand,
-    buy_price,
-    category,
-    delivery_price,
-    description,
-    color,
-    height,
-    length,
-    name,
-    provider,
-    type,
-    weight,
-    width,
-    mark,
-    country,
-    barcode,
-    yt1,
-    yt2,
-    yt3,
-  }: any) => {
+  const onFinish = async (e: any) => {
+    const {
+      article,
+      brand,
+      buy_price,
+      category,
+      delivery_price,
+      update_price,
+      description,
+      color,
+      height,
+      length,
+      name,
+      provider,
+      type,
+      weight,
+      width,
+      mark,
+      country,
+      barcode,
+      yt1,
+      yt2,
+      yt3,
+    } = e
+    console.log(e);
+
+    console.log(update_price);
+
     try {
       const videos = [yt1, yt2, yt3].filter(x => x)
       const product: IProduct = {
@@ -174,6 +182,7 @@ const ProductsForm: FC<Props> = ({
         videos,
         buy_price,
         delivery_price,
+        update_price,
         height,
         length,
         width,
@@ -236,6 +245,7 @@ const ProductsForm: FC<Props> = ({
             name: product?.name,
             buy_price: product?.buy_price,
             delivery_price: product?.delivery_price,
+            update_price: product?.update_price,
             width: product?.width,
             height: product?.height,
             length: product?.length,
@@ -514,6 +524,15 @@ const ProductsForm: FC<Props> = ({
                       placeholder='Цена доставки'
                     />
                   </Form.Item>
+                  <Form.Item
+                    label='Разрешать автоматический подгон цен на маркетплейсах'
+                    name='update_price'
+                    valuePropName='checked'
+                  >
+                    <Checkbox
+                      defaultChecked={product?.update_price ?? true}
+                    />
+                  </Form.Item>
                 </Panel>
                 <Panel header='Размеры' key='5'>
                   <Form.Item
@@ -611,7 +630,7 @@ const ProductsForm: FC<Props> = ({
               {onRemove && (
                 <Form.Item style={{ flexGrow: 1 }}>
                   <Popconfirm
-                    onCancel={() => {}}
+                    onCancel={() => { }}
                     onConfirm={onRemove}
                     title={`Вы точно хотите безвозвратно удалить товар?`}
                     okText='Да'

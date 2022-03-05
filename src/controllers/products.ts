@@ -41,6 +41,7 @@ const parseReqToProduct = (req: Request) => {
     videos,
     buy_price,
     delivery_price,
+    update_price,
     height,
     length,
     width,
@@ -93,6 +94,7 @@ const parseReqToProduct = (req: Request) => {
     addresses: addresses && JSON.parse(addresses),
     buy_price,
     delivery_price,
+    update_price,
     height,
     length,
     width,
@@ -376,7 +378,6 @@ export const createWbUrlProduct = async (req: Request, res: Response) => {
     const { url } = req.body
 
     const data = await parseWbPage(url)
-    console.log(data)
 
     const raw_product = {
       width: data.width,
@@ -394,6 +395,7 @@ export const createWbUrlProduct = async (req: Request, res: Response) => {
       imgs_small: [] as string[],
       buy_price: '1',
       delivery_price: '1',
+      update_price: true,
     }
 
     await Promise.allSettled(

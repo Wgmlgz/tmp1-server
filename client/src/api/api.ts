@@ -120,6 +120,8 @@ const productToFormData = (product: IProduct) => {
   if (product.imgs) {
     Array.from(product.imgs).forEach(file => fd.append('imgs', file))
   }
+  console.log(product)
+
   ;[
     'type',
     'category',
@@ -129,6 +131,7 @@ const productToFormData = (product: IProduct) => {
     'color',
     'buy_price',
     'delivery_price',
+    'update_price',
     'height',
     'length',
     'width',

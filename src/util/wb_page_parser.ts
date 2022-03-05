@@ -16,9 +16,11 @@ async function parseWbPage(link: string) {
   const pics: string[] = []
   $('img')
     .filter(
+      // @ts-ignore
       (a, b) => !!b.attribs['alt'] && /.+Вид [1-2]./.test(b.attribs['alt'])
     )
     .each((a, b) => {
+      // @ts-ignore
       pics.push(`https:${b.attribs['src']}`)
     })
 

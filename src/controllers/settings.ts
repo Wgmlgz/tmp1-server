@@ -6,6 +6,8 @@ const default_settings = {
   send_cron_enabled: true,
   update_orders_cron: '*/8 * * * *',
   update_orders_cron_enabled: true,
+  update_prices_cron: '*/8 * * * *',
+  update_prices_cron_enabled: true,
   api_key:
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NJRCI6ImE1Y2ZmMTE0LTFkZDktNDRhNy1iNzc1LWY4NDNiYWYxMjUzMiJ9.Q1MURJ627ZSoJhIaYBogFEA27SvQO5LRaXjPfpptQVU',
 }

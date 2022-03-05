@@ -31,6 +31,7 @@ export const exportProducts = (selected_products: IProductFull[]) => {
     { header: 'videos', key: 'videos' },
     { header: 'buy_price', key: 'buy_price' },
     { header: 'delivery_price', key: 'delivery_price' },
+    { header: 'update_price', key: 'update_price' },
     { header: 'height', key: 'height' },
     { header: 'length', key: 'length' },
     { header: 'width', key: 'width' },

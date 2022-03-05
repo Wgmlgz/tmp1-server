@@ -27,6 +27,7 @@ import {
 } from './controllers/wildberries'
 import logger from './util/logger'
 import { readSettings } from './controllers/settings'
+import { updatePrices } from './controllers/update_prices'
 
 let dir = './upload/categories'
 if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
@@ -72,6 +73,13 @@ app.use('/api/notifications', notifications_routes)
 mongoose
   .connect(MONGO_CONNECTION_URL)
   .then(async () => {
+    try {
+      const res = await updatePrices()
+      logger.info(`updating prices done:`, res)
+    } catch (err) {
+      logger.error(`updating prices error:`, err)
+    }
+    
     app.listen(PORT, () => {
       logger.info(`Mongo connection - OK`)
       logger.info(`server goes brrrrrr at ${PORT}`)
@@ -95,6 +103,16 @@ mongoose
           logger.info(`updating orders done:`, res)
         } catch (err) {
           logger.error(`updating orders error:`, err)
+        }
+      }
+    })
+    cron.schedule((await readSettings()).update_prices_cron, async () => {
+      if ((await readSettings()).update_prices_cron_enabled) {
+        try {
+          const res = await updatePrices()
+          logger.info(`updating prices done:`, res)
+        } catch (err) {
+          logger.error(`updating prices error:`, err)
         }
       }
     })

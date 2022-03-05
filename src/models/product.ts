@@ -15,6 +15,7 @@ export interface IProduct {
   videos?: string[]
   buy_price: string
   delivery_price: string
+  update_price: boolean
   height: number
   length: number
   width: number
@@ -90,6 +91,10 @@ const ProductSchema = new mongoose.Schema<IProduct>({
   delivery_price: {
     type: String,
     required: [true, 'Введите цену доставки'],
+  },
+  update_price: {
+    type: Boolean,
+    default: true,
   },
   height: {
     type: Number,

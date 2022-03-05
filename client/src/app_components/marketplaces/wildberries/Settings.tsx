@@ -56,18 +56,26 @@ export default function Settings() {
             required={false}
           />
           <Form.Item name='send_cron_enabled' valuePropName="checked">
-            <Checkbox name='send_cron_enabled' defaultChecked={settings.send_cron_enabled}/>
+            <Checkbox name='send_cron_enabled' defaultChecked={settings.send_cron_enabled} />
           </Form.Item>
           <Form.Item label='Интервал отправки (cron)' name='send_cron'>
             <Input placeholder='Интервал отправки (cron)' />
           </Form.Item>
           <Form.Item name='update_orders_cron_enabled' valuePropName="checked">
-            <Checkbox name='send_cron_enabled' defaultChecked={settings.update_orders_cron_enabled} />
+            <Checkbox name='update_orders_cron_enabled' defaultChecked={settings.update_orders_cron_enabled} />
           </Form.Item>
           <Form.Item
             label='Интервал обновления заказов (cron)'
             name='update_orders_cron'>
             <Input placeholder='Интервал обновления заказов (cron)' />
+          </Form.Item>
+          <Form.Item name='update_prices_cron_enabled' valuePropName="checked">
+            <Checkbox name='update_prices_cron_enabled' defaultChecked={settings.update_prices_cron_enabled} />
+          </Form.Item>
+          <Form.Item
+            label='Интервал обновления цен (cron)'
+            name='update_prices_cron'>
+            <Input placeholder='Интервал обновления цен (cron)' />
           </Form.Item>
           <Form.Item label='API ключ' name='api_key'>
             <TextArea placeholder='API ключ' />
