@@ -7,6 +7,7 @@ import {
   Popover,
   Select,
   Table,
+  Image
 } from 'antd'
 import axios, { AxiosResponse } from 'axios'
 import React, { Key, useEffect, useState } from 'react'
@@ -95,10 +96,8 @@ export default function WildberriesProducts() {
         key: 'img',
         render: (text, record, index) =>
           record.img && (
-            <img
-              style={{ borderRadius: '20px', width: '100px' }}
+            <Image
               src={`${products_url}/img/${record.img}`}
-              alt='img'
             />
           ),
       },
@@ -270,16 +269,16 @@ export default function WildberriesProducts() {
             barcodes={
               barcodes_creation === 'barcodes wb'
                 ? selected_products.map(product => ({
-                    article: product.article,
-                    barcode: product.barcode,
-                    name: product.name,
-                    color: product.color
-                  }))
+                  article: product.article,
+                  barcode: product.barcode,
+                  name: product.name,
+                  color: product.color
+                }))
                 : selected_products.map(product => ({
-                    article: product.article,
-                    barcode: product.barcode,
-                    name: product.name,
-                  }))
+                  article: product.article,
+                  barcode: product.barcode,
+                  name: product.name,
+                }))
             }
           />
         </FullscreenCard>

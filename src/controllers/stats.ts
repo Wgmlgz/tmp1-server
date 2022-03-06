@@ -5,8 +5,6 @@ import logger from '../util/logger'
 export const getStats = async (req: Request, res: Response) => {
   try {
     const { start, end, product } = req.body
-    console.log(new Date(start))
-    console.log(new Date(end))
 
     const orders = await WBOrderModel.find({
       created: {
@@ -18,13 +16,14 @@ export const getStats = async (req: Request, res: Response) => {
     const stats: any[] = []
 
     orders.forEach(order => {
-      order.products.forEach(product => {
-        stats.push({
-          product: product.id,
-          amount: product.count,
-          platform: 'wildberries',
-          date: order.created,
-        })
+      order.products.forEach(order_product => {
+        order_product.id === product &&
+          stats.push({
+            product: order_product.id,
+            amount: order_product.count,
+            platform: 'wildberries',
+            date: order.created,
+          })
       })
     })
 

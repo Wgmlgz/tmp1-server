@@ -51,7 +51,7 @@ export const getWildberriesProducts = async (req: Request, res: Response) => {
         (item.barcode = (db_product.marketplace_data as any).get(
           'Штрихкод Wildberries FBS'
         ))
-      db_product.imgs_small && (item.img = db_product.imgs_small[0])
+      db_product.imgs_big && (item.img = db_product.imgs_big[0])
       item.buy_price = db_product.buy_price
       item.delivery_price = db_product.delivery_price
       item.article = db_product.article

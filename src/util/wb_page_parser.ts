@@ -8,7 +8,11 @@ async function parseWbPage(link: string) {
   const raw_name = $('.same-part-kt__header-wrap > .same-part-kt__header')
     .text()
     .trim()
-  const name = raw_name.substring(0, raw_name.length / 2)
+  const name =
+    raw_name
+      ?.substring(0, raw_name.length / 2)
+      ?.split('/')[1]
+      ?.trim() || raw_name.substring(0, raw_name.length / 2)
 
   const raw_art = $('#productNmId').text().trim()
   const article = raw_art.substring(0, raw_art.length / 2)

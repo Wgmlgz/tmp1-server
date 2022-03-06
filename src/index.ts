@@ -78,6 +78,12 @@ mongoose
       logger.info(`server goes brrrrrr at ${PORT}`)
       console.log(`server goes brrrrrr at ${PORT}`)
     })
+    // try {
+    //   const res = await updatePrices()
+    //   logger.info(`updating prices done:`, res)
+    // } catch (err) {
+    //   logger.error(`updating prices error:`, err)
+    // }
     cron.schedule((await readSettings()).send_cron, async () => {
       if ((await readSettings()).send_cron_enabled) {
         try {

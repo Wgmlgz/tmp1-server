@@ -189,6 +189,17 @@ export default function Categories() {
         roots.push(node)
       }
     }
+
+    const dfs = (node: any) => {
+      if (node.children && !node.children?.length) {
+        delete node.children
+      } else {
+        node?.children?.forEach((node: any) => {
+          dfs(node)
+        })
+      }
+    }
+    dfs({ children: roots })
     return roots
   }
 
