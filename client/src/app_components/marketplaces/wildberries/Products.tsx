@@ -97,6 +97,7 @@ export default function WildberriesProducts() {
         render: (text, record, index) =>
           record.img && (
             <Image
+              width={100}
               src={`${products_url}/img/${record.img}`}
             />
           ),
