@@ -117,6 +117,9 @@ mongoose
     })
   })
   .catch(err => {
+    console.log(err);
+    console.log('Mongo connection - problems')
+    
     logger.error(`Mongo connection - problem`, err.message)
     console.log(err.message)
   })

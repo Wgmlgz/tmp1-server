@@ -86,7 +86,7 @@ export const updatePrices = async () => {
         }
       } catch (e) {
         if (axios.isAxiosError(e)) {
-          logger.log(e.response?.data)
+          logger.error(JSON.stringify(e.response?.data))
         }
       }
     })
