@@ -73,19 +73,16 @@ app.use('/api/notifications', notifications_routes)
 mongoose
   .connect(MONGO_CONNECTION_URL)
   .then(async () => {
+    try {
+
     app.listen(PORT, () => {
       logger.info(`Mongo connection - OK`)
       logger.info(`server goes brrrrrr at ${PORT}`)
       console.log(`server goes brrrrrr at ${PORT}`)
     })
-    // try {
-    //   const res = await updatePrices()
-    //   logger.info(`updating prices done:`, res)
-    // } catch (err) {
-    //   logger.error(`updating prices error:`, err)
-    // }
-    cron.schedule((await readSettings()).send_cron, async () => {
-      if ((await readSettings()).send_cron_enabled) {
+    
+    cron.schedule(await readSettings('send_cron'), async () => {
+      if (await readSettings('send_cron_enabled')) {
         try {
           logger.info(`updating stocks`)
           const res = await updateWildberriesStocks()
@@ -95,8 +92,8 @@ mongoose
         }
       }
     })
-    cron.schedule((await readSettings()).update_orders_cron, async () => {
-      if ((await readSettings()).update_orders_cron_enabled) {
+    cron.schedule(await readSettings('update_orders_cron'), async () => {
+      if (await readSettings('update_orders_cron_enabled')) {
         try {
           const res = await refreshOrders()
           logger.info(`updating orders done:`, res)
@@ -105,8 +102,8 @@ mongoose
         }
       }
     })
-    cron.schedule((await readSettings()).update_prices_cron, async () => {
-      if ((await readSettings()).update_prices_cron_enabled) {
+    cron.schedule(await readSettings('update_prices_cron'), async () => {
+      if (await readSettings('update_prices_cron_enabled')) {
         try {
           const res = await updatePrices()
           logger.info(`updating prices done:`, res)
@@ -115,6 +112,10 @@ mongoose
         }
       }
     })
+    } catch (err: any) {
+      logger.error(err.message)
+    }
+
   })
   .catch(err => {
     console.log(err);

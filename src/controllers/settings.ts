@@ -1,6 +1,6 @@
 import SettingsModel from '../models/settings'
 
-const default_settings = {
+export const default_settings: any = {
   sender_warehouse: '61eda2d7f1a680d8e9adea70',
   send_cron: '*/10 * * * *',
   send_cron_enabled: true,
@@ -11,13 +11,27 @@ const default_settings = {
   api_key:
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NJRCI6ImE1Y2ZmMTE0LTFkZDktNDRhNy1iNzc1LWY4NDNiYWYxMjUzMiJ9.Q1MURJ627ZSoJhIaYBogFEA27SvQO5LRaXjPfpptQVU',
 }
-export const readSettings: () => any = async () => {
+export const readSettings = async (str: string) => {
   const obj = await SettingsModel.findOne({})
-  if (obj && obj.data) return obj.data
+  console.log(obj?.data[str] ?? default_settings[str])
+  
+  if (obj && obj.data) return obj.data[str] ?? default_settings[str]
 
   const new_settings = new SettingsModel({ data: default_settings })
   await new_settings.save()
-  return (await SettingsModel.findOne({}))?.data
+
+  return (await SettingsModel.findOne({}))?.data[str] ?? default_settings[str]
+}
+
+export const readSettingsAll = async () => {
+  const obj = await SettingsModel.findOne({})
+
+  if (obj && obj.data) return obj.data ?? default_settings
+
+  const new_settings = new SettingsModel({ data: default_settings })
+  await new_settings.save()
+
+  return (await SettingsModel.findOne({}))?.data ?? default_settings
 }
 
 export const writeSettings = async (settings: any) => {

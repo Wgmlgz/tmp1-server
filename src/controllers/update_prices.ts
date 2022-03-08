@@ -8,7 +8,7 @@ import { readSettings } from './settings'
 export const updatePrices = async () => {
   const products = await ProductModel.find({ update_price: true })
 
-  const WILDBERRIES_API_KEY = (await readSettings()).api_key
+  const WILDBERRIES_API_KEY = await readSettings('api_key')
   const wb_header = {
     headers: { Authorization: WILDBERRIES_API_KEY },
   }

@@ -10,7 +10,7 @@ import moment from 'moment'
 import WBOrderModel from '../models/wb_orders'
 import { changeRemain, changeRemains } from './remains'
 import logger from '../util/logger'
-import { readSettings, writeSettings } from './settings'
+import { readSettings, readSettingsAll, writeSettings } from './settings'
 
 interface IWilbberriesProduct {
   barcode: string
@@ -22,7 +22,7 @@ interface IWilbberriesProduct {
 
 export const getWildberriesProducts = async (req: Request, res: Response) => {
   try {
-    const WILDBERRIES_API_KEY = (await readSettings()).api_key
+    const WILDBERRIES_API_KEY = await readSettings('api_key')
     const table = (
       await axios.get(`${WILDBERRIES_URL}/public/api/v1/info`, {
         headers: { Authorization: WILDBERRIES_API_KEY },
@@ -67,7 +67,7 @@ export const getWildberriesProducts = async (req: Request, res: Response) => {
 
 export const getWildberriesOrders = async (req: Request, res: Response) => {
   try {
-    const WILDBERRIES_API_KEY = (await readSettings()).api_key
+    const WILDBERRIES_API_KEY = await readSettings('api_key')
 
     const wb_header = { headers: { Authorization: WILDBERRIES_API_KEY } }
     const status = req.query.status
@@ -246,7 +246,7 @@ export const updateWildberriesSettings = async (
       update_prices_cron,
       update_prices_cron_enabled,
     } = req.body
-    const old = await readSettings()
+    const old = await readSettingsAll()
     if (sender_warehouse) old.sender_warehouse = sender_warehouse
     if (send_cron) old.send_cron = send_cron
     if (send_cron_enabled !== undefined)
@@ -266,7 +266,7 @@ export const updateWildberriesSettings = async (
 }
 export const getWildberriesSettings = async (req: Request, res: Response) => {
   try {
-    const old = await readSettings()
+    const old = await readSettingsAll()
     res.status(200).json(old)
   } catch (err: any) {
     logger.error(err.message)
@@ -275,10 +275,10 @@ export const getWildberriesSettings = async (req: Request, res: Response) => {
 }
 
 export const updateWildberriesStocks = async () => {
-  const WILDBERRIES_API_KEY = (await readSettings()).api_key
+  const WILDBERRIES_API_KEY = await readSettings('api_key')
   const wb_header = { headers: { Authorization: WILDBERRIES_API_KEY } }
 
-  const warehouse = (await readSettings()).sender_warehouse
+  const warehouse = await readSettings('sender_warehouse')
   const wb_warehouse = WB_WAREHOUSE_ID
   const remains = await RemainModel.find({ warehouse })
 
@@ -321,7 +321,7 @@ export const checkWildberriesConnection = async (
   res: Response
 ) => {
   try {
-    const WILDBERRIES_API_KEY = (await readSettings()).api_key
+    const WILDBERRIES_API_KEY = await readSettings('api_key')
 
     await axios.get(`${WILDBERRIES_URL}/api/v2/warehouses`, {
       headers: { Authorization: WILDBERRIES_API_KEY },
@@ -335,8 +335,8 @@ export const checkWildberriesConnection = async (
 }
 
 export const refreshOrders = async () => {
-  const setting = await readSettings()
-  const WILDBERRIES_API_KEY = setting.api_key
+  const WILDBERRIES_API_KEY = await readSettings('api_key')
+  const sender_warehouse = await readSettings('sender_warehouse')
   const wb_header = { headers: { Authorization: WILDBERRIES_API_KEY } }
 
   const total = (
@@ -416,7 +416,7 @@ export const refreshOrders = async () => {
           )
           .reduce((acc, cur) => acc * cur, 1),
         status: 0,
-        warehouse_id: setting.sender_warehouse,
+        warehouse_id: sender_warehouse,
         wb_order: order,
       }
     })
@@ -458,8 +458,7 @@ export const runRefreshOrdeers = async (req: Request, res: Response) => {
 
 export const updateDiscount = async (req: Request, res: Response) => {
   try {
-    const setting = await readSettings()
-    const WILDBERRIES_API_KEY = setting.api_key
+    const WILDBERRIES_API_KEY = await readSettings('api_key')
     const wb_header = { headers: { Authorization: WILDBERRIES_API_KEY } }
 
     const { nmId, val } = req.body
@@ -494,8 +493,7 @@ export const updateDiscount = async (req: Request, res: Response) => {
 
 export const updatePrice = async (req: Request, res: Response) => {
   try {
-    const setting = await readSettings()
-    const WILDBERRIES_API_KEY = setting.api_key
+    const WILDBERRIES_API_KEY = await readSettings('api_key')
     const wb_header = { headers: { Authorization: WILDBERRIES_API_KEY } }
 
     const { nmId, val } = req.body
