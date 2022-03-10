@@ -15,7 +15,6 @@ import products_move_routes from './routes/products_move'
 import wildberries_routes from './routes/wildberries'
 import notifications_routes from './routes/notifications'
 import stats_routes from './routes/stats'
-import cron from 'node-cron'
 import mongoose from 'mongoose'
 import cookieParser from 'cookie-parser'
 import { CORS_ORIGIN, MONGO_CONNECTION_URL, PORT, NODE_ENV } from './config/env'
@@ -28,6 +27,11 @@ import {
 import logger from './util/logger'
 import { readSettings } from './controllers/settings'
 import { updatePrices } from './controllers/update_prices'
+import {
+  updateOrdersTask,
+  updatePricesTask,
+  updateStocksTask,
+} from './util/tasks'
 
 let dir = './upload/categories'
 if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
@@ -74,53 +78,23 @@ mongoose
   .connect(MONGO_CONNECTION_URL)
   .then(async () => {
     try {
+      app.listen(PORT, () => {
+        logger.info(`Mongo connection - OK`)
+        logger.info(`server goes brrrrrr at ${PORT}`)
+        console.log(`server goes brrrrrr at ${PORT}`)
+      })
 
-    app.listen(PORT, () => {
-      logger.info(`Mongo connection - OK`)
-      logger.info(`server goes brrrrrr at ${PORT}`)
-      console.log(`server goes brrrrrr at ${PORT}`)
-    })
-    
-    cron.schedule(await readSettings('send_cron'), async () => {
-      if (await readSettings('send_cron_enabled')) {
-        try {
-          logger.info(`updating stocks`)
-          const res = await updateWildberriesStocks()
-          logger.info(`updating stocks done:`, res)
-        } catch (err) {
-          logger.error(`updating stocks error:`, err)
-        }
-      }
-    })
-    cron.schedule(await readSettings('update_orders_cron'), async () => {
-      if (await readSettings('update_orders_cron_enabled')) {
-        try {
-          const res = await refreshOrders()
-          logger.info(`updating orders done:`, res)
-        } catch (err) {
-          logger.error(`updating orders error:`, err)
-        }
-      }
-    })
-    cron.schedule(await readSettings('update_prices_cron'), async () => {
-      if (await readSettings('update_prices_cron_enabled')) {
-        try {
-          const res = await updatePrices()
-          logger.info(`updating prices done:`, res)
-        } catch (err) {
-          logger.error(`updating prices error:`, err)
-        }
-      }
-    })
+      updateOrdersTask()
+      updatePricesTask()
+      updateStocksTask()
     } catch (err: any) {
       logger.error(err.message)
     }
-
   })
   .catch(err => {
-    console.log(err);
+    console.log(err)
     console.log('Mongo connection - problems')
-    
+
     logger.error(`Mongo connection - problem`, err.message)
     console.log(err.message)
   })

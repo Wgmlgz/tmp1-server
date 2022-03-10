@@ -1,4 +1,4 @@
-import { Button, Card, Checkbox, Form, Input, message } from 'antd'
+import { Button, Card, Checkbox, Form, Input, InputNumber, message } from 'antd'
 import TextArea from 'antd/lib/input/TextArea'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
@@ -55,28 +55,38 @@ export default function Settings() {
             name={'sender_warehouse'}
             required={false}
           />
-          <Form.Item name='send_cron_enabled' valuePropName="checked">
-            <Checkbox name='send_cron_enabled' defaultChecked={settings.send_cron_enabled} />
-          </Form.Item>
-          <Form.Item label='Интервал отправки (cron)' name='send_cron'>
-            <Input placeholder='Интервал отправки (cron)' />
-          </Form.Item>
-          <Form.Item name='update_orders_cron_enabled' valuePropName="checked">
-            <Checkbox name='update_orders_cron_enabled' defaultChecked={settings.update_orders_cron_enabled} />
-          </Form.Item>
-          <Form.Item
-            label='Интервал обновления заказов (cron)'
-            name='update_orders_cron'>
-            <Input placeholder='Интервал обновления заказов (cron)' />
-          </Form.Item>
-          <Form.Item name='update_prices_cron_enabled' valuePropName="checked">
-            <Checkbox name='update_prices_cron_enabled' defaultChecked={settings.update_prices_cron_enabled} />
-          </Form.Item>
-          <Form.Item
-            label='Интервал обновления цен (cron)'
-            name='update_prices_cron'>
-            <Input placeholder='Интервал обновления цен (cron)' />
-          </Form.Item>
+
+          <div style={{ display: 'flex', gap: '20px' }}>
+            <Form.Item name='update_stocks_enabled' valuePropName="checked">
+              <Checkbox name='update_stocks_enabled' defaultChecked={settings.update_stocks_enabled} />
+            </Form.Item>
+            <Form.Item label='Интервал отправки (секунды)' name='update_stocks'>
+              <InputNumber placeholder='Интервал отправки (секунды)' />
+            </Form.Item>
+          </div>
+
+          <div style={{ display: 'flex', gap: '20px' }}>
+            <Form.Item name='update_orders_enabled' valuePropName="checked">
+              <Checkbox name='update_orders_enabled' defaultChecked={settings.update_orders_enabled} />
+            </Form.Item>
+            <Form.Item
+              label='Интервал обновления заказов (секунды)'
+              name='update_orders'>
+              <InputNumber placeholder='Интервал обновления заказов (секунды)' />
+            </Form.Item>
+          </div>
+
+          <div style={{ display: 'flex', gap: '20px' }}>
+            <Form.Item name='update_prices_enabled' valuePropName="checked">
+              <Checkbox name='update_prices_enabled' defaultChecked={settings.update_prices_enabled} />
+            </Form.Item>
+            <Form.Item
+              label='Интервал обновления цен (секунды)'
+              name='update_prices'>
+              <InputNumber placeholder='Интервал обновления цен (секунды)' />
+            </Form.Item>
+          </div>
+
           <Form.Item label='API ключ' name='api_key'>
             <TextArea placeholder='API ключ' />
           </Form.Item>

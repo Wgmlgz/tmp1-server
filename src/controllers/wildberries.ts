@@ -239,24 +239,24 @@ export const updateWildberriesSettings = async (
   try {
     const {
       sender_warehouse,
-      send_cron,
-      send_cron_enabled,
-      update_orders_cron,
-      update_orders_cron_enabled,
-      update_prices_cron,
-      update_prices_cron_enabled,
+      update_stocks,
+      update_stocks_enabled,
+      update_orders,
+      update_orders_enabled,
+      update_prices,
+      update_prices_enabled,
     } = req.body
     const old = await readSettingsAll()
     if (sender_warehouse) old.sender_warehouse = sender_warehouse
-    if (send_cron) old.send_cron = send_cron
-    if (send_cron_enabled !== undefined)
-      old.send_cron_enabled = send_cron_enabled
-    if (update_orders_cron) old.update_orders_cron = update_orders_cron
-    if (update_orders_cron_enabled !== undefined)
-      old.update_orders_cron_enabled = update_orders_cron_enabled
-    if (update_prices_cron) old.update_prices_cron = update_prices_cron
-    if (update_prices_cron_enabled !== undefined)
-      old.update_prices_cron_enabled = update_prices_cron_enabled
+    if (update_stocks) old.update_stocks = update_stocks
+    if (update_stocks_enabled !== undefined)
+      old.update_stocks_enabled = update_stocks_enabled
+    if (update_orders) old.update_orders = update_orders
+    if (update_orders_enabled !== undefined)
+      old.update_orders_enabled = update_orders_enabled
+    if (update_prices) old.update_prices = update_prices
+    if (update_prices_enabled !== undefined)
+      old.update_prices_enabled = update_prices_enabled
     await writeSettings(old)
     res.status(200).send('settings updated')
   } catch (err: any) {
@@ -350,7 +350,6 @@ export const refreshOrders = async () => {
       },
     })
   ).data.total
-  console.log('total:', total)
 
   const take = 1000
   let orders: any[] = []

@@ -2,18 +2,17 @@ import SettingsModel from '../models/settings'
 
 export const default_settings: any = {
   sender_warehouse: '61eda2d7f1a680d8e9adea70',
-  send_cron: '*/10 * * * *',
-  send_cron_enabled: true,
-  update_orders_cron: '*/8 * * * *',
-  update_orders_cron_enabled: true,
-  update_prices_cron: '*/8 * * * *',
-  update_prices_cron_enabled: true,
+  update_stocks: '*/10 * * * *',
+  update_stocks_enabled: true,
+  update_orders: '*/8 * * * *',
+  update_orders_enabled: true,
+  update_prices: '*/8 * * * *',
+  update_prices_enabled: true,
   api_key:
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NJRCI6ImE1Y2ZmMTE0LTFkZDktNDRhNy1iNzc1LWY4NDNiYWYxMjUzMiJ9.Q1MURJ627ZSoJhIaYBogFEA27SvQO5LRaXjPfpptQVU',
 }
 export const readSettings = async (str: string) => {
   const obj = await SettingsModel.findOne({})
-  console.log(obj?.data[str] ?? default_settings[str])
   
   if (obj && obj.data) return obj.data[str] ?? default_settings[str]
 
