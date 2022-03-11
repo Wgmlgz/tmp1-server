@@ -7,6 +7,7 @@ import {
   getCount,
   searchProducts,
   updateProduct,
+  updateManyProducts,
   upload,
   createExcelProducts,
   getProduct,
@@ -22,6 +23,7 @@ router.post('/wb_url', authenticateAdmin, createWbUrlProduct)
 router.post('/excel', authenticateAdmin, createExcelProducts)
 router.get('/excel', authenticateAdmin, getExcelImports)
 router.post('/search/:pageNumber/:nPerPage', authenticateAdmin, searchProducts)
+router.patch('/many', [authenticateAdmin], updateManyProducts)
 router.patch(
   '/:id',
   [authenticateAdmin, upload.array('imgs', 12)],

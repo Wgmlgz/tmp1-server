@@ -5,6 +5,7 @@ import {
   UserOutlined,
   AppstoreOutlined,
   ImportOutlined,
+  DownloadOutlined
 } from '@ant-design/icons'
 import { getNotifications, getUser, logout } from '../api/api'
 import SuperAdminUsers from './super_admin/SuperAdminUsers'
@@ -18,6 +19,7 @@ import ProductsIn from './warehouses/ProductsIn'
 import ProductsOut from './warehouses/ProductsOut'
 import ProductsMove from './warehouses/ProductsMove'
 import Import from './excel/Import'
+import Backup from './Backup'
 import WildberriesProducts from './marketplaces/wildberries/Products'
 import Settings from './marketplaces/wildberries/Settings'
 import Orders from './marketplaces/wildberries/Orders'
@@ -112,7 +114,7 @@ export default function Dashboard() {
             onClick={async () => {
               try {
                 await logout()
-              } catch {}
+              } catch { }
               window.location.replace('/login')
             }}>
             выйти
@@ -178,6 +180,9 @@ export default function Dashboard() {
                 </Menu.Item>
               </SubMenu>
             </SubMenu>
+            <Menu.Item key='sub4' icon={<DownloadOutlined />} title='Бекап'>
+              <Link to='/dashboard/backup'>Бекап</Link>
+            </Menu.Item>
           </Menu>
         </Sider>
         <Content style={{ margin: '20px' }}>
@@ -192,6 +197,7 @@ export default function Dashboard() {
               <Route path='/products_out' element={<ProductsOut />} />
               <Route path='/products_move' element={<ProductsMove />} />
               <Route path='/import' element={<Import />} />
+              <Route path='/backup' element={<Backup />} />
               <Route
                 path='/marketplaces/wildberries/products'
                 element={<WildberriesProducts />}

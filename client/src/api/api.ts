@@ -107,9 +107,14 @@ export const getProductsCount = () => axios.get(`${products_url}/count`)
 
 export const searchProducts = (
   str: string,
+  options: string[],
   pageNumber: number = 0,
   nPerPage: number = 1000000
-) => axios.post(`${products_url}/search/${pageNumber}/${nPerPage}`, { str })
+) =>
+  axios.post(`${products_url}/search/${pageNumber}/${nPerPage}`, {
+    str,
+    options,
+  })
 
 export const removeProduct = (id: string) =>
   axios.delete(`${products_url}/${id}`)
@@ -121,7 +126,6 @@ const productToFormData = (product: IProduct) => {
     Array.from(product.imgs).forEach(file => fd.append('imgs', file))
   }
   console.log(product)
-
   ;[
     'type',
     'category',
@@ -173,6 +177,8 @@ export const updateProduct = (product: IProduct, id: string) =>
     headers: { 'Content-Type': 'multipart/form-data' },
   })
 
+export const updateManyProducts = (data: any, ids: string[]) =>
+  axios.patch(`${products_url}/many`, { data, ids })
 /** Warehouses */
 export const getWarehouses = () => axios.get(`${warehouses_url}`)
 export const createWarehouse = (warehouse: IWarehouse) =>
@@ -263,3 +269,8 @@ export const notifications_url = `${url}/api/notifications`
 export const getNotifications = () => axios.get(`${notifications_url}`)
 export const removeNotification = (id: string) =>
   axios.delete(`${notifications_url}/${id}`)
+
+export const backup_url = `${url}/api/backup`
+
+export const getBackup = () => axios.get(`${backup_url}`)
+export const restoreBackup = (json: any) => axios.patch(`${backup_url}`)

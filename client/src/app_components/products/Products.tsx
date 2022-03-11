@@ -1,10 +1,14 @@
 import {
   Button,
   Card,
+  Checkbox,
   ConfigProvider,
   DatePicker,
+  Dropdown,
   Form,
   Input,
+  InputNumber,
+  Menu,
   message,
   Modal,
   Popconfirm,
@@ -24,6 +28,7 @@ import {
   products_url,
   removeProducts,
   searchProducts,
+  updateManyProducts,
   updateProduct,
 } from '../../api/api'
 import {
@@ -287,7 +292,7 @@ const Products = () => {
         </span>
       ),
     },
-  ])
+  ], [search_query])
 
   // const fetchProductsPagination = async (pagination: TablePaginationConfig) => {
   //   setLoading(true)
@@ -313,6 +318,10 @@ const Products = () => {
   //   }
   //   setLoading(false)
   // }
+
+  // 'brand', 'supplier'
+  const [massEdit, setMassEdit] = useState<string[]>()
+  const [options, setOptions] = useState(['brand'])
 
   const fetchAllProducts = async () => {
     const res = await getProducts(1, 10000000)
@@ -423,7 +432,7 @@ const Products = () => {
             <Popover content={
               <form onSubmit={async (e: any) => {
                 e.preventDefault()
-                
+
                 try {
                   await createWbProduct(e.target.url.value)
                   await fetchProducts()
@@ -465,7 +474,7 @@ const Products = () => {
               placeholder='поиск'
               onSearch={async e => {
                 try {
-                  const res = await searchProducts(e)
+                  const res = await searchProducts(e, options)
                   setSearchQuery(e)
                   setProducts(res.data)
                 } catch (e) {
@@ -474,6 +483,27 @@ const Products = () => {
                   }
                 }
               }}
+              suffix={
+                <Dropdown overlay={<Menu>
+                  <Menu.Item>
+                    <Checkbox checked={options.includes('brand')} onChange={(e) => {
+                      setOptions([...options, 'brand'].filter(x => (x !== 'brand') || e.target.checked))
+                    }} />
+                    <label> искать по брендам</label>
+                  </Menu.Item>
+                  <Menu.Item>
+                    <Checkbox checked={options.includes('provider')} onChange={(e) => {
+                      setOptions([...options, 'provider'].filter(x => (x !== 'provider') || e.target.checked))
+                    }} />
+                    <label> искать по поставщикам</label>
+                  </Menu.Item>
+                </Menu>}>
+                  <Button>
+                    опции
+                  </Button>
+                </Dropdown>
+
+              }
             />
             <Button
               style={{ backgroundColor: '#98f379' }}
@@ -508,6 +538,123 @@ const Products = () => {
               }}>
               Экспорт excel(все)
             </Button>
+            <Button onClick={() => {
+              setMassEdit(selected_products.map(x => x._id))
+            }}>
+              Массовое редактирование
+            </Button>
+
+            {massEdit && <FullscreenCard onCancel={() => {
+              setMassEdit(undefined)
+            }}>
+              <Card>
+                <Form initialValues={{ delivery_price_option: 'set', buy_price_option: 'set' }} onFinish={async (e) => {
+                  // e.preventDefault()
+
+                  try {
+                    console.log(e);
+                    console.log(massEdit);
+
+                    await updateManyProducts(e, massEdit)
+                    await fetchProducts()
+                    message.success('Товары обновленны')
+                  } catch (e) {
+                    if (axios.isAxiosError(e)) {
+                      message.error(e.response?.data)
+                    }
+                  }
+                }}>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <Form.Item name='buy_price_option' label='Цены закупа'>
+                      <Select style={{ width: '200px' }}>
+                        <Option key={'percent'} value={'percent'}>
+                          Измениние в процентах
+                        </Option>
+                        <Option key={'add'} value={'add'}>
+                          Добавление
+                        </Option>
+                        <Option key={'set'} value={'set'}>
+                          Установка
+                        </Option>
+                      </Select>
+                    </Form.Item>
+
+                    <Form.Item name='buy_price'>
+                      <InputNumber />
+                    </Form.Item>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <Form.Item name='delivery_price_option' label='Цены доставки'>
+                      <Select style={{ width: '200px' }}>
+                        <Option key={'percent'} value={'percent'}>
+                          Измениние в процентах
+                        </Option>
+                        <Option key={'add'} value={'add'}>
+                          Добавление
+                        </Option>
+                        <Option key={'set'} value={'set'}>
+                          Установка
+                        </Option>
+                      </Select>
+                    </Form.Item>
+                    <Form.Item name='delivery_price'>
+                      <InputNumber />
+                    </Form.Item>
+                  </div>
+
+                  <Form.Item name='category' label='Категория'>
+                    <Select placeholder='Категория'>
+                      {categories.map((s, id) => (
+                        <Option key={id} value={s}>
+                          {s}
+                        </Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+
+                  <Form.Item name='provider' label='Поставщик'>
+                    <Input />
+                  </Form.Item>
+                  <Form.Item name='mark' label='Заметка'>
+                    <Input />
+                  </Form.Item>
+                  <Form.Item name='country' label='Страна'>
+                    <Input />
+                  </Form.Item>
+                  <Form.Item name='description' label='Описание'>
+                    <Input />
+                  </Form.Item>
+
+                  <Form.Item name='height' label='Высота'>
+                    <InputNumber />
+                  </Form.Item>
+                  <Form.Item name='length' label='Длина'>
+                    <InputNumber />
+                  </Form.Item>
+                  <Form.Item name='width' label='Ширина'>
+                    <InputNumber />
+                  </Form.Item>
+                  <Form.Item name='weight' label='Вес'>
+                    <InputNumber />
+                  </Form.Item>
+
+                  <Form.Item name='brand' label='Бренд'>
+                    <Input />
+                  </Form.Item>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <Button onClick={() => {
+                      setMassEdit(undefined)
+                    }}>
+                      Отмена
+                    </Button>
+                    <Button htmlType='submit' type='primary'>
+                      Массовое редактирование
+                    </Button>
+                  </div>
+                </Form>
+              </Card>
+            </FullscreenCard>}
           </div>
           <br />
 

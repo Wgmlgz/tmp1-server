@@ -56,9 +56,11 @@ const ProductsListForm: FC<Props> = ({
     setup()
   }, [default_products])
 
+  const [options, setOptions] = useState([])
+
   const onSearch = async (query: string) => {
     try {
-      const res_products = await searchProducts(query)
+      const res_products = await searchProducts(query, options)
       setSearchProducts(res_products.data)
       setSearchQuery(query)
     } catch (err) {

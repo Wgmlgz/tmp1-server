@@ -111,6 +111,11 @@ const Orders = () => {
       sorter: (a, b) => String(a.name).localeCompare(String(b.name)),
     },
     {
+      title: 'Адресс',
+      dataIndex: 'address',
+      key: 'address',
+    },
+    {
       title: 'Фото',
       dataIndex: 'img',
       key: 'img',

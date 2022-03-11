@@ -14,19 +14,13 @@ import products_out_routes from './routes/products_out'
 import products_move_routes from './routes/products_move'
 import wildberries_routes from './routes/wildberries'
 import notifications_routes from './routes/notifications'
+import backup_routes from './routes/backup'
 import stats_routes from './routes/stats'
 import mongoose from 'mongoose'
 import cookieParser from 'cookie-parser'
 import { CORS_ORIGIN, MONGO_CONNECTION_URL, PORT, NODE_ENV } from './config/env'
 import fs from 'fs'
-import {
-  refreshOrders,
-  runUpdateWildberriesStocks,
-  updateWildberriesStocks,
-} from './controllers/wildberries'
 import logger from './util/logger'
-import { readSettings } from './controllers/settings'
-import { updatePrices } from './controllers/update_prices'
 import {
   updateOrdersTask,
   updatePricesTask,
@@ -62,6 +56,7 @@ app.use('/api/products_move', products_move_routes)
 app.use('/api/wildberries', wildberries_routes)
 app.use('/api/stats', stats_routes)
 app.use('/api/notifications', notifications_routes)
+app.use('/api/backup', backup_routes)
 
 // if (NODE_ENV === 'production') {
 //   app.use(express.static(path.join(__dirname, '../client/build')))

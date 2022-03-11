@@ -170,6 +170,78 @@ export const updateProduct = async (req: Request, res: Response) => {
   }
 }
 
+export const updateManyProducts = async (req: Request, res: Response) => {
+  try {
+    const { ids, data } = req.body
+
+    console.log(ids, data)
+
+    const {
+      brand,
+      category,
+      country,
+      description,
+      height,
+      length,
+      mark,
+      provider,
+      weight,
+      width,
+      buy_price,
+      buy_price_option,
+      delivery_price,
+      delivery_price_option,
+    } = data
+
+    await Promise.allSettled(
+      ids.map(async (id: string) => {
+        const old_product = await Product.findById(id)
+
+        let new_buy_price = Number(old_product?.buy_price)
+        if (buy_price) {
+          if (buy_price_option === 'percent') {
+            new_buy_price += new_buy_price * (buy_price / 100)
+          } else if (buy_price_option === 'add') {
+            new_buy_price += buy_price
+          } else {
+            new_buy_price = buy_price
+          }
+        }
+
+        let new_delivery_price = Number(old_product?.delivery_price)
+        if (delivery_price) {
+          if (delivery_price_option === 'percent') {
+            new_delivery_price += new_delivery_price * (delivery_price / 100)
+          } else if (delivery_price_option === 'add') {
+            new_delivery_price += delivery_price
+          } else {
+            new_delivery_price = delivery_price
+          }
+        }
+        await Product.findByIdAndUpdate(id, {
+          brand,
+          category,
+          country,
+          description,
+          height,
+          length,
+          mark,
+          provider,
+          weight,
+          width,
+          buy_price: new_buy_price,
+          delivery_price: new_delivery_price,
+        })
+      })
+    )
+
+    res.send('Products updated')
+  } catch (err: any) {
+    logger.error(err.message)
+    res.status(400).send(err.message)
+  }
+}
+
 export const getProduct = async (req: Request, res: Response) => {
   try {
     let { id } = req.params
@@ -227,20 +299,28 @@ export const getCount = async (req: Request, res: Response) => {
 
 export const searchProducts = async (req: Request, res: Response) => {
   try {
-    const { str } = req.body
+    const { str, options }: { str: string; options: string[] } = req.body
 
     let { pageNumber, nPerPage }: any = req.params
 
     pageNumber = parseInt(pageNumber)
     nPerPage = parseInt(nPerPage)
 
+    const search_options: any[] = [
+      { name: new RegExp(str, 'i') },
+      { article: new RegExp(str, 'i') },
+      { barcode: new RegExp(str, 'i') },
+    ]
+
+    if (options.includes('brand'))
+      search_options.push({ brand: new RegExp(str, 'i') })
+
+    if (options.includes('provider'))
+      search_options.push({ provider: new RegExp(str, 'i') })
+
     if (str) {
       const products = await Product.find({
-        $or: [
-          { name: new RegExp(str, 'i') },
-          { article: new RegExp(str, 'i') },
-          { barcode: new RegExp(str, 'i') },
-        ],
+        $or: search_options,
       })
         .skip(pageNumber > 0 ? (pageNumber - 1) * nPerPage : 0)
         .limit(nPerPage)

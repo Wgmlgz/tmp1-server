@@ -213,6 +213,7 @@ export const getWildberriesOrders = async (req: Request, res: Response) => {
         product,
       ])
     )
+    const warehouse = await readSettings('sender_warehouse')
     orders.orders.forEach((item: any) => {
       item.warehouse = warehouses.get(item.storeId)
       const db_product = db_products.get(item.barcode)
@@ -223,6 +224,10 @@ export const getWildberriesOrders = async (req: Request, res: Response) => {
       item.brand = db_product.brand
       item.article = db_product.article
       item.color = db_product.color
+
+      item.address = (
+        db_product.addresses as Map<string, string> | undefined
+      )?.get(warehouse)
     })
 
     res.status(200).send(orders)
