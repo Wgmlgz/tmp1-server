@@ -4,7 +4,7 @@ const { combine, timestamp, label, printf } = format
 
 const myFormat = printf(
   ({ level, message, timestamp }) =>
-    `${moment(timestamp).format('DD-MM-YYYY:HH:MM')} ${level}: ${message}`
+    `${moment(timestamp).format('DD-MM-YYYY:HH:mm')} ${level}: ${message}`
 )
 
 const logger = winston.createLogger({
