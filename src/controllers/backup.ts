@@ -14,7 +14,6 @@ import logger from '../util/logger'
 
 const collections = [
   RemainModel,
-  UserModel,
   ProductModel,
   WBOrderModel,
   CategoryModel,
@@ -27,7 +26,6 @@ const collections = [
 
 export const getBackup = async (req: Request, res: Response) => {
   try {
-    const { start, end, product } = req.body
     let backup: any = {}
 
     await Promise.allSettled(
@@ -46,8 +44,29 @@ export const getBackup = async (req: Request, res: Response) => {
 export const restoreBackup = async (req: Request, res: Response) => {
   try {
     const { backup } = req.body
+    /** validate shape */
+    try {
+      collections.map(x => {
+        if (!Array.isArray(backup[x.modelName])) throw new Error('err')
+      })
+    } catch (err) {
+      const msg = 'Неверный формат файла'
+      throw new Error(msg)
+    }
 
-    res.status(200).send('Восстановленно')
+    /** remove */
+    await Promise.allSettled(
+      collections.map(async x => {
+        await x.deleteMany(() => {})
+      })
+    )
+    /** restore */
+    collections.map(async x => {
+      await x.insertMany(backup[x.modelName])
+      logger.error(`Restoring ${x.modelName} done`)
+    })
+
+    res.status(200).send('Restoring started')
   } catch (err: any) {
     logger.error(err.message)
     res.status(400).send(err.message)

@@ -273,4 +273,5 @@ export const removeNotification = (id: string) =>
 export const backup_url = `${url}/api/backup`
 
 export const getBackup = () => axios.get(`${backup_url}`)
-export const restoreBackup = (json: any) => axios.patch(`${backup_url}`)
+export const restoreBackup = (backup: any) =>
+  axios.patch(`${backup_url}`, { backup })
