@@ -196,7 +196,7 @@ export default function Dashboard() {
               </SubMenu>
             )}
             {user.super_admin && (
-              <Menu.Item key='sub4' icon={<DownloadOutlined />} title='Бекап'>
+              <Menu.Item key='sub43' icon={<DownloadOutlined />} title='Бекап'>
                 <Link to='/dashboard/backup'>Бекап</Link>
               </Menu.Item>
             )}

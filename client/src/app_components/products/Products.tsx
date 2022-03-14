@@ -70,10 +70,10 @@ export const highlightText = (str: string, search: string) => (
   <span>
     {search
       ? reactStringReplace(str, new RegExp(`(${search})+`, 'g'), (match, i) => (
-        <span key={i} style={{ fontWeight: 'bold' }}>
-          {match}
-        </span>
-      ))
+          <span key={i} style={{ fontWeight: 'bold' }}>
+            {match}
+          </span>
+        ))
       : str}
   </span>
 )
@@ -158,8 +158,9 @@ const Products = () => {
 
       const map = new Map<string, string>()
       remains_res.data.forEach((remain: IRemain) => {
-        const str = `${warehouses_map.get(remain.warehouse)} - ${remain.quantity
-          }`
+        const str = `${warehouses_map.get(remain.warehouse)} - ${
+          remain.quantity
+        }`
         const old = map.get(remain.product)
         map.set(remain.product, old ? `${old}\n${str}` : str)
       })
@@ -185,114 +186,118 @@ const Products = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const columns = useColumns<IProductFull>('main_products', [
-    {
-      title: 'Изображение',
-      dataIndex: 'img',
-      key: 'type',
-      render: (text, record, index) =>
-        record.imgs_big &&
-        record.imgs_big[0] && (
-          <Image
-            width={100}
-            src={`${products_url}/img/${record.imgs_big[0]}`}
-          />
+  const columns = useColumns<IProductFull>(
+    'main_products',
+    [
+      {
+        title: 'Изображение',
+        dataIndex: 'img',
+        key: 'type',
+        render: (text, record, index) =>
+          record.imgs_big &&
+          record.imgs_big[0] && (
+            <Image
+              width={100}
+              src={`${products_url}/img/${record.imgs_big[0]}`}
+            />
+          ),
+      },
+      {
+        title: 'Артикул',
+        dataIndex: 'article',
+        key: 'article',
+        render: (text, record, index) =>
+          highlightText(record.article || '', search_query),
+      },
+      {
+        title: 'Штрихкод',
+        dataIndex: 'barcode',
+        key: 'barcode',
+        render: (text, record, index) =>
+          highlightText(record.barcode || '', search_query),
+      },
+      {
+        title: 'Имя',
+        dataIndex: 'name',
+        key: 'name',
+        sorter: (a, b) => a.name.localeCompare(b.name),
+        render: (text, record, index) => (
+          <p>{highlightText(record.name || '', search_query)}</p>
         ),
-    },
-    {
-      title: 'Артикул',
-      dataIndex: 'article',
-      key: 'article',
-      render: (text, record, index) =>
-        highlightText(record.article || '', search_query),
-    },
-    {
-      title: 'Штрихкод',
-      dataIndex: 'barcode',
-      key: 'barcode',
-      render: (text, record, index) =>
-        highlightText(record.barcode || '', search_query),
-    },
-    {
-      title: 'Имя',
-      dataIndex: 'name',
-      key: 'name',
-      sorter: (a, b) => a.name.localeCompare(b.name),
-      render: (text, record, index) => (
-        <p>{highlightText(record.name || '', search_query)}</p>
-      ),
-    },
-    {
-      title: 'Закупочная цена',
-      dataIndex: 'buy_price',
-      key: 'buy_price',
-      sorter: (a, b) =>
-        Number.parseInt(a.buy_price) - Number.parseInt(b.buy_price),
-    },
-    {
-      title: 'Цена доставки',
-      dataIndex: 'delivery_price',
-      key: 'delivery_price',
-      sorter: (a, b) =>
-        Number.parseInt(a.delivery_price) - Number.parseInt(b.delivery_price),
-    },
-    {
-      title: 'Создан',
-      dataIndex: 'created',
-      key: 'created',
-      render: (text, record, index) =>
-        moment(record.created).format('DD-MM-GGGG'),
-      sorter: (a, b) => moment(a.created).unix() - moment(b.created).unix(),
-    },
-    {
-      title: 'Количество',
-      dataIndex: 'count',
-      key: 'count',
-    },
-    {
-      title: 'Изменить/Удалить',
-      dataIndex: 'name',
-      key: 'edit',
-      render: (text, record, index) => (
-        <span style={{ display: 'flex', gap: '10px' }}>
-          <Button
-            onClick={() => {
-              setEditedProductId(record._id)
-              setEditedProduct(record)
-            }}>
-            <EditOutlined />
-          </Button>
-          <Popconfirm
-            onCancel={() => { }}
-            onConfirm={async () => {
-              try {
-                await removeProducts([record?._id ?? ''])
-                await fetchProducts()
-                setEditedProductId('')
-                message.success('Продукт удален')
-              } catch (e) {
-                if (axios.isAxiosError(e)) {
-                  message.error(e.response?.data)
-                }
-              }
-            }}
-            title={`Вы точно хотите безвозвратно удалить товар?`}
-            okText='Да'
-            cancelText='Нет'>
-            <Button>
-              <DeleteOutlined />
+      },
+      {
+        title: 'Закупочная цена',
+        dataIndex: 'buy_price',
+        key: 'buy_price',
+        sorter: (a, b) =>
+          Number.parseInt(a.buy_price) - Number.parseInt(b.buy_price),
+      },
+      {
+        title: 'Цена доставки',
+        dataIndex: 'delivery_price',
+        key: 'delivery_price',
+        sorter: (a, b) =>
+          Number.parseInt(a.delivery_price) - Number.parseInt(b.delivery_price),
+      },
+      {
+        title: 'Создан',
+        dataIndex: 'created',
+        key: 'created',
+        render: (text, record, index) =>
+          moment(record.created).format('DD-MM-GGGG'),
+        sorter: (a, b) => moment(a.created).unix() - moment(b.created).unix(),
+      },
+      {
+        title: 'Количество',
+        dataIndex: 'count',
+        key: 'count',
+      },
+      {
+        title: 'Изменить/Удалить',
+        dataIndex: 'name',
+        key: 'edit',
+        render: (text, record, index) => (
+          <span style={{ display: 'flex', gap: '10px' }}>
+            <Button
+              onClick={() => {
+                setEditedProductId(record._id)
+                setEditedProduct(record)
+              }}>
+              <EditOutlined />
             </Button>
-          </Popconfirm>
-          <Button
-            onClick={() => {
-              setStats(record)
-            }}>
-            <BarChartOutlined />
-          </Button>
-        </span>
-      ),
-    },
-  ], [search_query])
+            <Popconfirm
+              onCancel={() => {}}
+              onConfirm={async () => {
+                try {
+                  await removeProducts([record?._id ?? ''])
+                  await fetchProducts()
+                  setEditedProductId('')
+                  message.success('Продукт удален')
+                } catch (e) {
+                  if (axios.isAxiosError(e)) {
+                    message.error(e.response?.data)
+                  }
+                }
+              }}
+              title={`Вы точно хотите безвозвратно удалить товар?`}
+              okText='Да'
+              cancelText='Нет'>
+              <Button>
+                <DeleteOutlined />
+              </Button>
+            </Popconfirm>
+            <Button
+              onClick={() => {
+                setStats(record)
+              }}>
+              <BarChartOutlined />
+            </Button>
+          </span>
+        ),
+      },
+    ],
+    [search_query]
+  )
 
   // const fetchProductsPagination = async (pagination: TablePaginationConfig) => {
   //   setLoading(true)
@@ -329,7 +334,7 @@ const Products = () => {
   }
 
   useEffect(() => {
-    ; (async () => {
+    ;(async () => {
       if (!stats) return
 
       try {
@@ -372,12 +377,12 @@ const Products = () => {
             barcodes={
               barcodes_creation === 'barcodes all'
                 ? products.map(product => ({
-                  barcode: product.barcode || '',
-                  name: product.name || '',
-                  article: product.article || '',
-                }))
+                    barcode: product.barcode || '',
+                    name: product.name || '',
+                    article: product.article || '',
+                  }))
                 : barcodes_creation === 'barcodes wb'
-                  ? selected_products
+                ? selected_products
                     .filter(
                       product =>
                         product.marketplace_data &&
@@ -390,7 +395,7 @@ const Products = () => {
                       article: product.article || '',
                       color: product.color || '',
                     }))
-                  : selected_products.map(product => ({
+                : selected_products.map(product => ({
                     barcode: product.barcode || '',
                     name: product.name || '',
                     article: product.article || '',
@@ -410,7 +415,7 @@ const Products = () => {
             }}>
             <h2>Все товары</h2>
             <Popconfirm
-              onCancel={() => { }}
+              onCancel={() => {}}
               onConfirm={async () => {
                 try {
                   await removeProducts(
@@ -429,25 +434,26 @@ const Products = () => {
               cancelText='Нет'>
               <Button>Удалить товары</Button>
             </Popconfirm>
-            <Popover content={
-              <form onSubmit={async (e: any) => {
-                e.preventDefault()
+            <Popover
+              content={
+                <form
+                  onSubmit={async (e: any) => {
+                    e.preventDefault()
 
-                try {
-                  await createWbProduct(e.target.url.value)
-                  await fetchProducts()
-                  message.success('Товар добавлен')
-                } catch (e) {
-                  if (axios.isAxiosError(e)) {
-                    message.error(e.response?.data)
-                  }
-                }
-              }}>
-                <Input name='url' placeholder='ссылка...' />
-                <Button htmlType='submit'>Добавить</Button>
-              </form>
-            }>
-
+                    try {
+                      await createWbProduct(e.target.url.value)
+                      await fetchProducts()
+                      message.success('Товар добавлен')
+                    } catch (e) {
+                      if (axios.isAxiosError(e)) {
+                        message.error(e.response?.data)
+                      }
+                    }
+                  }}>
+                  <Input name='url' placeholder='ссылка...' />
+                  <Button htmlType='submit'>Добавить</Button>
+                </form>
+              }>
               <Button>Добавить с WB</Button>
             </Popover>
             <div style={{ display: 'grid' }}>
@@ -484,25 +490,41 @@ const Products = () => {
                 }
               }}
               suffix={
-                <Dropdown overlay={<Menu>
-                  <Menu.Item>
-                    <Checkbox checked={options.includes('brand')} onChange={(e) => {
-                      setOptions([...options, 'brand'].filter(x => (x !== 'brand') || e.target.checked))
-                    }} />
-                    <label> искать по брендам</label>
-                  </Menu.Item>
-                  <Menu.Item>
-                    <Checkbox checked={options.includes('provider')} onChange={(e) => {
-                      setOptions([...options, 'provider'].filter(x => (x !== 'provider') || e.target.checked))
-                    }} />
-                    <label> искать по поставщикам</label>
-                  </Menu.Item>
-                </Menu>}>
-                  <Button>
+                <Dropdown
+                  overlay={
+                    <Menu>
+                      <Menu.Item>
+                        <Checkbox
+                          checked={options.includes('brand')}
+                          onChange={e => {
+                            setOptions(
+                              [...options, 'brand'].filter(
+                                x => x !== 'brand' || e.target.checked
+                              )
+                            )
+                          }}
+                        />
+                        <label> искать по брендам</label>
+                      </Menu.Item>
+                      <Menu.Item>
+                        <Checkbox
+                          checked={options.includes('provider')}
+                          onChange={e => {
+                            setOptions(
+                              [...options, 'provider'].filter(
+                                x => x !== 'provider' || e.target.checked
+                              )
+                            )
+                          }}
+                        />
+                        <label> искать по поставщикам</label>
+                      </Menu.Item>
+                    </Menu>
+                  }>
+                  <Button type='text' style={{ margin: '-10px'}}>
                     опции
                   </Button>
                 </Dropdown>
-
               }
             />
             <Button
@@ -538,123 +560,135 @@ const Products = () => {
               }}>
               Экспорт excel(все)
             </Button>
-            <Button onClick={() => {
-              setMassEdit(selected_products.map(x => x._id))
-            }}>
+            <Button
+              onClick={() => {
+                setMassEdit(selected_products.map(x => x._id))
+              }}>
               Массовое редактирование
             </Button>
 
-            {massEdit && <FullscreenCard onCancel={() => {
-              setMassEdit(undefined)
-            }}>
-              <Card>
-                <Form initialValues={{ delivery_price_option: 'set', buy_price_option: 'set' }} onFinish={async (e) => {
-                  // e.preventDefault()
-
-                  try {
-                    console.log(e);
-                    console.log(massEdit);
-
-                    await updateManyProducts(e, massEdit)
-                    await fetchProducts()
-                    message.success('Товары обновленны')
-                  } catch (e) {
-                    if (axios.isAxiosError(e)) {
-                      message.error(e.response?.data)
-                    }
-                  }
+            {massEdit && (
+              <FullscreenCard
+                onCancel={() => {
+                  setMassEdit(undefined)
                 }}>
-                  <div style={{ display: 'flex', gap: '10px' }}>
-                    <Form.Item name='buy_price_option' label='Цены закупа'>
-                      <Select style={{ width: '200px' }}>
-                        <Option key={'percent'} value={'percent'}>
-                          Измениние в процентах
-                        </Option>
-                        <Option key={'add'} value={'add'}>
-                          Добавление
-                        </Option>
-                        <Option key={'set'} value={'set'}>
-                          Установка
-                        </Option>
-                      </Select>
-                    </Form.Item>
+                <Card>
+                  <Form
+                    initialValues={{
+                      delivery_price_option: 'set',
+                      buy_price_option: 'set',
+                    }}
+                    onFinish={async e => {
+                      // e.preventDefault()
 
-                    <Form.Item name='buy_price'>
-                      <InputNumber />
-                    </Form.Item>
-                  </div>
+                      try {
+                        console.log(e)
+                        console.log(massEdit)
 
-                  <div style={{ display: 'flex', gap: '10px' }}>
-                    <Form.Item name='delivery_price_option' label='Цены доставки'>
-                      <Select style={{ width: '200px' }}>
-                        <Option key={'percent'} value={'percent'}>
-                          Измениние в процентах
-                        </Option>
-                        <Option key={'add'} value={'add'}>
-                          Добавление
-                        </Option>
-                        <Option key={'set'} value={'set'}>
-                          Установка
-                        </Option>
-                      </Select>
-                    </Form.Item>
-                    <Form.Item name='delivery_price'>
-                      <InputNumber />
-                    </Form.Item>
-                  </div>
-
-                  <Form.Item name='category' label='Категория'>
-                    <Select placeholder='Категория'>
-                      {categories.map((s, id) => (
-                        <Option key={id} value={s}>
-                          {s}
-                        </Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
-
-                  <Form.Item name='provider' label='Поставщик'>
-                    <Input />
-                  </Form.Item>
-                  <Form.Item name='mark' label='Заметка'>
-                    <Input />
-                  </Form.Item>
-                  <Form.Item name='country' label='Страна'>
-                    <Input />
-                  </Form.Item>
-                  <Form.Item name='description' label='Описание'>
-                    <Input />
-                  </Form.Item>
-
-                  <Form.Item name='height' label='Высота'>
-                    <InputNumber />
-                  </Form.Item>
-                  <Form.Item name='length' label='Длина'>
-                    <InputNumber />
-                  </Form.Item>
-                  <Form.Item name='width' label='Ширина'>
-                    <InputNumber />
-                  </Form.Item>
-                  <Form.Item name='weight' label='Вес'>
-                    <InputNumber />
-                  </Form.Item>
-
-                  <Form.Item name='brand' label='Бренд'>
-                    <Input />
-                  </Form.Item>
-                  <div style={{ display: 'flex', gap: '10px' }}>
-                    <Button onClick={() => {
-                      setMassEdit(undefined)
+                        await updateManyProducts(e, massEdit)
+                        await fetchProducts()
+                        message.success('Товары обновленны')
+                      } catch (e) {
+                        if (axios.isAxiosError(e)) {
+                          message.error(e.response?.data)
+                        }
+                      }
                     }}>
-                      Отмена
-                    </Button>
-                    <Button htmlType='submit' type='primary'>
-                      Массовое редактирование
-                    </Button>
-                  </div>
-                </Form>
-              </Card>
-            </FullscreenCard>}
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <Form.Item name='buy_price_option' label='Цены закупа'>
+                        <Select style={{ width: '200px' }}>
+                          <Option key={'percent'} value={'percent'}>
+                            Измениние в процентах
+                          </Option>
+                          <Option key={'add'} value={'add'}>
+                            Добавление
+                          </Option>
+                          <Option key={'set'} value={'set'}>
+                            Установка
+                          </Option>
+                        </Select>
+                      </Form.Item>
+
+                      <Form.Item name='buy_price'>
+                        <InputNumber />
+                      </Form.Item>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <Form.Item
+                        name='delivery_price_option'
+                        label='Цены доставки'>
+                        <Select style={{ width: '200px' }}>
+                          <Option key={'percent'} value={'percent'}>
+                            Измениние в процентах
+                          </Option>
+                          <Option key={'add'} value={'add'}>
+                            Добавление
+                          </Option>
+                          <Option key={'set'} value={'set'}>
+                            Установка
+                          </Option>
+                        </Select>
+                      </Form.Item>
+                      <Form.Item name='delivery_price'>
+                        <InputNumber />
+                      </Form.Item>
+                    </div>
+
+                    <Form.Item name='category' label='Категория'>
+                      <Select placeholder='Категория'>
+                        {categories.map((s, id) => (
+                          <Option key={id} value={s}>
+                            {s}
+                          </Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+
+                    <Form.Item name='provider' label='Поставщик'>
+                      <Input />
+                    </Form.Item>
+                    <Form.Item name='mark' label='Заметка'>
+                      <Input />
+                    </Form.Item>
+                    <Form.Item name='country' label='Страна'>
+                      <Input />
+                    </Form.Item>
+                    <Form.Item name='description' label='Описание'>
+                      <Input />
+                    </Form.Item>
+
+                    <Form.Item name='height' label='Высота'>
+                      <InputNumber />
+                    </Form.Item>
+                    <Form.Item name='length' label='Длина'>
+                      <InputNumber />
+                    </Form.Item>
+                    <Form.Item name='width' label='Ширина'>
+                      <InputNumber />
+                    </Form.Item>
+                    <Form.Item name='weight' label='Вес'>
+                      <InputNumber />
+                    </Form.Item>
+
+                    <Form.Item name='brand' label='Бренд'>
+                      <Input />
+                    </Form.Item>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <Button
+                        onClick={() => {
+                          setMassEdit(undefined)
+                        }}>
+                        Отмена
+                      </Button>
+                      <Button htmlType='submit' type='primary'>
+                        Массовое редактирование
+                      </Button>
+                    </div>
+                  </Form>
+                </Card>
+              </FullscreenCard>
+            )}
           </div>
           <br />
 
@@ -676,14 +710,14 @@ const Products = () => {
               ),
             }))}
             columns={columns}
-          // loading={loading}
-          // pagination={{
-          //   ...pagination,
-          //   pageSizeOptions: ['50', '100', '200'],
-          //   // pageSizeOptions: ['1', '2', '3'],
-          //   // pageSize: 1
-          // }}
-          // onChange={fetchProductsPagination}
+            loading={!products.length}
+            // pagination={{
+            //   ...pagination,
+            //   pageSizeOptions: ['50', '100', '200'],
+            //   // pageSizeOptions: ['1', '2', '3'],
+            //   // pageSize: 1
+            // }}
+            // onChange={fetchProductsPagination}
           />
         </Card>
       </div>

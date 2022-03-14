@@ -106,6 +106,20 @@ export default function Settings() {
             </Form.Item>
           </div>
 
+          <div style={{ display: 'flex', gap: '20px' }}>
+            <Form.Item name='update_json_enabled' valuePropName='checked'>
+              <Checkbox
+                name='update_json_enabled'
+                defaultChecked={settings.update_json_enabled}
+              />
+            </Form.Item>
+            <Form.Item
+              label='Интервал обмена JSON (секунды)'
+              name='update_json'>
+              <InputNumber placeholder='Интервал обмена JSON (секунды)' />
+            </Form.Item>
+          </div>
+
           <Form.Item label='API ключ' name='api_key'>
             <TextArea placeholder='API ключ' />
           </Form.Item>

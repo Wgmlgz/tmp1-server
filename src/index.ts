@@ -25,6 +25,7 @@ import logger from './util/logger'
 import {
   updateOrdersTask,
   updatePricesTask,
+  updateJsonTask,
   updateStocksTask,
 } from './util/tasks'
 
@@ -84,6 +85,7 @@ mongoose
 
       updateOrdersTask()
       updatePricesTask()
+      updateJsonTask()
       updateStocksTask()
     } catch (err: any) {
       logger.error(err.message)

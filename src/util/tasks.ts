@@ -1,5 +1,6 @@
 import { readSettings } from '../controllers/settings'
 import { updatePrices } from '../controllers/update_prices'
+import { updateJson } from '../controllers/update_json'
 import {
   refreshOrders,
   updateWildberriesStocks,
@@ -50,5 +51,21 @@ export const updatePricesTask = async () => {
   setTimeout(
     updatePricesTask,
     Number(await readSettings('update_prices')) * 1000 || 60 * 10 * 1000
+  )
+}
+
+export const updateJsonTask = async () => {
+  if (await readSettings('update_json_enabled')) {
+    try {
+      const res = await updateJson()
+      logger.info(`updating json done:`, res)
+    } catch (err) {
+      logger.error(`updating json error:`, err)
+    }
+  }
+
+  setTimeout(
+    updateJsonTask,
+    Number(await readSettings('update_json')) * 1000 || 60 * 10 * 1000
   )
 }
