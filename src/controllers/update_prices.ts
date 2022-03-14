@@ -9,6 +9,8 @@ export const updatePrices = async () => {
   const products = await ProductModel.find({ update_price: true })
 
   const WILDBERRIES_API_KEY = await readSettings('api_key')
+  const prices = await readSettings('prices')
+
   const wb_header = {
     headers: { Authorization: WILDBERRIES_API_KEY },
   }
@@ -40,13 +42,12 @@ export const updatePrices = async () => {
 
         let target_price = db_price
 
-        if (db_price <= 49) target_price = 145
-        else if (db_price <= 100) target_price = db_price * 3.0
-        else if (db_price <= 200) target_price = db_price * 2.7
-        else if (db_price <= 300) target_price = db_price * 2.5
-        else if (db_price <= 350) target_price = db_price * 2.3
-        else if (db_price <= 400) target_price = db_price * 2.2
-        else target_price = db_price * 2.0
+        for (let i = 0; i < prices.length; ++i) {
+          if (db_price <= Number(prices[i].price)) {
+            target_price = db_price * Number(prices[i].modifier)
+            break
+          }
+        }
 
         target_price = Math.ceil(target_price)
 

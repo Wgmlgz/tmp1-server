@@ -1,4 +1,13 @@
-import { Button, Card, Checkbox, Form, Input, InputNumber, message } from 'antd'
+import {
+  Button,
+  Card,
+  Checkbox,
+  Form,
+  Input,
+  InputNumber,
+  message,
+  Space,
+} from 'antd'
 import TextArea from 'antd/lib/input/TextArea'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
@@ -10,6 +19,8 @@ import {
   updateWildberriesSettings,
 } from '../../../api/api'
 import WarehouseSelect from '../../warehouses/WarehouseSelect'
+
+import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
 
 export default function Settings() {
   const [msg, setMsg] = useState('')
@@ -98,6 +109,53 @@ export default function Settings() {
           <Form.Item label='API ключ' name='api_key'>
             <TextArea placeholder='API ключ' />
           </Form.Item>
+
+          <div style={{ width: '500px' }}>
+            <Form.List name='prices'>
+              {(fields, { add, remove }) => (
+                <>
+                  {fields.map(field => (
+                    <Space key={field.key} align='baseline'>
+                      <Form.Item
+                        {...field}
+                        label='Цена'
+                        name={[field.name, 'price']}
+                        rules={[{ required: true, message: 'Введите цену' }]}>
+                        <Input />
+                      </Form.Item>
+                      <Form.Item
+                        {...field}
+                        label='Модификатор'
+                        name={[field.name, 'modifier']}
+                        rules={[
+                          { required: true, message: 'Введите модификатор' },
+                        ]}>
+                        <Input />
+                      </Form.Item>
+                      <MinusCircleOutlined onClick={() => remove(field.name)} />
+                    </Space>
+                  ))}
+
+                  <Form.Item>
+                    <Button
+                      type='dashed'
+                      onClick={() => {
+                        if (fields.length < 20) {
+                          add()
+                        } else {
+                          message.error('Максимум 20 ячеек')
+                        }
+                      }}
+                      block
+                      icon={<PlusOutlined />}>
+                      Добавить модификатор
+                    </Button>
+                  </Form.Item>
+                </>
+              )}
+            </Form.List>
+          </div>
+
           <div style={{ display: 'flex', gap: '20px', width: '100%' }}>
             <Form.Item style={{ flexGrow: 1 }}>
               <Button type='primary' htmlType='submit'>
