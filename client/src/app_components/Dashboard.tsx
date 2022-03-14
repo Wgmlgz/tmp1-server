@@ -5,7 +5,7 @@ import {
   UserOutlined,
   AppstoreOutlined,
   ImportOutlined,
-  DownloadOutlined
+  DownloadOutlined,
 } from '@ant-design/icons'
 import { getNotifications, getUser, logout } from '../api/api'
 import SuperAdminUsers from './super_admin/SuperAdminUsers'
@@ -37,6 +37,7 @@ export default function Dashboard() {
   const [notifications, setNotifications] = useState<Notification[]>([])
 
   const fetchNotifications = async () => {
+    if (!(user.admin || user.super_admin)) return
     try {
       const res = await getNotifications()
       setNotifications(res.data)
@@ -54,7 +55,11 @@ export default function Dashboard() {
     try {
       let res = await getUser()
       setUser(res.data)
-      if (!res.data.admin && !res.data.super_admin) {
+      if (
+        !res.data.content_manager &&
+        !res.data.admin &&
+        !res.data.super_admin
+      ) {
         window.location.replace('/login')
         message.error('Вы не админ')
       }
@@ -89,19 +94,21 @@ export default function Dashboard() {
             }}>
             MIRACLUS
           </div>
-          <Link
-            to='/dashboard/notifications'
-            style={{
-              backgroundColor: '#ffffff',
-              paddingLeft: '15px',
-              paddingRight: '15px',
-            }}>
-            <Badge count={notifications.length}>
-              <div style={{ margin: '10px' }}>
-                <NotificationFilled />
-              </div>
-            </Badge>
-          </Link>
+          {(user.admin || user.super_admin) && (
+            <Link
+              to='/dashboard/notifications'
+              style={{
+                backgroundColor: '#ffffff',
+                paddingLeft: '15px',
+                paddingRight: '15px',
+              }}>
+              <Badge count={notifications.length}>
+                <div style={{ margin: '10px' }}>
+                  <NotificationFilled />
+                </div>
+              </Badge>
+            </Link>
+          )}
           <div
             style={{
               fontWeight: 'bold',
@@ -139,54 +146,60 @@ export default function Dashboard() {
                 <Link to='/dashboard/categories'>Категории</Link>
               </Menu.Item>
             </SubMenu>
-            <SubMenu key='sub2' icon={<PicCenterOutlined />} title='Склады'>
-              <Menu.Item key='4' icon={<PicCenterOutlined />}>
-                <Link to='/dashboard/warehouses'>Склады</Link>
-              </Menu.Item>
-              <Menu.Item key='5' icon={<PicCenterOutlined />}>
-                <Link to='/dashboard/products_in'>Приходы</Link>
-              </Menu.Item>
-              <Menu.Item key='6' icon={<PicCenterOutlined />}>
-                <Link to='/dashboard/products_out'>Списания</Link>
-              </Menu.Item>
-              <Menu.Item key='7' icon={<PicCenterOutlined />}>
-                <Link to='/dashboard/products_move'>Перемещения</Link>
-              </Menu.Item>
-              <Menu.Item key='77' icon={<PicCenterOutlined />}>
-                <Link to='/dashboard/json'>Обмен JSON</Link>
-              </Menu.Item>
-            </SubMenu>
+            {(user.admin || user.super_admin) && (
+              <SubMenu key='sub2' icon={<PicCenterOutlined />} title='Склады'>
+                <Menu.Item key='4' icon={<PicCenterOutlined />}>
+                  <Link to='/dashboard/warehouses'>Склады</Link>
+                </Menu.Item>
+                <Menu.Item key='5' icon={<PicCenterOutlined />}>
+                  <Link to='/dashboard/products_in'>Приходы</Link>
+                </Menu.Item>
+                <Menu.Item key='6' icon={<PicCenterOutlined />}>
+                  <Link to='/dashboard/products_out'>Списания</Link>
+                </Menu.Item>
+                <Menu.Item key='7' icon={<PicCenterOutlined />}>
+                  <Link to='/dashboard/products_move'>Перемещения</Link>
+                </Menu.Item>
+                <Menu.Item key='77' icon={<PicCenterOutlined />}>
+                  <Link to='/dashboard/json'>Обмен JSON</Link>
+                </Menu.Item>
+              </SubMenu>
+            )}
             <Menu.Item key='8' icon={<ImportOutlined />}>
               <Link to='/dashboard/import'>Импорт</Link>
             </Menu.Item>
-            <SubMenu
-              key='sub3'
-              icon={<PicCenterOutlined />}
-              title='Маркетплейсы'>
+            {(user.admin || user.super_admin) && (
               <SubMenu
-                key='sub4'
+                key='sub3'
                 icon={<PicCenterOutlined />}
-                title='Wildberries'>
-                <Menu.Item key='9' icon={<PicCenterOutlined />}>
-                  <Link to='/dashboard/marketplaces/wildberries/products'>
-                    Товары
-                  </Link>
-                </Menu.Item>
-                <Menu.Item key='10' icon={<PicCenterOutlined />}>
-                  <Link to='/dashboard/marketplaces/wildberries/settings'>
-                    Настройки
-                  </Link>
-                </Menu.Item>
-                <Menu.Item key='11' icon={<PicCenterOutlined />}>
-                  <Link to='/dashboard/marketplaces/wildberries/orders'>
-                    Заказы
-                  </Link>
-                </Menu.Item>
+                title='Маркетплейсы'>
+                <SubMenu
+                  key='sub4'
+                  icon={<PicCenterOutlined />}
+                  title='Wildberries'>
+                  <Menu.Item key='9' icon={<PicCenterOutlined />}>
+                    <Link to='/dashboard/marketplaces/wildberries/products'>
+                      Товары
+                    </Link>
+                  </Menu.Item>
+                  <Menu.Item key='10' icon={<PicCenterOutlined />}>
+                    <Link to='/dashboard/marketplaces/wildberries/settings'>
+                      Настройки
+                    </Link>
+                  </Menu.Item>
+                  <Menu.Item key='11' icon={<PicCenterOutlined />}>
+                    <Link to='/dashboard/marketplaces/wildberries/orders'>
+                      Заказы
+                    </Link>
+                  </Menu.Item>
+                </SubMenu>
               </SubMenu>
-            </SubMenu>
-            <Menu.Item key='sub4' icon={<DownloadOutlined />} title='Бекап'>
-              <Link to='/dashboard/backup'>Бекап</Link>
-            </Menu.Item>
+            )}
+            {user.super_admin && (
+              <Menu.Item key='sub4' icon={<DownloadOutlined />} title='Бекап'>
+                <Link to='/dashboard/backup'>Бекап</Link>
+              </Menu.Item>
+            )}
           </Menu>
         </Sider>
         <Content style={{ margin: '20px' }}>

@@ -7,14 +7,24 @@ import {
   getImg,
   upload,
 } from '../controllers/categories'
-import { authenticateAdmin } from '../controllers/auth'
+import {
+  authenticateContentManager,
+} from '../controllers/auth'
 
 const router = express.Router()
 
-router.get('/', authenticateAdmin, getCategories)
-router.delete('/:id', authenticateAdmin, removeCategory)
-router.post('/', [authenticateAdmin, upload.single('file')], createCategory)
-router.post('/edit', [authenticateAdmin, upload.single('file')], editCategory)
+router.get('/', authenticateContentManager, getCategories)
+router.delete('/:id', authenticateContentManager, removeCategory)
+router.post(
+  '/',
+  [authenticateContentManager, upload.single('file')],
+  createCategory
+)
+router.post(
+  '/edit',
+  [authenticateContentManager, upload.single('file')],
+  editCategory
+)
 router.get('/img/:id', getImg)
 
 export default router

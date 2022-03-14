@@ -5,13 +5,14 @@ import logger from '../util/logger'
 
 export const superAdminUpdateUser = async (req: Request, res: Response) => {
   try {
-    const { id, admin } = req.body
-    if (!id || admin === undefined) throw new Error('Please fill in all fields')
+    const { id, admin, content_manager } = req.body
+    if (!id || admin === undefined || content_manager === undefined)
+      throw new Error('Please fill in all fields')
 
     if (!mongoose.Types.ObjectId.isValid(id))
       throw new Error(`No user with id: ${id}`)
 
-    const updatedUser = { admin }
+    const updatedUser = { admin, content_manager }
 
     await User.findByIdAndUpdate(id, updatedUser, { new: true })
     res.status(200).json(updatedUser)
@@ -29,6 +30,7 @@ export const superAdminGetUsers = async (req: any, res: Response) => {
         email: user.email,
         admin: user.admin,
         super_admin: user.super_admin,
+        content_manager: user.content_manager,
       }))
     )
   } catch (err: any) {

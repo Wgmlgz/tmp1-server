@@ -22,9 +22,14 @@ interface IOrder {
 }
 
 const Orders = () => {
-  const [orders, setOrders] = useState<{ orders: IOrder[]; total: number }>({
+  const [orders, setOrders] = useState<{
+    orders: IOrder[]
+    total: number
+    supplies: any[]
+  }>({
     orders: [],
     total: 0,
+    supplies: [],
   })
   const [status, setStatus] = useState('new')
 
@@ -39,7 +44,7 @@ const Orders = () => {
     useState<TablePaginationConfig>(defaultPagination)
 
   const fetchProducts = async (pagination: TablePaginationConfig) => {
-    setOrders({ orders: [], total: 0 })
+    setOrders({ orders: [], total: 0, supplies: [] })
     try {
       const res = await getWildberriesOrders(
         status,
@@ -222,6 +227,7 @@ const Orders = () => {
             />
           </TabPane>
           <TabPane tab='Активные заказы' key='active'>
+            <pre>{JSON.stringify(orders.supplies, null, 2)}</pre>
             <Table
               dataSource={orders.orders?.map((x, i) => ({ ...x, key: i }))}
               columns={columns}

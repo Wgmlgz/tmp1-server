@@ -1,9 +1,9 @@
 import express from 'express'
 import { getRemains } from '../controllers/remains'
-import { authenticateAdmin } from '../controllers/auth'
+import { authenticateAdmin, authenticateContentManager } from '../controllers/auth'
 
 const router = express.Router()
 
-router.get('/', authenticateAdmin, getRemains)
+router.get('/', authenticateContentManager, getRemains)
 
 export default router

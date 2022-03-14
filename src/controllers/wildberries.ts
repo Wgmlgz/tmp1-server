@@ -102,17 +102,18 @@ export const getWildberriesOrders = async (req: Request, res: Response) => {
         })
       ).data
     } else if (status === 'active') {
+      const supplies = (
+        await axios.get(`${WILDBERRIES_URL}/api/v2/supplies`, {
+          ...wb_header,
+          params: {
+            status: 'ACTIVE',
+          },
+        })
+      ).data.supplies
       orders = await Promise.all(
         (
           await Promise.all(
-            (
-              await axios.get(`${WILDBERRIES_URL}/api/v2/supplies`, {
-                ...wb_header,
-                params: {
-                  status: 'ACTIVE',
-                },
-              })
-            ).data.supplies
+            supplies
               .map((supply: { supplyId: string }) => supply.supplyId)
               .map(async (supply: string) =>
                 (
@@ -141,7 +142,7 @@ export const getWildberriesOrders = async (req: Request, res: Response) => {
             supply,
           }))
       )
-      orders = { orders, total: orders.length }
+      orders = { orders, total: orders.length, supplies }
     } else if (status === 'on_delivery') {
       orders = await Promise.all(
         (

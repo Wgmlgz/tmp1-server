@@ -1,5 +1,7 @@
 import express from 'express'
-import { authenticateAdmin } from '../controllers/auth'
+import {
+  authenticateContentManager,
+} from '../controllers/auth'
 import {
   createProduct,
   getImg,
@@ -18,21 +20,33 @@ import {
 
 const router = express.Router()
 
-router.post('/', [authenticateAdmin, upload.array('imgs', 12)], createProduct)
-router.post('/wb_url', authenticateAdmin, createWbUrlProduct)
-router.post('/excel', authenticateAdmin, createExcelProducts)
-router.get('/excel', authenticateAdmin, getExcelImports)
-router.post('/search/:pageNumber/:nPerPage', authenticateAdmin, searchProducts)
-router.patch('/many', [authenticateAdmin], updateManyProducts)
+router.post(
+  '/',
+  [authenticateContentManager, upload.array('imgs', 12)],
+  createProduct
+)
+router.post('/wb_url', authenticateContentManager, createWbUrlProduct)
+router.post('/excel', authenticateContentManager, createExcelProducts)
+router.get('/excel', authenticateContentManager, getExcelImports)
+router.post(
+  '/search/:pageNumber/:nPerPage',
+  authenticateContentManager,
+  searchProducts
+)
+router.patch('/many', [authenticateContentManager], updateManyProducts)
 router.patch(
   '/:id',
-  [authenticateAdmin, upload.array('imgs', 12)],
+  [authenticateContentManager, upload.array('imgs', 12)],
   updateProduct
 )
-router.get('/product/:id', authenticateAdmin, getProduct)
-router.post('/remove', authenticateAdmin, removeProducts)
-router.get('/page/:pageNumber/:nPerPage', authenticateAdmin, getProducts)
+router.get('/product/:id', authenticateContentManager, getProduct)
+router.post('/remove', authenticateContentManager, removeProducts)
+router.get(
+  '/page/:pageNumber/:nPerPage',
+  authenticateContentManager,
+  getProducts
+)
 router.get('/img/:id', getImg)
-router.get('/count', authenticateAdmin, getCount)
+router.get('/count', authenticateContentManager, getCount)
 
 export default router

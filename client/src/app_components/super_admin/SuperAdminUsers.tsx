@@ -8,6 +8,7 @@ export interface IUser {
   _id: string
   email: string
   admin: boolean
+  content_manager: boolean
   super_admin: boolean
 }
 
@@ -46,9 +47,44 @@ const SuperAdminUsers: FC = () => {
             onChange={async e => {
               try {
                 const new_admin = e.target.checked
-                await superAdminUpdateUser(record._id, new_admin)
+                await superAdminUpdateUser(
+                  record._id,
+                  new_admin,
+                  record.content_manager
+                )
                 const new_users = [...users]
                 new_users[index].admin = new_admin
+                setUsers(new_users)
+                message.success('Сохранено')
+              } catch (err) {
+                if (axios.isAxiosError(err)) {
+                  message.error(err.response?.data)
+                }
+              }
+            }}
+          />
+        </div>
+      ),
+    },
+    {
+      title: 'Контент-менеджер',
+      dataIndex: 'content_manager',
+      key: 'content_manager',
+      render: (text, record, index) => (
+        <div>
+          <Checkbox
+            checked={record.content_manager}
+            disabled={record.super_admin}
+            onChange={async e => {
+              try {
+                const new_content_manager = e.target.checked
+                await superAdminUpdateUser(
+                  record._id,
+                  record.admin,
+                  new_content_manager
+                )
+                const new_users = [...users]
+                new_users[index].content_manager = new_content_manager
                 setUsers(new_users)
                 message.success('Сохранено')
               } catch (err) {

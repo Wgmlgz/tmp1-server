@@ -6,6 +6,7 @@ export interface IUser {
   password: string
   admin: boolean
   super_admin: boolean
+  content_manager: boolean
   columns_settings?: Map<string, Map<string, boolean>>
 }
 
@@ -23,6 +24,10 @@ const UserSchema = new mongoose.Schema<IUser>({
     required: true,
   },
   super_admin: {
+    type: Boolean,
+    required: true,
+  },
+  content_manager: {
     type: Boolean,
     required: true,
   },

@@ -32,6 +32,27 @@ export const authenticateUser = (
   }
 }
 
+export const authenticateContentManager = (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  const token = req.cookies['access-token']
+
+  if (!token) res.status(401).send('no token')
+  else
+    jwt.verify(token, ACCESS_TOKEN_SECRET as string, (err: any, user: any) => {
+      if (err) {
+        res.status(401).send('You are not logged in')
+      } else if (!user.content_manager && !user.admin && !user.super_admin) {
+        res.status(400).send('You are not content_manager')
+      } else {
+        req.user = user
+        next()
+      }
+    })
+}
+
 export const authenticateAdmin = (
   req: any,
   res: Response,
@@ -45,7 +66,7 @@ export const authenticateAdmin = (
       if (err) {
         res.status(401).send('You are not logged in')
       } else if (!user.admin && !user.super_admin) {
-        res.status(400).send('You are not super admin')
+        res.status(400).send('You are not admin')
       } else {
         req.user = user
         next()
@@ -106,6 +127,7 @@ export const login = async (req: Request, res: Response) => {
           password,
           admin: db_user.admin,
           super_admin: db_user.super_admin,
+          content_manager: db_user.content_manager,
         }
 
         const access_token = generateAccessToken(user)
@@ -145,6 +167,7 @@ export const token = async (req: Request, res: Response) => {
         password: String(user.password),
         admin: Boolean(user.admin),
         super_admin: Boolean(user.super_admin),
+        content_manager: Boolean(user.content_manager),
       })
       res.cookie('access-token', access_token, { httpOnly: true })
       res.json()

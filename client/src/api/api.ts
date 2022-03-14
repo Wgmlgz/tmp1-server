@@ -56,8 +56,12 @@ export const setUserColumnsSetting = (
   )
 
 export const superAdminGetUsers = () => axios.get(`${super_admin_url}/users`)
-export const superAdminUpdateUser = (id: string, admin: boolean) =>
-  axios.patch(`${super_admin_url}/update_user`, { id, admin })
+export const superAdminUpdateUser = (
+  id: string,
+  admin: boolean,
+  content_manager: boolean
+) =>
+  axios.patch(`${super_admin_url}/update_user`, { id, admin, content_manager })
 
 export const login = (email: string, password: string) =>
   axios.post(`${auth_url}/login`, { email, password })

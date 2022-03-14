@@ -17,7 +17,11 @@ const LoginForm: FC = () => {
       await login(email, password)
       setErrMsg('')
       const user = await getUser()
-      if (!user.data.admin && !user.data.super_admin) {
+      if (
+        !user.data.content_manager &&
+        !user.data.admin &&
+        !user.data.super_admin
+      ) {
         message.error('Вы не админ')
       } else {
         window.location.replace('/dashboard')

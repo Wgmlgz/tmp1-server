@@ -5,11 +5,11 @@ import {
   updateWarehouse,
   getWarehouses,
 } from '../controllers/warehouse'
-import { authenticateAdmin, authenticateSuperAdmin } from '../controllers/auth'
+import { authenticateAdmin, authenticateContentManager, authenticateSuperAdmin } from '../controllers/auth'
 
 const router = express.Router()
 
-router.get('/', authenticateAdmin, getWarehouses)
+router.get('/', authenticateContentManager, getWarehouses)
 router.post('/', authenticateAdmin, createWarehouse)
 router.patch('/:id', authenticateSuperAdmin, updateWarehouse)
 router.delete('/:id', authenticateSuperAdmin, removeWarehouse)
