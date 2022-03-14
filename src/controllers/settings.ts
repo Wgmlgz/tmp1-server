@@ -13,7 +13,7 @@ export const default_settings: any = {
 }
 export const readSettings = async (str: string) => {
   const obj = await SettingsModel.findOne({})
-  
+
   if (obj && obj.data) return obj.data[str] ?? default_settings[str]
 
   const new_settings = new SettingsModel({ data: default_settings })
@@ -34,6 +34,8 @@ export const readSettingsAll = async () => {
 }
 
 export const writeSettings = async (settings: any) => {
+  console.log(settings)
+
   const obj = await SettingsModel.findOne({})
   if (!obj) {
     const new_settings = new SettingsModel({ data: default_settings })

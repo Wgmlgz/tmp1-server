@@ -26,6 +26,7 @@ import Orders from './marketplaces/wildberries/Orders'
 import Notifications from './notifications/Notifications'
 import { NotificationFilled } from '@ant-design/icons'
 import axios from 'axios'
+import WarehousesJson from './warehouses/WarehousesJson'
 
 const { Header, Content, Sider } = Layout
 const { SubMenu } = Menu
@@ -114,7 +115,7 @@ export default function Dashboard() {
             onClick={async () => {
               try {
                 await logout()
-              } catch { }
+              } catch {}
               window.location.replace('/login')
             }}>
             выйти
@@ -150,6 +151,9 @@ export default function Dashboard() {
               </Menu.Item>
               <Menu.Item key='7' icon={<PicCenterOutlined />}>
                 <Link to='/dashboard/products_move'>Перемещения</Link>
+              </Menu.Item>
+              <Menu.Item key='77' icon={<PicCenterOutlined />}>
+                <Link to='/dashboard/json'>Обмен JSON</Link>
               </Menu.Item>
             </SubMenu>
             <Menu.Item key='8' icon={<ImportOutlined />}>
@@ -192,6 +196,7 @@ export default function Dashboard() {
               <Route path='/categories' element={<Categories />} />
               <Route path='/users' element={<SuperAdminUsers />} />
               <Route path='/products' element={<Products />} />
+              <Route path='/json' element={<WarehousesJson />} />
               <Route path='/warehouses' element={<Warehouses />} />
               <Route path='/products_in' element={<ProductsIn />} />
               <Route path='/products_out' element={<ProductsOut />} />

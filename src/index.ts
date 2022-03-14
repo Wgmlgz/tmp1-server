@@ -14,6 +14,7 @@ import products_out_routes from './routes/products_out'
 import products_move_routes from './routes/products_move'
 import wildberries_routes from './routes/wildberries'
 import notifications_routes from './routes/notifications'
+import json_routes from './routes/json'
 import backup_routes from './routes/backup'
 import stats_routes from './routes/stats'
 import mongoose from 'mongoose'
@@ -58,6 +59,7 @@ app.use('/api/wildberries', wildberries_routes)
 app.use('/api/stats', stats_routes)
 app.use('/api/notifications', notifications_routes)
 app.use('/api/backup', backup_routes)
+app.use('/api/json', json_routes)
 
 // if (NODE_ENV === 'production') {
 //   app.use(express.static(path.join(__dirname, '../client/build')))

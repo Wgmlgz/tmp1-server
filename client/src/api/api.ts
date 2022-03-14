@@ -275,3 +275,10 @@ export const backup_url = `${url}/api/backup`
 export const getBackup = () => axios.get(`${backup_url}`)
 export const restoreBackup = (backup: any) =>
   axios.patch(`${backup_url}`, { backup })
+
+export const json_url = `${url}/api/json`
+
+export const getJsonProducts = (img_prefix: string) =>
+  axios.post(`${json_url}/products`, { img_prefix })
+export const getJsonCategories = () => axios.post(`${json_url}/categories`)
+export const getJsonStocks = () => axios.post(`${json_url}/stocks`)

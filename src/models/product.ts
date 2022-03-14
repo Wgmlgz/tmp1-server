@@ -59,7 +59,7 @@ const ProductSchema = new mongoose.Schema<IProduct>({
     unique: true,
     dropDups: true,
     required: [true, 'Введите имя'],
-    maxLength: 100,
+    maxLength: 150,
   },
   description: {
     type: String,

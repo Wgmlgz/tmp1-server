@@ -250,6 +250,11 @@ export const updateWildberriesSettings = async (
       update_orders_enabled,
       update_prices,
       update_prices_enabled,
+      warehouse_send,
+      sell_price,
+      opt_price,
+      warehouse_reserve,
+      token,
     } = req.body
     const old = await readSettingsAll()
     if (sender_warehouse) old.sender_warehouse = sender_warehouse
@@ -262,6 +267,13 @@ export const updateWildberriesSettings = async (
     if (update_prices) old.update_prices = update_prices
     if (update_prices_enabled !== undefined)
       old.update_prices_enabled = update_prices_enabled
+
+    if (warehouse_send !== undefined) old.warehouse_send = warehouse_send
+    if (sell_price !== undefined) old.sell_price = sell_price
+    if (opt_price !== undefined) old.opt_price = opt_price
+    if (warehouse_reserve !== undefined)
+      old.warehouse_reserve = warehouse_reserve
+    if (token !== undefined) old.token = token
     await writeSettings(old)
     res.status(200).send('settings updated')
   } catch (err: any) {

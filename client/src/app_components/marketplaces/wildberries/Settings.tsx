@@ -41,7 +41,6 @@ export default function Settings() {
           onFinish={async e => {
             try {
               console.log(e)
-
               await updateWildberriesSettings(e)
               message.success('Обновлено')
             } catch (e) {
@@ -57,8 +56,11 @@ export default function Settings() {
           />
 
           <div style={{ display: 'flex', gap: '20px' }}>
-            <Form.Item name='update_stocks_enabled' valuePropName="checked">
-              <Checkbox name='update_stocks_enabled' defaultChecked={settings.update_stocks_enabled} />
+            <Form.Item name='update_stocks_enabled' valuePropName='checked'>
+              <Checkbox
+                name='update_stocks_enabled'
+                defaultChecked={settings.update_stocks_enabled}
+              />
             </Form.Item>
             <Form.Item label='Интервал отправки (секунды)' name='update_stocks'>
               <InputNumber placeholder='Интервал отправки (секунды)' />
@@ -66,8 +68,11 @@ export default function Settings() {
           </div>
 
           <div style={{ display: 'flex', gap: '20px' }}>
-            <Form.Item name='update_orders_enabled' valuePropName="checked">
-              <Checkbox name='update_orders_enabled' defaultChecked={settings.update_orders_enabled} />
+            <Form.Item name='update_orders_enabled' valuePropName='checked'>
+              <Checkbox
+                name='update_orders_enabled'
+                defaultChecked={settings.update_orders_enabled}
+              />
             </Form.Item>
             <Form.Item
               label='Интервал обновления заказов (секунды)'
@@ -77,8 +82,11 @@ export default function Settings() {
           </div>
 
           <div style={{ display: 'flex', gap: '20px' }}>
-            <Form.Item name='update_prices_enabled' valuePropName="checked">
-              <Checkbox name='update_prices_enabled' defaultChecked={settings.update_prices_enabled} />
+            <Form.Item name='update_prices_enabled' valuePropName='checked'>
+              <Checkbox
+                name='update_prices_enabled'
+                defaultChecked={settings.update_prices_enabled}
+              />
             </Form.Item>
             <Form.Item
               label='Интервал обновления цен (секунды)'
