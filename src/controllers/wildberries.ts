@@ -258,6 +258,7 @@ export const updateWildberriesSettings = async (
       opt_price,
       warehouse_reserve,
       token,
+      api_key,
       prices,
     } = req.body
     const old = await readSettingsAll()
@@ -281,6 +282,7 @@ export const updateWildberriesSettings = async (
     if (warehouse_reserve !== undefined)
       old.warehouse_reserve = warehouse_reserve
     if (token !== undefined) old.token = token
+    if (api_key !== undefined) old.api_key = api_key
     if (prices !== undefined) old.prices = prices
 
     await writeSettings(old)
