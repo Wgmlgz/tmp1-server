@@ -211,6 +211,7 @@ export const register = (req: Request, res: Response) => {
         password: hashed_password,
         admin: false,
         super_admin: false,
+        content_manager: false,
       })
       await new_user.save()
       res.send('User Created')
