@@ -68,65 +68,13 @@ export default function WarehousesJson() {
             name='warehouse_reserve'
             required={false}
           />
-          <Form.Item label='API ключ' name='token'>
-            <TextArea placeholder='API ключ' />
+          <Form.Item label='Токен' name='token'>
+            <TextArea placeholder='Токен' />
           </Form.Item>
           <div style={{ display: 'flex', gap: '20px', width: '100%' }}>
             <Form.Item style={{ flexGrow: 1 }}>
               <Button type='primary' htmlType='submit'>
                 Обновить настройки
-              </Button>
-            </Form.Item>
-            <Form.Item style={{ flexGrow: 1 }}>
-              <Button
-                type='dashed'
-                onClick={async () => {
-                  try {
-                    const res = (await getJsonCategories()).data
-                    console.log(res)
-                    downloadJson(res, `exported-categories.json`)
-                  } catch (e) {
-                    if (axios.isAxiosError(e)) {
-                      message.error(e.response?.data)
-                    }
-                  }
-                }}>
-                Экспорт категорий
-              </Button>
-            </Form.Item>
-            <Form.Item style={{ flexGrow: 1 }}>
-              <Button
-                type='dashed'
-                onClick={async () => {
-                  try {
-                    const res = (await getJsonStocks()).data
-                    console.log(res)
-                    downloadJson(res, `exported-stocks.json`)
-                  } catch (e) {
-                    if (axios.isAxiosError(e)) {
-                      message.error(e.response?.data)
-                    }
-                  }
-                }}>
-                Экспорт остатков
-              </Button>
-            </Form.Item>
-            <Form.Item style={{ flexGrow: 1 }}>
-              <Button
-                type='dashed'
-                onClick={async () => {
-                  try {
-                    const res = (await getJsonProducts(`${products_url}/img`))
-                      .data
-                    console.log(res)
-                    downloadJson(res, `exported-products.json`)
-                  } catch (e) {
-                    if (axios.isAxiosError(e)) {
-                      message.error(e.response?.data)
-                    }
-                  }
-                }}>
-                Экспорт товаров
               </Button>
             </Form.Item>
           </div>

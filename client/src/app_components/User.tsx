@@ -9,7 +9,6 @@ export default function User() {
     try {
       setUser('loading...')
       const res = await getUser()
-      console.log(res)
       setUser(res.data)
     } catch (err) {
       if (axios.isAxiosError(err)) {

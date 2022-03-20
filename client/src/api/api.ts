@@ -129,7 +129,6 @@ const productToFormData = (product: IProduct) => {
   if (product.imgs) {
     Array.from(product.imgs).forEach(file => fd.append('imgs', file))
   }
-  console.log(product)
   ;[
     'type',
     'category',
@@ -211,6 +210,10 @@ export const updateWildberriesSettings = (e: any) =>
   axios.post(`${wildberries_url}/settings`, e)
 export const getWildberriesSettings = () =>
   axios.get(`${wildberries_url}/settings`)
+export const closeSupply = (e: string) =>
+  axios.post(`${wildberries_url}/close_supply`, { supply: e })
+export const wbPrintStickers = (e: string[]) =>
+  axios.post(`${wildberries_url}/print_stickers`, { ids: e })
 
 export const runUpdateWildberriesStocks = () =>
   axios.get(`${wildberries_url}/update`)
@@ -282,7 +285,7 @@ export const restoreBackup = (backup: any) =>
 
 export const json_url = `${url}/api/json`
 
-export const getJsonProducts = (img_prefix: string) =>
-  axios.post(`${json_url}/products`, { img_prefix })
+export const getJsonProducts = () =>
+  axios.post(`${json_url}/products`)
 export const getJsonCategories = () => axios.post(`${json_url}/categories`)
 export const getJsonStocks = () => axios.post(`${json_url}/stocks`)

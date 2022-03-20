@@ -2,13 +2,15 @@ import { Request, Response } from 'express'
 import CategoryModel from '../models/category'
 import ProductModel from '../models/product'
 import RemainModel from '../models/remains'
-import SettingsModel from '../models/settings'
 import logger from '../util/logger'
 import { readSettings } from './settings'
-import { getSetting } from './user'
 
 export const getJsonCategories = async (req: Request, res: Response) => {
   try {
+    const token = req.headers.token
+    const db_token = await readSettings('token')
+    if (token !== db_token) throw new Error('invalid token')
+
     const categories = await CategoryModel.find({})
     const json = await Promise.all(
       categories.map(async ({ id, description, parent, name }) => ({
@@ -19,7 +21,6 @@ export const getJsonCategories = async (req: Request, res: Response) => {
       }))
     )
     res.status(200).json(json)
-    res.status(200).json(json)
   } catch (err: any) {
     logger.error(err.message)
     res.status(400).send(err.message)
@@ -28,15 +29,23 @@ export const getJsonCategories = async (req: Request, res: Response) => {
 
 export const getJsonStocks = async (req: Request, res: Response) => {
   try {
+    const token = req.headers.token
+    const db_token = await readSettings('token')
+    if (token !== db_token) throw new Error('invalid token')
+
     const warehouse = await readSettings('warehouse_send')
     const stocks = await RemainModel.find({ warehouse })
     const json = await Promise.all(
-      stocks.map(async ({ product, quantity }) => ({
-        product_id: product,
-        sku: (await ProductModel.findById(product))?.article || null,
-        warehouse_id: warehouse,
-        quantity,
-      }))
+      stocks.map(async ({ product, quantity }) => {
+        console.log(product)
+
+        return {
+          product_id: product,
+          sku: (await ProductModel.findById(product))?.article || null,
+          warehouse_id: warehouse,
+          quantity,
+        }
+      })
     )
     res.status(200).json(json)
   } catch (err: any) {
@@ -47,7 +56,12 @@ export const getJsonStocks = async (req: Request, res: Response) => {
 
 export const getJsonProducts = async (req: Request, res: Response) => {
   try {
-    const { img_prefix } = req.body
+    const token = req.headers.token
+    const db_token = await readSettings('token')
+    if (token !== db_token) throw new Error('invalid token')
+
+    const img_prefix =
+      req.protocol + '://' + req.get('host') + '/api/products/img'
     const sell_price = Number(await readSettings('sell_price')) || 1
     const opt_price = Number(await readSettings('opt_price')) || 1
     const products = await ProductModel.find({})

@@ -68,6 +68,7 @@ export const getWildberriesProducts = async (req: Request, res: Response) => {
 export const getWildberriesOrders = async (req: Request, res: Response) => {
   try {
     const WILDBERRIES_API_KEY = await readSettings('api_key')
+    const update_time_h = Number(await readSettings('update_time_h'))
 
     const wb_header = { headers: { Authorization: WILDBERRIES_API_KEY } }
     const status = req.query.status
@@ -110,6 +111,7 @@ export const getWildberriesOrders = async (req: Request, res: Response) => {
           },
         })
       ).data.supplies
+
       orders = await Promise.all(
         (
           await Promise.all(
@@ -135,7 +137,9 @@ export const getWildberriesOrders = async (req: Request, res: Response) => {
                   id: orderId,
                   skip: 0,
                   take: 1,
-                  date_start: '2021-01-11T17:52:51+00:00',
+                  date_start: moment()
+                    .subtract(update_time_h, 'h')
+                    .toISOString(),
                 },
               })
             ).data.orders[0],
@@ -176,7 +180,9 @@ export const getWildberriesOrders = async (req: Request, res: Response) => {
                   id: orderId,
                   skip: 0,
                   take: 1,
-                  date_start: '2021-01-11T17:52:51+00:00',
+                  date_start: moment()
+                    .subtract(update_time_h, 'h')
+                    .toISOString(),
                 },
               })
             ).data.orders[0],
@@ -189,7 +195,7 @@ export const getWildberriesOrders = async (req: Request, res: Response) => {
         await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
           ...wb_header,
           params: {
-            date_start: '2021-01-11T17:52:51+00:00',
+            date_start: moment().subtract(update_time_h, 'h').toISOString(),
             take: Number(req.query.take),
             skip: Number(req.query.skip),
           },
@@ -217,6 +223,7 @@ export const getWildberriesOrders = async (req: Request, res: Response) => {
     const warehouse = await readSettings('sender_warehouse')
     orders.orders.forEach((item: any) => {
       item.warehouse = warehouses.get(item.storeId)
+
       const db_product = db_products.get(item.barcode)
       if (!db_product) return
 
@@ -252,6 +259,7 @@ export const updateWildberriesSettings = async (
       update_prices,
       update_prices_enabled,
       update_json,
+      update_time_h,
       update_json_enabled,
       warehouse_send,
       sell_price,
@@ -275,6 +283,7 @@ export const updateWildberriesSettings = async (
     if (update_json) old.update_json = update_json
     if (update_json_enabled !== undefined)
       old.update_json_enabled = update_json_enabled
+    if (update_time_h !== undefined) old.update_time_h = update_time_h
 
     if (warehouse_send !== undefined) old.warehouse_send = warehouse_send
     if (sell_price !== undefined) old.sell_price = sell_price
@@ -365,13 +374,14 @@ export const checkWildberriesConnection = async (
 export const refreshOrders = async () => {
   const WILDBERRIES_API_KEY = await readSettings('api_key')
   const sender_warehouse = await readSettings('sender_warehouse')
+  const update_time_h = Number(await readSettings('update_time_h'))
   const wb_header = { headers: { Authorization: WILDBERRIES_API_KEY } }
 
   const total = (
     await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
       ...wb_header,
       params: {
-        date_start: '2000-01-11T17:52:51+00:00',
+        date_start: moment().subtract(update_time_h, 'h').toISOString(),
         date_end: new Date().toISOString(),
         take: 1,
         skip: 0,
@@ -387,7 +397,7 @@ export const refreshOrders = async () => {
         await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
           ...wb_header,
           params: {
-            date_start: '2000-01-11T17:52:51+00:00',
+            date_start: moment().subtract(update_time_h, 'h').toISOString(),
             take: take,
             skip: i,
           },
@@ -448,7 +458,6 @@ export const refreshOrders = async () => {
       }
     })
   )
-  console.log(orders2save)
 
   await Promise.allSettled(
     orders2save.map(async order => {
@@ -464,7 +473,6 @@ export const refreshOrders = async () => {
         )
       } catch (err: any) {
         logger.error(err.message)
-        console.log(err.message)
       }
     })
   )
@@ -500,7 +508,6 @@ export const updateDiscount = async (req: Request, res: Response) => {
         ],
         wb_header
       )
-      console.log(ans.data)
 
       res.status(200).json(ans.data)
     } else {
@@ -509,7 +516,6 @@ export const updateDiscount = async (req: Request, res: Response) => {
         [Number(nmId)],
         wb_header
       )
-      console.log(ans.data)
       res.status(200).json(ans.data)
     }
   } catch (err: any) {
@@ -535,8 +541,45 @@ export const updatePrice = async (req: Request, res: Response) => {
       ],
       wb_header
     )
-    console.log(ans.data)
 
+    res.status(200).json(ans.data)
+  } catch (err: any) {
+    logger.error(err.message)
+    res.status(400).json(err.message)
+  }
+}
+
+export const closeSupply = async (req: Request, res: Response) => {
+  try {
+    const WILDBERRIES_API_KEY = await readSettings('api_key')
+    const wb_header = { headers: { Authorization: WILDBERRIES_API_KEY } }
+
+    const { supply } = req.body
+
+    const ans = await axios.post(
+      `${WILDBERRIES_URL}/api/v2/supplies/${supply}/close`,
+      {},
+      wb_header
+    )
+    res.status(200).json(ans.data)
+  } catch (err: any) {
+    logger.error(err.message)
+    res.status(400).json(err.message)
+  }
+}
+
+export const printStickers = async (req: Request, res: Response) => {
+  try {
+    const WILDBERRIES_API_KEY = await readSettings('api_key')
+    const wb_header = { headers: { Authorization: WILDBERRIES_API_KEY } }
+
+    const { ids } = req.body
+
+    const ans = await axios.post(
+      `${WILDBERRIES_URL}/api/v2/orders/stickers/pdf`,
+      { orderIds: ids.map((x: any) => Number(x)), type: 'code128' },
+      wb_header
+    )
     res.status(200).json(ans.data)
   } catch (err: any) {
     logger.error(err.message)

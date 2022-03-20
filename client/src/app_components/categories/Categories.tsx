@@ -224,10 +224,6 @@ export default function Categories() {
     )
   }, [columns, categories])
 
-  useEffect(() => {
-    console.log(table)
-  }, [table])
-
   const [category_creation, setCategoryCreation] = useState(false)
 
   return (

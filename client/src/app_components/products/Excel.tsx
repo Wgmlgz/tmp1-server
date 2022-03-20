@@ -3,7 +3,7 @@ import { IProductFull } from './ProductsForm'
 import { saveAs } from 'file-saver'
 import { products_url } from '../../api/api'
 
-async function saveFile(fileName: string, workbook: ExcelJS.Workbook) {
+export async function saveFile(fileName: string, workbook: ExcelJS.Workbook) {
   const xls64 = await workbook.xlsx.writeBuffer({ base64: true } as any)
   saveAs(
     new Blob([xls64], {

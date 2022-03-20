@@ -1,12 +1,20 @@
-import { Card, message, Table, Tabs } from 'antd'
-import { useEffect, useMemo, useState } from 'react'
-
+import { Button, Card, Form, message, Modal, Select, Table, Tabs } from 'antd'
+import { Key, useEffect, useMemo, useState } from 'react'
+import ExcelJS from 'exceljs'
 import axios from 'axios'
 import { ColumnsType, TablePaginationConfig } from 'antd/lib/table'
-import { getWildberriesOrders } from '../../../api/api'
+import {
+  closeSupply,
+  getWildberriesOrders,
+  wbPrintStickers,
+} from '../../../api/api'
 import moment from 'moment'
 import { products_url } from '../../../api/api'
 import useColumns from '../../../hooks/useColumns'
+import Item from 'antd/lib/list/Item'
+import Barcodes from '../../products/Barcodes'
+import { saveFile } from '../../products/Excel'
+import FullscreenCard from '../../FullscreenCard'
 const { TabPane } = Tabs
 interface IOrder {
   product: string
@@ -16,11 +24,46 @@ interface IOrder {
   img: string
   name: string
   totalPrice: number
+  article: string
   barcodes: string[]
   barcode: string
   supply?: string
 }
+const { Option } = Select
 
+const exportExcel = (orders: (IOrder | undefined)[]) => {
+  const workbook = new ExcelJS.Workbook()
+  const worksheet = workbook.addWorksheet('My Sheet')
+
+  worksheet.columns = [
+    { header: 'supply', key: 'supply' },
+    { header: 'address', key: 'address' },
+    { header: 'name', key: 'name' },
+    { header: 'barcode', key: 'barcode' },
+    { header: 'article', key: 'article' },
+    { header: 'dateCreated', key: 'dateCreated' },
+    { header: 'warehouse', key: 'warehouse' },
+    { header: 'count', key: 'count' },
+    { header: 'orderId', key: 'orderId' },
+  ]
+  orders
+    .filter(x => !!x)
+    .map((order: any) => ({
+      supply: order.supply,
+      address: order.address,
+      name: order.name,
+      barcode: order.barcode,
+      article: order.article,
+      dateCreated: order.dateCreated,
+      warehouse: order.warehouse,
+      count: order.barcodes.length,
+      orderId: order.orderId,
+    }))
+    .forEach(order => {
+      worksheet.addRow(order)
+    })
+  saveFile('exported_orders.xls', workbook)
+}
 const Orders = () => {
   const [orders, setOrders] = useState<{
     orders: IOrder[]
@@ -40,10 +83,12 @@ const Orders = () => {
     }),
     []
   )
+  const [loading, setLoading] = useState(false)
   const [pagination, setPagination] =
     useState<TablePaginationConfig>(defaultPagination)
 
   const fetchProducts = async (pagination: TablePaginationConfig) => {
+    setLoading(true)
     setOrders({ orders: [], total: 0, supplies: [] })
     try {
       const res = await getWildberriesOrders(
@@ -61,6 +106,7 @@ const Orders = () => {
         message.error(err.response?.data)
       }
     }
+    setLoading(false)
   }
 
   useEffect(() => {
@@ -195,14 +241,64 @@ const Orders = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status])
 
+  const [selected_row_keys, setSelectedRowKeys] = useState<Key[]>([])
+  const [barcodes_creation, setBarcodesCreation] = useState('')
+
+  const urltoFile = async (url: any, filename: any, mimeType: any) => {
+    const res = await fetch(url)
+    const buf = await res.arrayBuffer()
+    return new File([buf], filename, { type: mimeType })
+  }
+  const printStickers = async () => {
+    try {
+      const res = await wbPrintStickers(
+        selected_row_keys
+          .map(i => orders?.orders.at(i as number))
+          .filter(x => !!x)
+          .map((product: any) => product.orderId)
+      )
+      const file = await urltoFile(
+        `data:text/plain;base64,${res.data.data.file}`,
+        res.data.data.name,
+        res.data.data.mimeType
+      )
+      var data = new Blob([file], { type: res.data.data.mimeType })
+      var csvURL = window.URL.createObjectURL(data)
+      const tempLink = document.createElement('a')
+      tempLink.href = csvURL
+      tempLink.setAttribute('download', res.data.data.name)
+      tempLink.click()
+      
+      message.success('Поставка закрыта')
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        message.error(err.response?.data)
+      }
+    }
+  }
   return (
     <div style={{ width: '100%' }}>
+      {barcodes_creation && (
+        <FullscreenCard
+          onCancel={() => {
+            setBarcodesCreation('')
+          }}>
+          <Barcodes
+            barcodes={selected_row_keys
+              .map(i => orders?.orders.at(i as number))
+              .filter(x => !!x)
+              .map((product: any) => ({
+                barcode: product.barcode || '',
+                name: product.name || '',
+                article: product.article || '',
+              }))}
+          />
+        </FullscreenCard>
+      )}
       <Card>
         <Tabs
           defaultActiveKey='0'
           onChange={async e => {
-            console.log(e)
-
             setPagination(defaultPagination)
             setStatus(e)
           }}>
@@ -227,23 +323,112 @@ const Orders = () => {
             />
           </TabPane>
           <TabPane tab='Активные заказы' key='active'>
-            <pre>{JSON.stringify(orders.supplies, null, 2)}</pre>
+            <Form
+              onFinish={async e => {
+                try {
+                  await closeSupply(e.supply)
+                  message.success('Поставка закрыта')
+                } catch (err) {
+                  if (axios.isAxiosError(err)) {
+                    message.error(err.response?.data)
+                  }
+                }
+              }}>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <Form.Item
+                  name='supply'
+                  required={true}
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}>
+                  <Select placeholder='Выберите поставку для закрытия'>
+                    {orders.supplies &&
+                      orders.supplies.map(({ supplyId }) => (
+                        <Option value={supplyId}>{supplyId}</Option>
+                      ))}
+                  </Select>
+                </Form.Item>
+                <Button type='primary' htmlType='submit'>
+                  Закрыть поставку
+                </Button>
+                <Button
+                  onClick={() => {
+                    exportExcel(
+                      selected_row_keys.map(i =>
+                        orders?.orders?.at(i as number)
+                      )
+                    )
+                  }}>
+                  Экспорт в Excel выделенных заказов
+                </Button>
+                <Button
+                  onClick={() => {
+                    setBarcodesCreation('selected')
+                  }}>
+                  Распечатать штрихкод на WB
+                </Button>
+                <Button
+                  onClick={() => {
+                    printStickers()
+                  }}>
+                  Распечатать стикеры заказов
+                </Button>
+              </div>
+            </Form>
             <Table
+              loading={loading}
               dataSource={orders.orders?.map((x, i) => ({ ...x, key: i }))}
+              rowSelection={{
+                selectedRowKeys: selected_row_keys,
+                onChange: selectedRowKeys => {
+                  setSelectedRowKeys(selectedRowKeys)
+                },
+              }}
               columns={columns}
               pagination={{ ...pagination, pageSizeOptions: [100] }}
               onChange={pagination => {
-                fetchProducts(pagination)
+                // fetchProducts(pagination)
               }}
             />
           </TabPane>
           <TabPane tab='Заказы в пути' key='on_delivery'>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <Button
+                onClick={() => {
+                  exportExcel(
+                    selected_row_keys.map(i => orders?.orders?.at(i as number))
+                  )
+                }}>
+                Экспорт в Excel выделенных заказов
+              </Button>
+              <Button
+                onClick={() => {
+                  setBarcodesCreation('selected')
+                }}>
+                Распечатать штрихкод на WB
+              </Button>
+              <Button
+                onClick={() => {
+                  printStickers()
+                }}>
+                Распечатать стикеры заказов
+              </Button>
+            </div>
             <Table
+              loading={loading}
+              rowSelection={{
+                selectedRowKeys: selected_row_keys,
+                onChange: selectedRowKeys => {
+                  setSelectedRowKeys(selectedRowKeys)
+                },
+              }}
               dataSource={orders.orders?.map((x, i) => ({ ...x, key: i }))}
               columns={columns}
               pagination={{ ...pagination, pageSizeOptions: [100] }}
               onChange={pagination => {
-                fetchProducts(pagination)
+                // fetchProducts(pagination)
               }}
             />
           </TabPane>

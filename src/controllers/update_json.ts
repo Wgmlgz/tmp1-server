@@ -24,7 +24,7 @@ export const updateJson = async () => {
   const res = (
     await axios.post(`https://mirishop.ru/bnpapi/ordersList`, params, {
       headers: {
-        token: 'n6yujum27wkc2fi49yp3ossysyhmb9kmf9q76vcf',
+        token: await readSettings('token'),
       },
     })
   ).data
@@ -48,11 +48,17 @@ export const updateJson = async () => {
         ),
       }
 
-      const remain: any[] = new_order.content.map((x: any) => ({
-        warehouse: null,
-        product: x.sku_id,
-        quantity_add: x.quantity,
-      }))
+      const remain: any[] = (
+        await Promise.all(
+          new_order.content.map(async (x: any) => ({
+            warehouse: null,
+            product: await ProductModel.findOne({ article: x.sku_id }),
+            quantity_add: x.quantity,
+          }))
+        )
+      )
+        .filter(x => !!x.product)
+        .map(x => ({ ...x, product: x.product._id }))
 
       if (
         x.state_id === 'obabotan-dlya-do' ||

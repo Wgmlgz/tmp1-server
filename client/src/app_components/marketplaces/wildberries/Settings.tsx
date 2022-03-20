@@ -120,6 +120,10 @@ export default function Settings() {
             </Form.Item>
           </div>
 
+          <Form.Item label='Количество часов для выгрузки' name='update_time_h'>
+            <InputNumber placeholder='Количество часов для выгрузки' />
+          </Form.Item>
+
           <Form.Item label='API ключ' name='api_key'>
             <TextArea placeholder='API ключ' />
           </Form.Item>

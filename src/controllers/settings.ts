@@ -9,7 +9,9 @@ export const default_settings: any = {
   update_prices: '*/8 * * * *',
   update_prices_enabled: true,
   update_json: '*/8 * * * *',
+  update_time_h: 10,
   update_json_enabled: true,
+  token: 'no_token',
   api_key:
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NJRCI6ImE1Y2ZmMTE0LTFkZDktNDRhNy1iNzc1LWY4NDNiYWYxMjUzMiJ9.Q1MURJ627ZSoJhIaYBogFEA27SvQO5LRaXjPfpptQVU',
 }
