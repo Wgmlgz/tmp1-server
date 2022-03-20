@@ -195,6 +195,8 @@ export const wildberries_url = `${url}/api/wildberries`
 
 export const getWildBerriesProducts = () =>
   axios.get(`${wildberries_url}/products`, {})
+export const getWildBerriesAnalytics = (start: Date, end: Date) =>
+  axios.post(`${wildberries_url}/analytics`, { start, end })
 
 export const getWildberriesOrders = (
   status: string,
@@ -212,6 +214,8 @@ export const getWildberriesSettings = () =>
   axios.get(`${wildberries_url}/settings`)
 export const closeSupply = (e: string) =>
   axios.post(`${wildberries_url}/close_supply`, { supply: e })
+export const printSupply = (e: string) =>
+  axios.post(`${wildberries_url}/print_supply`, { supply: e })
 export const wbPrintStickers = (e: string[]) =>
   axios.post(`${wildberries_url}/print_stickers`, { ids: e })
 
@@ -285,7 +289,6 @@ export const restoreBackup = (backup: any) =>
 
 export const json_url = `${url}/api/json`
 
-export const getJsonProducts = () =>
-  axios.post(`${json_url}/products`)
+export const getJsonProducts = () => axios.post(`${json_url}/products`)
 export const getJsonCategories = () => axios.post(`${json_url}/categories`)
 export const getJsonStocks = () => axios.post(`${json_url}/stocks`)

@@ -27,6 +27,7 @@ import Notifications from './notifications/Notifications'
 import { NotificationFilled } from '@ant-design/icons'
 import axios from 'axios'
 import WarehousesJson from './warehouses/WarehousesJson'
+import { Analytics } from './warehouses/Analytics'
 
 const { Header, Content, Sider } = Layout
 const { SubMenu } = Menu
@@ -192,6 +193,11 @@ export default function Dashboard() {
                       Заказы
                     </Link>
                   </Menu.Item>
+                  <Menu.Item key='12' icon={<PicCenterOutlined />}>
+                    <Link to='/dashboard/marketplaces/wildberries/analytics'>
+                      Аналитика
+                    </Link>
+                  </Menu.Item>
                 </SubMenu>
               </SubMenu>
             )}
@@ -227,6 +233,10 @@ export default function Dashboard() {
               <Route
                 path='/marketplaces/wildberries/orders'
                 element={<Orders />}
+              />
+              <Route
+                path='/marketplaces/wildberries/analytics'
+                element={<Analytics />}
               />
             </Routes>
           </div>

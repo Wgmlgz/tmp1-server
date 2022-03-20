@@ -6,6 +6,7 @@ import { ColumnsType, TablePaginationConfig } from 'antd/lib/table'
 import {
   closeSupply,
   getWildberriesOrders,
+  printSupply,
   wbPrintStickers,
 } from '../../../api/api'
 import moment from 'moment'
@@ -268,7 +269,7 @@ const Orders = () => {
       tempLink.href = csvURL
       tempLink.setAttribute('download', res.data.data.name)
       tempLink.click()
-      
+
       message.success('Поставка закрыта')
     } catch (err) {
       if (axios.isAxiosError(err)) {
@@ -353,30 +354,75 @@ const Orders = () => {
                 <Button type='primary' htmlType='submit'>
                   Закрыть поставку
                 </Button>
-                <Button
-                  onClick={() => {
-                    exportExcel(
-                      selected_row_keys.map(i =>
-                        orders?.orders?.at(i as number)
-                      )
-                    )
-                  }}>
-                  Экспорт в Excel выделенных заказов
-                </Button>
-                <Button
-                  onClick={() => {
-                    setBarcodesCreation('selected')
-                  }}>
-                  Распечатать штрихкод на WB
-                </Button>
-                <Button
-                  onClick={() => {
-                    printStickers()
-                  }}>
-                  Распечатать стикеры заказов
+              </div>
+            </Form>
+            <Form
+              onFinish={async e => {
+                try {
+                  const res = await printSupply(e.supply)
+
+                  const file = await urltoFile(
+                    `data:text/plain;base64,${res.data.file}`,
+                    res.data.name,
+                    res.data.mimeType
+                  )
+                  var data = new Blob([file], { type: res.data.mimeType })
+                  var csvURL = window.URL.createObjectURL(data)
+                  const tempLink = document.createElement('a')
+                  tempLink.href = csvURL
+                  tempLink.setAttribute('download', res.data.name)
+                  tempLink.click()
+                  
+                  message.success('Поставка закрыта')
+                } catch (err) {
+                  if (axios.isAxiosError(err)) {
+                    message.error(err.response?.data)
+                  }
+                }
+              }}>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <Form.Item
+                  name='supply'
+                  required={true}
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}>
+                  <Select placeholder='Распечатать штрихкод поставки'>
+                    {orders.supplies &&
+                      orders.supplies.map(({ supplyId }) => (
+                        <Option value={supplyId}>{supplyId}</Option>
+                      ))}
+                  </Select>
+                </Form.Item>
+                <Button type='primary' htmlType='submit'>
+                  Распечатать штрихкод поставки
                 </Button>
               </div>
             </Form>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <Button
+                onClick={() => {
+                  exportExcel(
+                    selected_row_keys.map(i => orders?.orders?.at(i as number))
+                  )
+                }}>
+                Экспорт в Excel выделенных заказов
+              </Button>
+              <Button
+                onClick={() => {
+                  setBarcodesCreation('selected')
+                }}>
+                Распечатать штрихкод на WB
+              </Button>
+              <Button
+                onClick={() => {
+                  printStickers()
+                }}>
+                Распечатать стикеры заказов
+              </Button>
+            </div>
             <Table
               loading={loading}
               dataSource={orders.orders?.map((x, i) => ({ ...x, key: i }))}

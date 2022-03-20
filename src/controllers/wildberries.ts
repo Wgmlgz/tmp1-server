@@ -568,6 +568,29 @@ export const closeSupply = async (req: Request, res: Response) => {
   }
 }
 
+export const printSupply = async (req: Request, res: Response) => {
+  try {
+    const WILDBERRIES_API_KEY = await readSettings('api_key')
+    const wb_header = { headers: { Authorization: WILDBERRIES_API_KEY } }
+
+    const { supply } = req.body
+
+    const ans = await axios.get(
+      `${WILDBERRIES_URL}/api/v2/supplies/${supply}/barcode`,
+      {
+        ...wb_header,
+        params: {
+          type: 'pdf',
+        },
+      }
+    )
+    res.status(200).json(ans.data)
+  } catch (err: any) {
+    logger.error(err.message)
+    res.status(400).json(err.message)
+  }
+}
+
 export const printStickers = async (req: Request, res: Response) => {
   try {
     const WILDBERRIES_API_KEY = await readSettings('api_key')
@@ -582,6 +605,65 @@ export const printStickers = async (req: Request, res: Response) => {
     )
     res.status(200).json(ans.data)
   } catch (err: any) {
+    logger.error(err.message)
+    res.status(400).json(err.message)
+  }
+}
+
+export const getWildBerriesAnalytics = async (req: Request, res: Response) => {
+  try {
+    const WILDBERRIES_API_KEY = await readSettings('api_key')
+    const wb_header = { headers: { Authorization: WILDBERRIES_API_KEY } }
+
+    const { start, end } = req.body
+
+    console.log(start, end)
+
+    const range = await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
+      ...wb_header,
+      params: {
+        date_start: start,
+        date_end: end,
+        skip: 0,
+        take: 1000,
+      },
+    })
+    const last = await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
+      ...wb_header,
+      params: {
+        date_start: moment().subtract(30, 'd').toISOString(),
+        date_end: moment().toISOString(),
+        skip: 0,
+        take: 1000,
+      },
+    })
+
+    const ans = {
+      orders: 0,
+      sum: 0,
+      last: [] as string[],
+    }
+
+    ans.orders = range.data.total
+    ans.sum = range.data.orders.reduce((old: number, x: any) => {
+      return old + Number(x.totalPrice)
+    }, 0)
+
+    const map = new Map<string, { orders: number; sum: number }>()
+    last.data.orders.forEach((order: any) => {
+      const date = moment(order.dateCreated).format('DD.MM.YYYY')
+      map.set(date, {
+        orders: (map.get(date)?.orders ?? 0) + 1,
+        sum: (map.get(date)?.sum ?? 0) + Number(order.totalPrice),
+      })
+    })
+    ans.last = [...map.entries()].map(
+      ([date, { orders, sum }]) => `${date} - ${sum} руб - ${orders}`
+    )
+    res.status(200).json(ans)
+  } catch (err: any) {
+    console.log(err)
+
     logger.error(err.message)
     res.status(400).json(err.message)
   }
