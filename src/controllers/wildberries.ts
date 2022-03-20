@@ -76,6 +76,14 @@ export const getWildberriesOrders = async (req: Request, res: Response) => {
     let orders: any = { orders: [], total: 0 }
 
     if (status === 'new') {
+      const supplies = (
+        await axios.get(`${WILDBERRIES_URL}/api/v2/supplies`, {
+          ...wb_header,
+          params: {
+            status: 'ON_DELIVERY',
+          },
+        })
+      ).data.supplies
       orders = (
         await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
           ...wb_header,
@@ -90,6 +98,7 @@ export const getWildberriesOrders = async (req: Request, res: Response) => {
       orders.orders = orders.orders.filter(
         (order: { userStatus: number }) => order.userStatus === 4
       )
+      orders.supplies = supplies
     } else if (status === 'on_assembly') {
       orders = (
         await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
@@ -148,17 +157,19 @@ export const getWildberriesOrders = async (req: Request, res: Response) => {
       )
       orders = { orders, total: orders.length, supplies }
     } else if (status === 'on_delivery') {
+      const supplies = (
+        await axios.get(`${WILDBERRIES_URL}/api/v2/supplies`, {
+          ...wb_header,
+          params: {
+            status: 'ON_DELIVERY',
+          },
+        })
+      ).data.supplies
+
       orders = await Promise.all(
         (
           await Promise.all(
-            (
-              await axios.get(`${WILDBERRIES_URL}/api/v2/supplies`, {
-                ...wb_header,
-                params: {
-                  status: 'ON_DELIVERY',
-                },
-              })
-            ).data.supplies
+            supplies
               .map((supply: { supplyId: string }) => supply.supplyId)
               .map(async (supply: string) =>
                 (
@@ -189,7 +200,7 @@ export const getWildberriesOrders = async (req: Request, res: Response) => {
             supply,
           }))
       )
-      orders = { orders, total: orders.length }
+      orders = { orders, total: orders.length, supplies }
     } else if (status === 'all') {
       orders = (
         await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
@@ -617,8 +628,6 @@ export const getWildBerriesAnalytics = async (req: Request, res: Response) => {
 
     const { start, end } = req.body
 
-    console.log(start, end)
-
     const range = await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
       ...wb_header,
       params: {
@@ -662,9 +671,51 @@ export const getWildBerriesAnalytics = async (req: Request, res: Response) => {
     )
     res.status(200).json(ans)
   } catch (err: any) {
-    console.log(err)
-
     logger.error(err.message)
     res.status(400).json(err.message)
+  }
+}
+
+export const createSupply = async (req: Request, res: Response) => {
+  try {
+    const WILDBERRIES_API_KEY = await readSettings('api_key')
+    const wb_header = { headers: { Authorization: WILDBERRIES_API_KEY } }
+
+    const ans = await axios.post(
+      `${WILDBERRIES_URL}/api/v2/supplies`,
+      {},
+      wb_header
+    )
+    res.status(200).json('ok')
+  } catch (err: any) {
+    logger.error(err.message)
+    if (axios.isAxiosError(err)) {
+      res.status(400).json(err.response?.data?.errorText ?? err.message)
+    } else {
+      res.status(400).json(err.message)
+    }
+  }
+}
+
+export const putOrders = async (req: Request, res: Response) => {
+  try {
+    const WILDBERRIES_API_KEY = await readSettings('api_key')
+    const wb_header = { headers: { Authorization: WILDBERRIES_API_KEY } }
+
+    const { id, orders } = req.body
+
+    const ans = await axios.put(
+      `${WILDBERRIES_URL}/api/v2/supplies/${id}`,
+      { orders: orders.map((x: string) => String(x)) },
+      wb_header
+    )
+    res.status(200).json('ok')
+  } catch (err: any) {
+    logger.error(err.message)
+    if (axios.isAxiosError(err)) {
+      res.status(400).json(err.response?.data?.errorText ?? err.message)
+    } else {
+      res.status(400).json(err.message)
+    }
   }
 }

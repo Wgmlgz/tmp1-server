@@ -5,8 +5,10 @@ import axios from 'axios'
 import { ColumnsType, TablePaginationConfig } from 'antd/lib/table'
 import {
   closeSupply,
+  createSupply,
   getWildberriesOrders,
   printSupply,
+  putOrders,
   wbPrintStickers,
 } from '../../../api/api'
 import moment from 'moment'
@@ -24,6 +26,7 @@ interface IOrder {
   dateCreated: string
   img: string
   name: string
+  orderId: number
   totalPrice: number
   article: string
   barcodes: string[]
@@ -304,7 +307,63 @@ const Orders = () => {
             setStatus(e)
           }}>
           <TabPane tab='Новые заказы' key='new'>
+            <Form
+              onFinish={async e => {
+                try {
+                  await putOrders(
+                    e.supply,
+                    selected_row_keys.map(
+                      i => orders?.orders?.at(i as number)?.orderId
+                    ) as any[]
+                  )
+                  message.success('Поставка закрыта')
+                } catch (err) {
+                  if (axios.isAxiosError(err)) {
+                    message.error(err.response?.data)
+                  }
+                }
+              }}>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <Form.Item
+                  name='supply'
+                  required={true}
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}>
+                  <Select placeholder='Добавить заказы в поставку'>
+                    {orders.supplies &&
+                      orders.supplies.map(({ supplyId }) => (
+                        <Option value={supplyId}>{supplyId}</Option>
+                      ))}
+                  </Select>
+                </Form.Item>
+                <Button type='primary' htmlType='submit'>
+                  Добавить заказы в поставку
+                </Button>
+                <Button
+                  onClick={async () => {
+                    try {
+                      await createSupply()
+                      message.success('Поставка создана')
+                    } catch (err) {
+                      if (axios.isAxiosError(err)) {
+                        message.error(err.response?.data)
+                      }
+                    }
+                  }}>
+                  Создать поставку
+                </Button>
+              </div>
+            </Form>
             <Table
+              rowSelection={{
+                selectedRowKeys: selected_row_keys,
+                onChange: selectedRowKeys => {
+                  setSelectedRowKeys(selectedRowKeys)
+                },
+              }}
               dataSource={orders.orders?.map((x, i) => ({ ...x, key: i }))}
               columns={columns}
               pagination={{ ...pagination, pageSizeOptions: [100] }}
@@ -372,7 +431,7 @@ const Orders = () => {
                   tempLink.href = csvURL
                   tempLink.setAttribute('download', res.data.name)
                   tempLink.click()
-                  
+
                   message.success('Поставка закрыта')
                 } catch (err) {
                   if (axios.isAxiosError(err)) {
@@ -461,6 +520,51 @@ const Orders = () => {
                 }}>
                 Распечатать стикеры заказов
               </Button>
+              <Form
+                onFinish={async e => {
+                  try {
+                    const res = await printSupply(e.supply)
+
+                    const file = await urltoFile(
+                      `data:text/plain;base64,${res.data.file}`,
+                      res.data.name,
+                      res.data.mimeType
+                    )
+                    var data = new Blob([file], { type: res.data.mimeType })
+                    var csvURL = window.URL.createObjectURL(data)
+                    const tempLink = document.createElement('a')
+                    tempLink.href = csvURL
+                    tempLink.setAttribute('download', res.data.name)
+                    tempLink.click()
+
+                    message.success('Поставка закрыта')
+                  } catch (err) {
+                    if (axios.isAxiosError(err)) {
+                      message.error(err.response?.data)
+                    }
+                  }
+                }}>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <Form.Item
+                    name='supply'
+                    required={true}
+                    rules={[
+                      {
+                        required: true,
+                      },
+                    ]}>
+                    <Select placeholder='Распечатать штрихкод поставки'>
+                      {orders.supplies &&
+                        orders.supplies.map(({ supplyId }) => (
+                          <Option value={supplyId}>{supplyId}</Option>
+                        ))}
+                    </Select>
+                  </Form.Item>
+                  <Button type='primary' htmlType='submit'>
+                    Распечатать штрихкод поставки
+                  </Button>
+                </div>
+              </Form>
             </div>
             <Table
               loading={loading}

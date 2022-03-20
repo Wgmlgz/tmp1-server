@@ -219,6 +219,11 @@ export const printSupply = (e: string) =>
 export const wbPrintStickers = (e: string[]) =>
   axios.post(`${wildberries_url}/print_stickers`, { ids: e })
 
+export const putOrders = (id: string, orders: string[]) =>
+  axios.post(`${wildberries_url}/put_orders`, { id, orders })
+export const createSupply = () =>
+  axios.post(`${wildberries_url}/create_supply`, {})
+
 export const runUpdateWildberriesStocks = () =>
   axios.get(`${wildberries_url}/update`)
 export const runRefreshOrders = () =>

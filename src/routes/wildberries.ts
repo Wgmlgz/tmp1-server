@@ -13,6 +13,8 @@ import {
   printSupply,
   printStickers,
   getWildBerriesAnalytics,
+  createSupply,
+  putOrders,
 } from '../controllers/wildberries'
 import { authenticateAdmin, authenticateSuperAdmin } from '../controllers/auth'
 
@@ -31,5 +33,7 @@ router.get('/update_orders', authenticateAdmin, runRefreshOrdeers)
 router.post('/update_discount', authenticateAdmin, updateDiscount)
 router.post('/update_price', authenticateAdmin, updatePrice)
 router.get('/check', authenticateAdmin, checkWildberriesConnection)
+router.post('/create_supply', authenticateAdmin, createSupply)
+router.post('/put_orders', authenticateAdmin, putOrders)
 
 export default router
