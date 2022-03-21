@@ -28,6 +28,8 @@ import {
   updateJsonTask,
   updateStocksTask,
 } from './util/tasks'
+import RemainModel from './models/remains'
+import ProductModel from './models/product'
 
 let dir = './upload/categories'
 if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
@@ -87,6 +89,14 @@ mongoose
       updatePricesTask()
       updateJsonTask()
       updateStocksTask()
+      
+      ;(await RemainModel.find({})).forEach(async i => {
+        if (!(await mongoose.isValidObjectId(i.product))) {
+          console.log('delete:', i.product)
+
+          await ProductModel.findByIdAndDelete(i.id)
+        }
+      })
     } catch (err: any) {
       logger.error(err.message)
     }
