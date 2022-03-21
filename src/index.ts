@@ -92,9 +92,9 @@ mongoose
       
       ;(await RemainModel.find({})).forEach(async i => {
         if (!(await mongoose.isValidObjectId(i.product))) {
-          console.log('delete:', i.product)
+          console.log('delete:', i._id)
 
-          await ProductModel.findByIdAndDelete(i.id)
+          await RemainModel.findByIdAndDelete(i._id)
         }
       })
     } catch (err: any) {
