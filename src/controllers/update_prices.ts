@@ -55,6 +55,7 @@ export const updatePrices = async () => {
 
         target_price = Math.ceil(target_price)
         console.log(db_price, target_price)
+        return
         
 
         if (real_price >= target_price) return
