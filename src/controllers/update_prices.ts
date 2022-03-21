@@ -42,7 +42,11 @@ export const updatePrices = async () => {
 
         let target_price = db_price
 
+        console.log(prices);
+        
         for (let i = 0; i < prices.length; ++i) {
+          console.log(db_price, Number(prices[i].price), Number(prices[i].modifier))
+          
           if (db_price <= Number(prices[i].price)) {
             target_price = db_price * Number(prices[i].modifier)
             break
@@ -50,6 +54,8 @@ export const updatePrices = async () => {
         }
 
         target_price = Math.ceil(target_price)
+        console.log(db_price, target_price)
+        
 
         if (real_price >= target_price) return
 
