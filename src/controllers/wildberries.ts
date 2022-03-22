@@ -80,7 +80,7 @@ export const getWildberriesOrders = async (req: Request, res: Response) => {
         await axios.get(`${WILDBERRIES_URL}/api/v2/supplies`, {
           ...wb_header,
           params: {
-            status: 'ON_DELIVERY',
+            status: 'ACTIVE',
           },
         })
       ).data.supplies
