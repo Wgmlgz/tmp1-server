@@ -652,7 +652,7 @@ export const getWildBerriesAnalytics = async (req: Request, res: Response) => {
 
     ans.orders = range.data.total
     ans.sum = range.data.orders.reduce((old: number, x: any) => {
-      return old + Number(x.totalPrice)
+      return old + Number(x.totalPrice) / 100
     }, 0)
 
     const map = new Map<string, { orders: number; sum: number }>()
@@ -660,7 +660,7 @@ export const getWildBerriesAnalytics = async (req: Request, res: Response) => {
       const date = moment(order.dateCreated).format('DD.MM.YYYY')
       map.set(date, {
         orders: (map.get(date)?.orders ?? 0) + 1,
-        sum: (map.get(date)?.sum ?? 0) + Number(order.totalPrice),
+        sum: (map.get(date)?.sum ?? 0) + Number(order.totalPrice) / 100,
       })
     })
     ans.last = [...map.entries()].map(
