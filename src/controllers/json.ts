@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import CategoryModel from '../models/category'
 import ProductModel from '../models/product'
 import RemainModel from '../models/remains'
+import WarehouseModel from '../models/warehouse'
 import logger from '../util/logger'
 import { readSettings } from './settings'
 
@@ -78,10 +79,23 @@ export const getJsonProducts = async (req: Request, res: Response) => {
           category,
           brand,
           country,
+          addresses,
         }) => ({
           id,
           sku: article,
           name,
+          addresses: addresses
+            ? Object.fromEntries(
+                await Promise.all(
+                  [...(addresses as any).entries()].map(
+                    async ([id, val]: any) => [
+                      (await WarehouseModel.findById(id))?.name,
+                      val,
+                    ]
+                  )
+                )
+              )
+            : null,
           description,
           sebes_price: Number(buy_price) + Number(delivery_price),
           sell_price: (Number(buy_price) + Number(delivery_price)) * sell_price,
