@@ -106,6 +106,7 @@ const Products = () => {
 
   /** maps product_id to warehouse-count */
   const [remains_map, setRemainsMap] = useState(new Map<string, string>())
+  const [warehouses_map, setWarehouses] = useState(new Map<string, string>())
 
   const [pagination, setPagination] = useState<TablePaginationConfig>({})
   // fetch
@@ -153,6 +154,7 @@ const Products = () => {
           warehouse.name,
         ])
       )
+      setWarehouses(warehouses_map)
 
       const remains_res = await getRemains()
 
@@ -226,6 +228,21 @@ const Products = () => {
         ),
       },
       {
+        title: 'Адресса',
+        dataIndex: 'addresses',
+        key: 'addresses',
+        render: (text, record, index) => (
+          <div>
+            {record?.addresses &&
+              Object.entries(record?.addresses)?.map(([id, val]) => (
+                <p key={id}>
+                  {warehouses_map.get(id) ?? 'загрузка...'} - {val}
+                </p>
+              ))}
+          </div>
+        ),
+      },
+      {
         title: 'Закупочная цена',
         dataIndex: 'buy_price',
         key: 'buy_price',
@@ -296,7 +313,7 @@ const Products = () => {
         ),
       },
     ],
-    [search_query]
+    [search_query, warehouses_map]
   )
 
   // const fetchProductsPagination = async (pagination: TablePaginationConfig) => {
@@ -521,7 +538,7 @@ const Products = () => {
                       </Menu.Item>
                     </Menu>
                   }>
-                  <Button type='text' style={{ margin: '-10px'}}>
+                  <Button type='text' style={{ margin: '-10px' }}>
                     опции
                   </Button>
                 </Dropdown>
@@ -691,7 +708,6 @@ const Products = () => {
             )}
           </div>
           <br />
-
           <Table
             rowSelection={{
               selectedRowKeys: selected_row_keys,

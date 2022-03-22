@@ -164,9 +164,9 @@ const ProductsForm: FC<Props> = ({
       yt2,
       yt3,
     } = e
-    console.log(e);
+    console.log(e)
 
-    console.log(update_price);
+    console.log(update_price)
 
     try {
       const videos = [yt1, yt2, yt3].filter(x => x)
@@ -527,11 +527,8 @@ const ProductsForm: FC<Props> = ({
                   <Form.Item
                     label='Разрешать автоматический подгон цен на маркетплейсах'
                     name='update_price'
-                    valuePropName='checked'
-                  >
-                    <Checkbox
-                      defaultChecked={product?.update_price ?? true}
-                    />
+                    valuePropName='checked'>
+                    <Checkbox defaultChecked={product?.update_price ?? true} />
                   </Form.Item>
                 </Panel>
                 <Panel header='Размеры' key='5'>
@@ -630,7 +627,7 @@ const ProductsForm: FC<Props> = ({
               {onRemove && (
                 <Form.Item style={{ flexGrow: 1 }}>
                   <Popconfirm
-                    onCancel={() => { }}
+                    onCancel={() => {}}
                     onConfirm={onRemove}
                     title={`Вы точно хотите безвозвратно удалить товар?`}
                     okText='Да'
