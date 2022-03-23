@@ -52,7 +52,7 @@ export const updateJson = async () => {
         await Promise.all(
           new_order.content.map(async (x: any) => ({
             warehouse: null,
-            product: await ProductModel.findOne({ article: x.sku_id }),
+            product: await ProductModel.findOne({ article: x.sku_code }),
             quantity_add: x.quantity,
           }))
         )
