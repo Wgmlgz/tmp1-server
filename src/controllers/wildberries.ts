@@ -634,15 +634,6 @@ export const getWildBerriesAnalytics = async (req: Request, res: Response) => {
         take: 1000,
       },
     })
-    const last = await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
-      ...wb_header,
-      params: {
-        date_start: moment().subtract(30, 'd').toISOString(),
-        date_end: moment().toISOString(),
-        skip: 0,
-        take: 1000,
-      },
-    })
 
     const ans = {
       orders: 0,
@@ -654,20 +645,35 @@ export const getWildBerriesAnalytics = async (req: Request, res: Response) => {
     ans.sum = range.data.orders.reduce((old: number, x: any) => {
       return old + Number(x.totalPrice) / 100
     }, 0)
-
     const map = new Map<string, { orders: number; sum: number }>()
-    last.data.orders.forEach((order: any) => {
-      const date = moment(order.dateCreated).format('DD.MM.YYYY')
-      map.set(date, {
-        orders: (map.get(date)?.orders ?? 0) + 1,
-        sum: (map.get(date)?.sum ?? 0) + Number(order.totalPrice) / 100,
+    for (let i = 0; i < 10; ++i) {
+      const last = await axios.get(`${WILDBERRIES_URL}/api/v2/orders`, {
+        ...wb_header,
+        params: {
+          date_start: moment().subtract(30, 'd').toISOString(),
+          date_end: moment().toISOString(),
+          skip: i * 1000,
+          take: 1000,
+        },
       })
-    })
+
+      last.data.orders.forEach((order: any) => {
+        console.log(order.dateCreated)
+
+        const date = moment(order.dateCreated).format('DD.MM.YYYY')
+        map.set(date, {
+          orders: (map.get(date)?.orders ?? 0) + 1,
+          sum: (map.get(date)?.sum ?? 0) + Number(order.totalPrice) / 100,
+        })
+      })
+    }
     ans.last = [...map.entries()].map(
-      ([date, { orders, sum }]) => `${date} - ${sum} руб - ${orders}`
+      ([date, { orders, sum }]) => `${date} - ${Math.round(sum)} руб - ${orders}`
     )
     res.status(200).json(ans)
   } catch (err: any) {
+    console.log(err);
+    
     logger.error(err.message)
     res.status(400).json(err.message)
   }

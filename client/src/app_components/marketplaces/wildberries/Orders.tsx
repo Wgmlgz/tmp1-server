@@ -492,10 +492,10 @@ const Orders = () => {
                 },
               }}
               columns={columns}
-              pagination={{ ...pagination, pageSizeOptions: [100] }}
-              onChange={pagination => {
-                // fetchProducts(pagination)
-              }}
+              // pagination={{ ...pagination, pageSizeOptions: [100] }}
+              // onChange={pagination => {
+              //   // fetchProducts(pagination)
+              // }}
             />
           </TabPane>
           <TabPane tab='Заказы в пути' key='on_delivery'>
@@ -576,10 +576,10 @@ const Orders = () => {
               }}
               dataSource={orders.orders?.map((x, i) => ({ ...x, key: i }))}
               columns={columns}
-              pagination={{ ...pagination, pageSizeOptions: [100] }}
-              onChange={pagination => {
-                // fetchProducts(pagination)
-              }}
+              // pagination={{ ...pagination, pageSizeOptions: [100] }}
+              // onChange={pagination => {
+              //   // fetchProducts(pagination)
+              // }}
             />
           </TabPane>
           <TabPane tab='Все' key='all'>
